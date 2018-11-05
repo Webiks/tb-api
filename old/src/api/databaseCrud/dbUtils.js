@@ -18,7 +18,7 @@ const removeLayer = (layerId, worldId) => {
 	// return dbWorldCrud.getAll().then(worlds => worlds.filter(world => world._id !== worldId))
 	return dbWorldCrud.getworlds({ _id: !worldId })
 		.then(worlds => {
-			console.log("removeLayer worlds: " + JSON.stringify(worlds));
+			console.log('removeLayer worlds: ' + JSON.stringify(worlds));
 			// 2. check if a giving layer exists in another world
 			const isLayerExist = worlds.some(world => world.layersId.some(id => id === layerId));
 			console.log('isLayerExist: ', isLayerExist);

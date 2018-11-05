@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const http = require ('http');
+const http = require('http');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const bodyParser = require('body-parser');
@@ -25,12 +25,12 @@ DBManager.connect(url);
 
 // define the session
 app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    secure: false
-  }
+	secret: 'keyboard cat',
+	resave: false,
+	saveUninitialized: true,
+	cookie: {
+		secure: false
+	}
 }));
 
 app.use('/login', login);
@@ -42,11 +42,11 @@ server.listen(configParams.serverPort, () => console.log('listen to ', configPar
 
 // stop the App server
 function stop() {
-    server.close();
+	server.close();
 }
 
 module.exports = {
-    stop,
-    server: server,
-    app: app
+	stop,
+	server: server,
+	app: app
 };
