@@ -2,6 +2,7 @@ const gsUtils = require('../geoserverCrud/gsUtils');
 const worldModel = require('../../database/schemas/WorldSchema');
 const layerModel = require('../../database/schemas/LayerSchema');
 const MongoCrud = require('../../database/MongoCrud');
+require('../fs/fileMethods')();
 
 const dbWorldCrud = new MongoCrud(worldModel);
 const dbLayerCrud = new MongoCrud(layerModel);
@@ -15,8 +16,7 @@ const handleError = (res, status, consoleMessage, sendMessage) => {
 // remove the layer only if it doesn't exist in another world (from the DataBase and from Geosewrver)
 const removeLayer = (layerId, worldId) => {
 	// 1. get all the worlds except to the current world
-	// return dbWorldCrud.getAll().then(worlds => worlds.filter(world => world._id !== worldId))
-	return dbWorldCrud.getworlds({ _id: !worldId })
+	return dbWorldCrud.getListByQuery({ _id: !worldId })
 		.then(worlds => {
 			console.log("removeLayer worlds: " + JSON.stringify(worlds));
 			// 2. check if a giving layer exists in another world
@@ -36,12 +36,14 @@ const removeLayer = (layerId, worldId) => {
 								worldId: worldId,
 								resourceUrl: layer.layer.resource.href,
 								storeUrl: layer.data.store.href,
-								type: layer.fileType
+								type: layer.fileType,
+								path: layer.fileData.splitPath
 							};
 						} else {
 							removedLayerData = {
 								worldId: worldId,
-								type: layer.fileType
+								type: layer.fileType,
+								path: layer.filePath
 							};
 						}
 						console.log(`removedLayerData: ${JSON.stringify(removedLayerData)}`);
@@ -51,21 +53,25 @@ const removeLayer = (layerId, worldId) => {
 								console.log(`removeLayerById: ${layerId}`);
 								return removedLayerData;
 							})
-							.then(removedLayerData => {
-								if (removedLayerData.type !== 'image') {
-									// d. if it isn't an image - delete the layer from GeoServer:
-									console.log('dbLayers remove layer: d. start to delete layer from the GeoServer!');
-									return gsUtils.removeLayerFromGeoserver(removedLayerData.resourceUrl, removedLayerData.storeUrl)
-										.then(() => {
-											console.log('dbLayers remove layer: e. deleted the store: ', removedLayerData.storeUrl);
-											return 'succeed to remove the file!';
-										});
-								} else {
-									console.log('succeed to remove an image file!');
-									return 'succeed to remove an image file!';
-								}
-							});
-					});
+					})
+                    .then(removedLayerData => {
+                    	// d. remove the files from the file system
+                        if (removedLayerData.path){
+                            removeFile(removedLayerData.path);
+                        }
+                        // e. if it isn't an image - delete the layer from GeoServer:
+                        if (removedLayerData.type !== 'image') {
+                            console.log('dbLayers remove layer: e. start to delete layer from the GeoServer!');
+                            return gsUtils.removeLayerFromGeoserver(removedLayerData.resourceUrl, removedLayerData.storeUrl)
+                                .then(() => {
+                                    console.log('dbLayers remove layer: f. deleted the store: ', removedLayerData.storeUrl);
+                                    return 'succeed to remove the file!';
+                                });
+                        } else {
+                            console.log('succeed to remove an image file!');
+                            return 'succeed to remove an image file!';
+                        }
+                    });
 			} else {
 				return `succeed to remove '${layerId} layer from '${worldId} world!`;
 			}
