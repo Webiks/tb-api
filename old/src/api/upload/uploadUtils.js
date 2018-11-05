@@ -61,9 +61,6 @@ const uploadFiles = (req, res) => {
 			// add the local file to the zip file
 			zip.addLocalFile(newFile.encodePathName);
 
-			// remove the original file that was added to the zip file
-			// fs.removeSync(newFile.encodePathName);
-
 			return newFile;
 		});
 
