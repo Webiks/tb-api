@@ -45,18 +45,6 @@ module.exports = function () {
 		}
 	};
 
-	this.removeFile = (filePath) => {
-		fs.remove(filePath, err => {
-			console.log('start removing a file...');
-			if (err) {
-				return console.error(err);
-			} else {
-				console.log(`the file '${filePath}' was removed!'`);
-				return 'ok';
-			}
-		});
-	};
-
 	this.fileToZip = (filename, uploadPath) => {
 		// define the layers parameters for the zip operation
 		return [

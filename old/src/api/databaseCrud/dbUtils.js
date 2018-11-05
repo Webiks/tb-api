@@ -2,7 +2,7 @@ const gsUtils = require('../geoserverCrud/gsUtils');
 const worldModel = require('../../database/schemas/WorldSchema');
 const layerModel = require('../../database/schemas/LayerSchema');
 const MongoCrud = require('../../database/MongoCrud');
-require('../fs/fileMethods')();
+const fs = require('fs-extra');
 
 const dbWorldCrud = new MongoCrud(worldModel);
 const dbLayerCrud = new MongoCrud(layerModel);
@@ -57,7 +57,7 @@ const removeLayer = (layerId, worldId) => {
                     .then(removedLayerData => {
                     	// d. remove the files from the file system
                         if (removedLayerData.path){
-                            removeFile(removedLayerData.path);
+                            fs.removeSync(removedLayerData.path);
                         }
                         // e. if it isn't an image - delete the layer from GeoServer:
                         if (removedLayerData.type !== 'image') {
