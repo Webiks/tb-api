@@ -62,7 +62,7 @@ const uploadFiles = (req, res) => {
 			zip.addLocalFile(newFile.encodePathName);
 
 			// remove the original file that was added to the zip file
-			removeFile(newFile.encodePathName);
+			fs.removeSync(newFile.encodePathName);
 
 			return newFile;
 		});
@@ -81,7 +81,7 @@ const uploadFiles = (req, res) => {
 	} else {
 		// upload the file to GeoServer
 		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
-        res.send(returnFiles(files, path));
+		res.send(returnFiles(files, path));
 	}
 };
 
@@ -114,7 +114,7 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 const returnFiles = (files, path) => {
 	console.log('upload files: ', JSON.stringify(files));
 	// remove the files from the local store
-	removeFile(path);
+	fs.removeSync(path);
 	// if ZIP files: remove the zip file
 	// send the path in the return files object to remove the zip directory after uploading the layer in geoserver
 	const splitPath = path.split('.');
@@ -124,7 +124,7 @@ const returnFiles = (files, path) => {
 				file.splitPath = splitPath[0].trim();
 			} else {
 				file.splitPath = null;
-				removeFile(splitPath[0]);
+				fs.removeSync(splitPath[0]);
 			}
 		});
 	} else {
