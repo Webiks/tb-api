@@ -173,4 +173,3 @@ router.delete('/delete/:worldId/:layerId', (req, res) => {
 });
 
 module.exports = router;
-
