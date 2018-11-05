@@ -52,26 +52,26 @@ const removeLayer = (layerId, worldId) => {
 							.then(() => {
 								console.log(`removeLayerById: ${layerId}`);
 								return removedLayerData;
-							})
+							});
 					})
-                    .then(removedLayerData => {
-                    	// d. remove the files from the file system
-                        if (removedLayerData.path){
-                            fs.removeSync(removedLayerData.path);
-                        }
-                        // e. if it isn't an image - delete the layer from GeoServer:
-                        if (removedLayerData.type !== 'image') {
-                            console.log('dbLayers remove layer: e. start to delete layer from the GeoServer!');
-                            return gsUtils.removeLayerFromGeoserver(removedLayerData.resourceUrl, removedLayerData.storeUrl)
-                                .then(() => {
-                                    console.log('dbLayers remove layer: f. deleted the store: ', removedLayerData.storeUrl);
-                                    return 'succeed to remove the file!';
-                                });
-                        } else {
-                            console.log('succeed to remove an image file!');
-                            return 'succeed to remove an image file!';
-                        }
-                    });
+					.then(removedLayerData => {
+						// d. remove the files from the file system
+						if (removedLayerData.path) {
+							fs.removeSync(removedLayerData.path);
+						}
+						// e. if it isn't an image - delete the layer from GeoServer:
+						if (removedLayerData.type !== 'image') {
+							console.log('dbLayers remove layer: e. start to delete layer from the GeoServer!');
+							return gsUtils.removeLayerFromGeoserver(removedLayerData.resourceUrl, removedLayerData.storeUrl)
+								.then(() => {
+									console.log('dbLayers remove layer: f. deleted the store: ', removedLayerData.storeUrl);
+									return 'succeed to remove the file!';
+								});
+						} else {
+							console.log('succeed to remove an image file!');
+							return 'succeed to remove an image file!';
+						}
+					});
 			} else {
 				return `succeed to remove '${layerId} layer from '${worldId} world!`;
 			}
