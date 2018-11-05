@@ -1,7 +1,7 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const fs = require('fs-extra');
-require('../fs/fileMethods')();
+// require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
 
 require('../../config/serverConfig')();
@@ -18,18 +18,20 @@ class UploadFilesToFS {
 
 		if (files.length !== 0) {
 			// 1. creating a new directory by the name of the workspace(form geoserver - if not exist)
-			const dirPath = `${configUrl.uploadUrlRelativy}/${worldId}`;
-			console.log(`UploadFilesToFS: dir path = ${dirPath}`);
-			createDir(dirPath);
-			console.log(`the '${dirPath}' directory was created!`);
+			// const dirPath = `${configUrl.uploadUrlRelativy}/${worldId}`;
+			// console.log(`UploadFilesToFS: dir path = ${dirPath}`);
+			// createDir(dirPath);
+			// console.log(`the '${dirPath}' directory was created!`);
 
 			// 2. move the files into the directory
 			const images = files.map(file => {
-				const filePath = `${dirPath}/${file.name}`;
+				// const filePath = `${dirPath}/${file.name}`;
+				const filePath = `${configUrl.uploadUrlRelativy}/${file.name}`;
 				console.log(`filePath: ${filePath}`);
 				fs.renameSync(file.filePath, filePath);
 				console.log(`the '${file.name}' was rename!`);
-				const fullPath = `${configUrl.uploadUrl}/${worldId}/${file.name}`;
+				const fullPath = `${configUrl.uploadUrl}/${file.name}`;
+				// const fullPath = `${configUrl.uploadUrl}/${worldId}/${file.name}`;
 
 				// 3. set the file Data from the upload file
 				const fileData = setFileData(file);

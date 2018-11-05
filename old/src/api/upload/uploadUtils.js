@@ -62,7 +62,7 @@ const uploadFiles = (req, res) => {
 			zip.addLocalFile(newFile.encodePathName);
 
 			// remove the original file that was added to the zip file
-			fs.removeSync(newFile.encodePathName);
+			// fs.removeSync(newFile.encodePathName);
 
 			return newFile;
 		});
@@ -113,18 +113,22 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 
 const returnFiles = (files, path) => {
 	console.log('upload files: ', JSON.stringify(files));
-	// remove the files from the local store
+	// remove the zip file from the temporary uploads directory
 	fs.removeSync(path);
-	// if ZIP files: remove the zip file
-	// send the path in the return files object to remove the zip directory after uploading the layer in geoserver
+	// if ZIP files: remove the zip directory
 	const splitPath = path.split('.');
 	if (splitPath[1] === 'zip') {
 		files.map(file => {
-			if (file.fileType.toLowerCase() === 'vector') {
+			if (file.fileType === 'vector') {
 				file.splitPath = splitPath[0].trim();
 			} else {
 				file.splitPath = null;
+				// remove the zip directory
 				fs.removeSync(splitPath[0]);
+			}
+			// remove files from the temporary uploads directory
+			if (file.fileType !== 'image') {
+				fs.removeSync(file.encodePathName);
 			}
 		});
 	} else {
