@@ -1,0 +1,30 @@
+x-swagger-router-controller: ansyn
+
+get:
+  description: Returns 'Hello' to the caller
+  # used as the method name of the controller
+  operationId: hello
+
+post:
+  tags:
+  - Ansyn
+  description: Upload image file.
+  # used as the method name of the controller
+  operationId: uploadImage
+#  parameters:
+#  - name: worldId
+#      description: Id of world.
+#      in: body
+#      required: true
+#      type: string
+#  - name: files
+#      description: Image files
+#      in: formData
+#      required: true
+#      type: array
+#        items:
+#          type: file
+
+  responses:
+    "200":
+      description: Success, Overlay
