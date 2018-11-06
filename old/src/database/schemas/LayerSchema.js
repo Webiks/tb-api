@@ -202,7 +202,6 @@ const fileData = {
 
 // IMAGE DATA: metadata of the upload JPG image
 const imageData = {
-	// imageName: { type: String, unique: true },   	 // the original image file name
 	ImageDescription: String,
 	Make: String,
 	Model: String,

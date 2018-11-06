@@ -13,9 +13,37 @@ const handleError = (res, status, consoleMessage, sendMessage) => {
 	res.status(status).send(sendMessage);
 };
 
+// get the layer and remove it
+const findAndRemoveLayer = (layerId, worldId) => {
+	console.log(`start find and remove layer: ${layerId}`);
+	dbLayerCrud.get({ _id: layerId })
+		.then(layer => {
+			if (layer.fileType === 'image'){
+				return {
+					worldId,
+					layerId: layer._id,
+					layerName: layer.name,
+					type: layer.fileType,
+					path: layer.filePath
+				};
+			} else {
+				return {
+					worldId,
+					layerId: layer._id,
+					layerName: layer.name,
+					type: layer.fileType,
+					resourceUrl: layer.layer.resource.href,
+					storeUrl: layer.data.store.href,
+					path: layer.fileData.splitPath
+				};
+			}
+		})
+		.then(removedLayer => removeLayer(removedLayer, worldId, false));
+};
+
 // remove the layer only if it doesn't exist in another world (from the DataBase and from Geosewrver)
-const removeLayer = (removedLayer, worldId) => {
-	console.log('removedLayer: ' + JSON.stringify(removedLayer));
+const removeLayer = (removedLayer, worldId, removeFromGeoserver) => {
+	console.log('removedLayer: ', JSON.stringify(removedLayer));
 	// 1. get all the worlds except to the current world
 	return dbWorldCrud.getListByQuery({ _id: { $not: { $eq: worldId } }})
 		.then(worlds => {
@@ -27,10 +55,15 @@ const removeLayer = (removedLayer, worldId) => {
 			if (!isLayerExist) {
 				console.log('start to remove layer: ', removedLayer.layerId);
 				// a. remove the layer from the Layers list in the DataBase
-				return removeLayerFromDB(removedLayer.layerId, removedLayer.path)
+				let path = removedLayer.path;
+				if (removedLayer.type === 'image'){
+					path = path.substring(0,removedLayer.path.lastIndexOf('/'));
+				}
+				console.log('dbUtils removeLayer path: ', path);
+				return removeLayerFromDB(removedLayer.layerId, path)
 					.then ( () => {
 						// b. if it isn't an image - delete the layer from GeoServer:
-						if (removedLayer.type !== 'image') {
+						if (removeFromGeoserver) {
 							return removeLayerFromGeoServer(removedLayer);
 						}
 					});
@@ -47,20 +80,19 @@ const removeLayerFromDB = (layerId, path) => {
 		.then(() => {
 			console.log(`removeLayerById: ${layerId}`);
 			// 2. remove from the file system
-			const dir = path.substring(0,path.lastIndexOf('/'));
-			console.log(`path: ${dir}`);
-			if (dir) {
-				fs.removeSync(dir);
+			if (path) {
+				return fs.removeSync(path);
 			}
 		});
 };
 
 const removeLayerFromGeoServer = (layer) => {
-		console.log('dbLayers remove layer: start to delete layer from the GeoServer!');
+		console.log('dbUtils remove layer: start to delete layer from the GeoServer!');
 		return gsUtils.removeLayerFromGeoserver(layer.resourceUrl, layer.storeUrl);
 };
 
 module.exports = {
 	handleError,
+	findAndRemoveLayer,
 	removeLayer
 };
