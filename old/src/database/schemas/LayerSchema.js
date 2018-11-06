@@ -202,7 +202,7 @@ const fileData = {
 
 // IMAGE DATA: metadata of the upload JPG image
 const imageData = {
-	imageName: { type: String, unique: true },   	 // the original image file name
+	// imageName: { type: String, unique: true },   	 // the original image file name
 	ImageDescription: String,
 	Make: String,
 	Model: String,
@@ -276,7 +276,7 @@ const inputData = {
 
 // create the World-Layer Schema
 const LayerSchema = new Schema({
-	// _id: { type: String },       			 		 		 // the original layer name (?)
+	_id: { type: String },         				   		 	 // get the id from uuid function
 	name: String,                                  // from GeoServer
 	href: String,                                  // href to the Layer page
 	fileName: String,

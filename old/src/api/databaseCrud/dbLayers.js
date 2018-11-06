@@ -156,13 +156,15 @@ router.put('/:layerId/:fieldName', (req, res) => {
 // delete a layer from World's Layers list in the Database and from the geoserver
 router.delete('/delete/:worldId/:layerId', (req, res) => {
 	console.log(`db LAYER SERVER: start DELETE layer: ${req.params.layerId}`);
+	console.log(`db LAYER SERVER: req body: ${req.body}`);
 	const layerId = req.params.layerId;
 	const worldId = req.params.worldId;
+	const removedLayer = req.body;
 	// 1. remove the layer's Id from the world's layersId array
 	dbWorldCrud.updateField({ _id: worldId }, { layersId: layerId }, 'removeFromArray')
 		.then(() => {
 			// 2. remove the layer if it doesn't exist in another worlds
-			return dbUtils.removeLayer(layerId, worldId)
+			return dbUtils.removeLayer(removedLayer, worldId)
 				.then(response => res.send(response));
 		})
 		.catch(error => {
