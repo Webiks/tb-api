@@ -1,0 +1,30 @@
+x-swagger-router-controller: ansyn
+
+post:
+  tags:
+  - Ansyn
+  description: Upload image file.
+  operationId: uploadImage
+  consumes:
+  - multipart/form-data
+  parameters:
+  - name: worldId
+    description: id of the world
+    in: path
+    default: public
+    type: string
+  - name: file
+    type: file
+    description: login by auth token
+    in: formData
+    required: true
+  responses:
+    "200":
+      description: Upload Success
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
+    default:
+      description: Error
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
+

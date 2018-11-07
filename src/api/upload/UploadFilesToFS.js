@@ -3,9 +3,9 @@ const exif = require('exif-parser');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
+const { configBaseUrl } = require('../../../config/serverConfig');
 
-require('../../config/serverConfig')();
-const configUrl = configBaseUrl().configUrl;
+const { configUrl } = configBaseUrl;
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -103,7 +103,7 @@ class UploadFilesToFS {
 			const parser = exif.create(buffer);
 			const result = parser.parse();
 			const imageData = result.tags;
-			file.fileData.fileCreatedDate = new Date(imageData.ModifyDate).toISOString();
+			file.fileData.fileCreatedDate = new Date(imageData.ModifyDate || Date.now()).toISOString();
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };
 		}
@@ -111,7 +111,7 @@ class UploadFilesToFS {
 		// set the geoData from the image GPS
 		function setGeoData(layer) {
 			// set the center point
-			const centerPoint = [layer.imageData.GPSLongitude, layer.imageData.GPSLatitude];
+			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
 			console.log('setGeoData center point: ' + JSON.stringify(centerPoint));
 			// get the Bbox
 			const bbox = getBbboxFromPoint(centerPoint, 200);

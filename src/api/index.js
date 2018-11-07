@@ -4,7 +4,7 @@ const dbWorlds = require('./databaseCrud/dbWorlds');
 const dbLayers = require('./databaseCrud/dbLayers');
 const uploadFiles = require('./upload/uploadFiles');
 const fileSystem = require('./fs/fileSystem');
-const ansyn = require('./ansyn');
+const ansyn = require('./ansyn/index');
 
 
 router.use('/dbworlds', dbWorlds);

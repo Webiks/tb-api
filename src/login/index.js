@@ -1,12 +1,9 @@
 const express = require('express');
 const checkAuth = require('./check-auth');
 const router = express.Router();
-const mongoose = require('mongoose');
+const { configParams } = require('../../config/serverConfig');
 
 router.post('/checkAuth', checkAuth, (req, res) => res.send('o.k'));
-
-require('../config/serverConfig')();
-const configParams = config().configParams;
 
 function isEqual(str1 = '', srt2 = '') {
 	return str1.trim().toLowerCase() === srt2.trim().toLowerCase();

@@ -1,9 +1,7 @@
 const axios = require('axios');
 
-require('../../config/serverConfig')();
-
-const configParams = config().configParams;
-const configUrl = configBaseUrl().configUrl;
+const { configParams, configBaseUrl } = require('../../../config/serverConfig');
+const { configUrl } = configBaseUrl;
 const headers = configParams.headers;
 
 class GsWorlds {

@@ -1,18 +1,16 @@
 const fs = require('fs-extra');
 const path = require('path');
-
-require('../../config/serverConfig')();
-const configParams = config().configParams;
+const { uploadPath } = require('../upload/uploadUtils');
+const { configParams } = require('../../../config/serverConfig');
 
 module.exports = function () {
-	this.setOptions = (uploadDir) => {
-		return {
-			encoding: 'utf-8',
-			maxFileSize: configParams.maxFileSize,
-			uploadDir: uploadDir,
-			multiples: true, // req.files to be arrays of files
-			keepExtensions: true
-		};
+
+	this.opts = {
+		encoding: 'utf-8',
+		maxFileSize: configParams.maxFileSize,
+		uploadDir: uploadPath,
+		multiples: true, // req.files to be arrays of files
+		keepExtensions: true
 	};
 
 	this.findFileType = (reqType) => {
@@ -43,23 +41,5 @@ module.exports = function () {
 				console.log(`error occured trying to make Directory ${dirPath}! - ${err}`);
 			}
 		}
-	};
-
-	this.fileToZip = (filename, uploadPath) => {
-		// define the layers parameters for the zip operation
-		return [
-			{
-				content: '',
-				name: filename,
-				mode: 0o755,
-				comment: '',
-				date: new Date(),
-				type: 'file'
-			},
-			{
-				path: uploadPath,
-				name: 'uploads'
-			}
-		];
 	};
 };

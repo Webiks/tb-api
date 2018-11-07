@@ -1,9 +1,14 @@
 'use strict';
 
 module.exports = {
-	uploadImage
+	uploadImage,
+	fetchLayers
 };
 
 function uploadImage(req, res) {
-	res.json({ message: 'great!' });
+	res.json({ message: 'Not implemented yet' });
+}
+
+function fetchLayers(req, res) {
+	res.json([]);
 }

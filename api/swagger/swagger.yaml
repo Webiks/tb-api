@@ -3,7 +3,7 @@ info:
   version: "1.0.0"
   title: TB api
 host: localhost:10010
-basePath: /api
+basePath: /v1/api
 schemes:
 - http
 - https
@@ -14,5 +14,7 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
-  /ansyn/upload:
+  /ansyn/upload/{worldId}:
     $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'
+  /ansyn/upload/fetch:
+    $ref: 'http://localhost:10011/yamls/ansyn/fetch.yaml'

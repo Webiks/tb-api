@@ -4,17 +4,12 @@ const UploadFilesToFS = require('./UploadFilesToFS');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 
-const getUploadPath = () => {
-	const uploadDir = '/public/uploads/';
-	const dirPath = __dirname.replace(/\\/g, '/');
-	return `${dirPath}${uploadDir}`;
-};
+const uploadPath = `${__dirname.replace(/\\\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
 	const worldId = req.params.worldId;
 	console.log('worldId: ', worldId);
 	let reqFiles = req.files.uploads;
-	const uploadPath = getUploadPath();
 	console.log('req Files: ', JSON.stringify(reqFiles));
 	console.log('req length: ', reqFiles.length);
 	console.log('uploadPath: ', uploadPath);
@@ -150,6 +145,6 @@ function guid() {
 
 module.exports = {
 	uploadFiles,
-	getUploadPath,
-	guid
+	guid,
+	uploadPath
 };
