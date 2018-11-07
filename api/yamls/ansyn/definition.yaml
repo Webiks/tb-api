@@ -11,3 +11,13 @@ definitions:
     properties:
       message:
         type: string
+  LoginAuth:
+    type: "object"
+    description: "login by auth token"
+    required:
+    - "file"
+    properties:
+      file:
+        type: file
+        in:
+        description: "authToken"

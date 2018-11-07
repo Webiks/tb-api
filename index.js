@@ -4,9 +4,12 @@ const SwaggerExpress = require('swagger-express-mw');
 const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
 const express = require('express');
 const cors = require('cors');
+const formidable = require('express-formidable');
 const { port, yamlsPort, yamlsPath } = require('./config/config');
 
 const app = express();
+doUploadFileStuff(app);
+
 const yamls = express();
 
 const config = {
@@ -33,5 +36,25 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 		console.log(`Swagger-ui available on ${port}, on: http://localhost:${port}/docs`);
 	});
 
-
 });
+
+function doUploadFileStuff(app) {
+	const uploadPath = `${__dirname.replace(/\\\\/g, '/')}/old/src/api/upload/public/uploads/` ;
+
+	const options =  {
+		encoding: 'utf-8',
+		maxFileSize: 50000000000,
+		uploadDir: uploadPath,
+		multiples: true,
+		keepExtensions: true
+	};
+
+	app.use((req, res, next) => {
+		if (req.url.includes('/api/ansyn/upload/')) {
+			formidable(options)(req, res, next)
+		} else {
+			next();
+		}
+	});
+
+}

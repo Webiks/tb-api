@@ -14,5 +14,5 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
-  /ansyn/upload:
+  /ansyn/upload/{worldId}:
     $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'
