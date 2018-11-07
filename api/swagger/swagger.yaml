@@ -16,3 +16,5 @@ paths:
     x-swagger-pipe: swagger_raw
   /ansyn/upload/{worldId}:
     $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'
+#  /ansyn/upload/fetch:
+#    $ref: 'http://localhost:10011/yamls/ansyn/fetch.yaml'
