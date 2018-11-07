@@ -1,0 +1,5 @@
+{
+	"port": 10010,
+	"yamlsPort": 10011,
+	"yamlsPath": "/yamls"
+}

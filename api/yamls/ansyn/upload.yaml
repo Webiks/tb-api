@@ -9,9 +9,9 @@ get:
     "200":
       description: Upload Success
       schema:
-        $ref: "http://localhost:8081/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
     default:
       description: Error
       schema:
-        $ref: "http://localhost:8081/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
 

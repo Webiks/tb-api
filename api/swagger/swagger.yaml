@@ -15,4 +15,4 @@ paths:
   /swagger:
     x-swagger-pipe: swagger_raw
   /ansyn/upload:
-    $ref: 'http://localhost:8081/yamls/ansyn/upload.yaml'
+    $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'

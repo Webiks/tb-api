@@ -1,38 +1,37 @@
 'use strict';
 
 const SwaggerExpress = require('swagger-express-mw');
+const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
 const express = require('express');
 const cors = require('cors');
+const { port, yamlsPort, yamlsPath } = require('./config/config');
+
 const app = express();
-app.use(cors());
-
-const port = process.env.PORT || 10010;
-
-app.listen(port, () => {
-	console.log('Your server is listening on port %d (http://localhost:%d)', port, port);
-	console.log('Swagger-ui is available on http://localhost:%d/docs', port);
-});
-
-const yamlsListener = express();
-yamlsListener.use(cors());
-yamlsListener.use('/yamls', express.static(__dirname+'/api/yamls'));
-yamlsListener.listen(8081,function(){
-	console.log("Yamls listener is up port 8081");
-});
-
-const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
+const yamls = express();
 
 const config = {
-  appRoot: __dirname
+	appRoot: __dirname
 };
 
-SwaggerExpress.create(config, function(err, swaggerExpress) {
-  if (err) { throw err; }
+/* yamls */
+yamls.use(cors());
+yamls.use(yamlsPath, express.static(__dirname + '/api/yamls'));
+yamls.listen(yamlsPort, () => {
+	console.log(`Yamls listener is up port ${yamlsPort}`);
+});
 
-  // Add swagger-ui (This must be before swaggerExpress.register)
-  app.use(SwaggerUi(swaggerExpress.runner.swagger));
+SwaggerExpress.create(config, function (err, swaggerExpress) {
+	if (err) {
+		throw err;
+	}
 
-  // install middleware
-  swaggerExpress.register(app);
+	/* app */
+	app.use(SwaggerUi(swaggerExpress.runner.swagger));
+	swaggerExpress.register(app);
+	app.use(cors());
+	app.listen(port, () => {
+		console.log(`Swagger-ui is available on http://localhost:${port}/docs`);
+	});
+
 
 });
