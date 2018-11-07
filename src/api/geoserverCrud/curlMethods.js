@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');          // for using the cURL command line
-const { configParams, configBaseUrl } = require('../../config/serverConfig');
+const { configParams, configBaseUrl } = require('../../../config/serverConfig');
 const { configUrl } = configBaseUrl;
 
 // // setting the cURL commands line (name and password, headers, request url)

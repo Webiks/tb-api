@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { configParams, configBaseUrl } = require('../../config/serverConfig');
+const { configParams, configBaseUrl } = require('../../../config/serverConfig');
 const { configUrl } = configBaseUrl;
 
 const headers = configParams.headers;

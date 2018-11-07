@@ -1,7 +1,7 @@
 const express = require('express');
 const checkAuth = require('./check-auth');
 const router = express.Router();
-const { configParams } = require('../config/serverConfig');
+const { configParams } = require('../../config/serverConfig');
 
 router.post('/checkAuth', checkAuth, (req, res) => res.send('o.k'));
 

@@ -3,7 +3,7 @@ const exif = require('exif-parser');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const { configBaseUrl } = require('../../config/serverConfig');
+const { configBaseUrl } = require('../../../config/serverConfig');
 
 const { configUrl } = configBaseUrl;
 

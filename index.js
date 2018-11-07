@@ -13,7 +13,7 @@ const api = require('./src/api/index');
 const login = require('./src/login/index');
 const checkAuth = require('./src/login/check-auth');
 const DBManager = require('./src/database/DBManager');
-const { configParams } = require('./src/config/serverConfig');
+const { configParams } = require('./config/serverConfig');
 
 const app = express();
 
