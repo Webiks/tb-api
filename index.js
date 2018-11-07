@@ -9,11 +9,11 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 
 const { port, yamlsPort, yamlsPath } = require('./config/config');
-const api = require('./old/src/api/index');
-const login = require('./old/src/login/index');
-const checkAuth = require('./old/src/login/check-auth');
-const DBManager = require('./old/src/database/DBManager');
-const { configParams } = require('./old/src/config/serverConfig');
+const api = require('./src/api/index');
+const login = require('./src/login/index');
+const checkAuth = require('./src/login/check-auth');
+const DBManager = require('./src/database/DBManager');
+const { configParams } = require('./src/config/serverConfig');
 
 const app = express();
 
