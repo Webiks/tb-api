@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = function () {
 
 	this.config = () => {
@@ -22,7 +24,7 @@ module.exports = function () {
 				baseUrlAppGetLayer: 'api/gsLayers/layer',
 				wmtsServiceUrl: 'gwc/service/wmts?SERVICE=wmts&REQUEST=getcapabilities&VERSION=1%2E0%2E0',
 				uploadGSFilesUrl: 'D:/GeoServer/data_dir',
-				uploadFilesDirLocal: 'C:/dev/Terrabiks/tb-api/images',
+				uploadFilesDirLocal: path.resolve(__dirname + "/../../../images"),
 				uploadFilesDirLocalRel: './images',
 				uploadFilesDirRemote: 'http://tb-static.webiks.com',
 				uploadFilesDirRemoteRel: '..../images',
