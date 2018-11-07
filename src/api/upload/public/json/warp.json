@@ -1,0 +1,7 @@
+{
+	"type": "GdalWarpTransform",
+	"options": [
+		"-t_srs",
+		"EPSG:4326"
+	]
+}
