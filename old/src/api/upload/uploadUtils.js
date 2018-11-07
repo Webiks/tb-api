@@ -43,7 +43,7 @@ const uploadFiles = (req, res) => {
 		console.log('UploadFiles SINGLE req file(after): ', JSON.stringify(reqFiles));
 	} else {
 		// creating a ZIP file
-		console.log('uploadToGeoserver multi files...');
+		console.log('upload multi files...');
 		// set the ZIP name according to the first file name
 		const splitName = (reqFiles[0].name).split('.');
 		name = `${splitName[0]}.zip`;
@@ -92,6 +92,7 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 	const encodePathName = uploadPath + encodeFileName;
 
 	const newFile = {
+		_id: guid(),
 		name,
 		size: file.size,
 		path: file.path,
@@ -137,7 +138,18 @@ const returnFiles = (files, path) => {
 	return files;
 };
 
+function guid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000)
+			.toString(16)
+			.substring(1);
+	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+};
+
+
 module.exports = {
 	uploadFiles,
-	getUploadPath
+	getUploadPath,
+	guid
 };

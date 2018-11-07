@@ -1,6 +1,7 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const fs = require('fs-extra');
+require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
 
 require('../../config/serverConfig')();
@@ -16,20 +17,22 @@ class UploadFilesToFS {
 		console.log('uploadFile PATH: ' + path);
 
 		if (files.length !== 0) {
-			// 1. move the files into the directory
+			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
-				const filePath = `${configUrl.uploadUrlRelativy}/${file.name}`;
+				const dirPath = `${configUrl.uploadUrlRelativy}/${file._id}`;
+				const filePath = `${dirPath}/${file.name}`;
 				console.log(`filePath: ${filePath}`);
+				createDir(dirPath);
 				fs.renameSync(file.filePath, filePath);
 				console.log(`the '${file.name}' was rename!`);
-				const fullPath = `${configUrl.uploadUrl}/${file.name}`;
+				const fullPath = `${configUrl.uploadUrl}/${file._id}/${file.name}`;
 
 				// 2. set the file Data from the upload file
 				const fileData = setFileData(file);
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
-				// 4. set the world-layer data
-				let worldLayer = setLayerFields(fileData, fullPath);
+				// 3. set the world-layer data
+				let worldLayer = setLayerFields(file._id, fileData, fullPath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 5. get the metadata of the image file
@@ -79,10 +82,11 @@ class UploadFilesToFS {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(file, fullPath) {
+		function setLayerFields(id, file, fullPath) {
 			const name = (file.name).split('.')[0];
 
 			return {
+				_id: id,
 				name,
 				fileName: file.name,
 				filePath: fullPath,
@@ -100,8 +104,6 @@ class UploadFilesToFS {
 			const result = parser.parse();
 			const imageData = result.tags;
 			file.fileData.fileCreatedDate = new Date(imageData.ModifyDate).toISOString();
-			// save the original image name
-			file.imageData.imageName = file.name;
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };
 		}
