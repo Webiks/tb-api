@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const http = require('http');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const bodyParser = require('body-parser');
@@ -9,7 +8,6 @@ const checkAuth = require('./src/login/check-auth');
 const DBManager = require('./src/database/DBManager');
 
 const app = express();
-const server = http.createServer(app);
 
 require('./src/config/serverConfig')();
 const configParams = config().configParams;
@@ -38,15 +36,9 @@ app.use('/login', login);
 app.use('/api', api);
 
 // start the App server
-server.listen(configParams.serverPort, () => console.log('listen to ', configParams.serverPort));
+app.listen(configParams.serverPort, () => console.log('listen to ', configParams.serverPort));
 
-// stop the App server
-function stop() {
-	server.close();
-}
 
 module.exports = {
-	stop,
-	server: server,
-	app: app
+	app
 };

@@ -17,7 +17,7 @@ const config = {
 yamls.use(cors());
 yamls.use(yamlsPath, express.static(__dirname + '/api/yamls'));
 yamls.listen(yamlsPort, () => {
-	console.log(`Yamls listener is up port ${yamlsPort}`);
+	console.log(`Yamls listen on port: ${yamlsPort}`);
 });
 
 SwaggerExpress.create(config, function (err, swaggerExpress) {
@@ -30,7 +30,7 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 	swaggerExpress.register(app);
 	app.use(cors());
 	app.listen(port, () => {
-		console.log(`Swagger-ui is available on http://localhost:${port}/docs`);
+		console.log(`Swagger-ui available on ${port}, on: http://localhost:${port}/docs`);
 	});
 
 
