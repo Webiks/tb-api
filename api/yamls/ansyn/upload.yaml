@@ -1,0 +1,17 @@
+x-swagger-router-controller: ansyn
+
+get:
+  tags:
+  - Ansyn
+  description: Upload image file.
+  operationId: uploadImage
+  responses:
+    "200":
+      description: Upload Success
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
+    default:
+      description: Error
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
+
