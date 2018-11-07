@@ -5,10 +5,20 @@ const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
 const express = require('express');
 const cors = require('cors');
 const formidable = require('express-formidable');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+
 const { port, yamlsPort, yamlsPath } = require('./config/config');
+const api = require('./old/src/api/index');
+const login = require('./old/src/login/index');
+const checkAuth = require('./old/src/login/check-auth');
+const DBManager = require('./old/src/database/DBManager');
+const { configParams } = require('./old/src/config/serverConfig');
 
 const app = express();
-doUploadFileStuff(app);
+
+app.use(cors({ credentials: true, origin: true }));
+app.use(bodyParser.json());
 
 const yamls = express();
 
@@ -38,23 +48,28 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 
 });
 
-function doUploadFileStuff(app) {
-	const uploadPath = `${__dirname.replace(/\\\\/g, '/')}/old/src/api/upload/public/uploads/` ;
+function initializeOld(app) {
 
-	const options =  {
-		encoding: 'utf-8',
-		maxFileSize: 50000000000,
-		uploadDir: uploadPath,
-		multiples: true,
-		keepExtensions: true
-	};
+// DB Connection URL
+	const url = `${configParams.mongoBaseUrl}/${configParams.dbName}`;
 
-	app.use((req, res, next) => {
-		if (req.url.includes('/api/ansyn/upload/')) {
-			formidable(options)(req, res, next)
-		} else {
-			next();
+// start the connection to the mongo Database
+	DBManager.connect(url);
+
+// define the session
+	app.use(session({
+		secret: 'keyboard cat',
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			secure: false
 		}
-	});
+	}));
+
+	app.use('/login', login);
+// app.use('/api', checkAuth);
+	app.use('/api', api);
 
 }
+
+initializeOld(app);

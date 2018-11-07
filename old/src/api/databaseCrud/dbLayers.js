@@ -8,10 +8,8 @@ const dbUtils = require('./dbUtils');
 const gsUtils = require('../geoserverCrud/gsUtils');
 const GsLayers = require('../geoserverCrud/GsLayers');
 const createNewLayer = require('./createNewLayer');
-
-require('../../config/serverConfig')();
-const configParams = config().configParams;
-const configUrl = configBaseUrl().configUrl;
+const { configParams, configBaseUrl } = require('../../config/serverConfig');
+const { configUrl } = configBaseUrl;
 
 const dbWorldCrud = new MongoCrud(worldModel);
 const dbLayerCrud = new MongoCrud(layerModel);

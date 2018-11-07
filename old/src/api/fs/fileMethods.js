@@ -1,8 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { uploadPath } = require('../upload/uploadUtils');
-require('../../config/serverConfig')();
-const configParams = config().configParams;
+const { configParams } = require('../../config/serverConfig');
 
 module.exports = function () {
 

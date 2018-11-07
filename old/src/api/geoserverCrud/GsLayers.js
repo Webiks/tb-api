@@ -1,9 +1,7 @@
 const axios = require('axios');
+const { configParams, configBaseUrl } = require('../../config/serverConfig');
+const { configUrl } = configBaseUrl;
 
-require('../../config/serverConfig')();
-
-const configParams = config().configParams;
-const configUrl = configBaseUrl().configUrl;
 const headers = configParams.headers;
 const authorization = headers.authorization;
 
