@@ -4,14 +4,11 @@ const SwaggerExpress = require('swagger-express-mw');
 const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
 const express = require('express');
 const cors = require('cors');
-const formidable = require('express-formidable');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-
 const { port, yamlsPort, yamlsPath } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
-const checkAuth = require('./src/login/check-auth');
 const DBManager = require('./src/database/DBManager');
 const { configParams } = require('./config/serverConfig');
 
@@ -28,7 +25,7 @@ const config = {
 
 /* yamls */
 yamls.use(cors());
-yamls.use(yamlsPath, express.static(__dirname + '/api/yamls'));
+yamls.use(yamlsPath, express.static(__dirname + '/api/swagger/yamls'));
 yamls.listen(yamlsPort, () => {
 	console.log(`Yamls listen on port: ${yamlsPort}`);
 });
@@ -54,7 +51,9 @@ function initializeOld(app) {
 	const url = `${configParams.mongoBaseUrl}/${configParams.dbName}`;
 
 // start the connection to the mongo Database
-	DBManager.connect(url);
+	DBManager.connect(url).catch(() => {
+		console.log("No connection for mongo!")
+	});
 
 // define the session
 	app.use(session({

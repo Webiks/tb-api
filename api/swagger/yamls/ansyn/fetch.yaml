@@ -1,0 +1,24 @@
+x-swagger-router-controller: ansyn
+
+post:
+  tags:
+  - Ansyn
+  description: Fetch layers for ansyn.
+  operationId: fetchLayers
+  parameters:
+  - name: payload
+    description: The name of the world
+    in: body
+    required: true
+    schema:
+      $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/FetchLayers"
+  responses:
+    "200":
+      description: Upload Success
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
+    default:
+      description: Error
+      schema:
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
+

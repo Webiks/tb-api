@@ -1,0 +1,43 @@
+definitions:
+  UploadSuccess:
+    required:
+    - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+    - message
+    properties:
+      message:
+        type: string
+  FetchLayers:
+    type: "object"
+    description: "fetch by worldName, geometry and dates."
+    required:
+    - "worldName"
+    - "geometry"
+    - "dates"
+    properties:
+      worldName:
+        type: "string"
+        description: "The id of worlds"
+      geometry:
+        type: "object"
+        description: "Geometry object (geoJSON)"
+      dates:
+        type: "object"
+        description: "Start & end dates"
+        required:
+        - "start"
+        - "end"
+        properties:
+          start:
+            type: "string"
+            description: "start date"
+          end:
+            type: "string"
+            description: "end date"
+
+
+
