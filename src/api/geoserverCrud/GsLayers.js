@@ -1,9 +1,9 @@
 const axios = require('axios');
-const { configParams, configBaseUrl } = require('../../../config/serverConfig');
-const { configUrl } = configBaseUrl;
+const { geoserver, upload } = require('../../../config/config');
+const { configUrl } = require('../../../config/serverConfig');
 
-const headers = configParams.headers;
-const authorization = headers.authorization;
+// const headers = upload.headers;
+const authorization = upload.headers.authorization;
 
 class GsLayers {
 	// ==============
@@ -12,7 +12,7 @@ class GsLayers {
 	// get a list of all the layers of the world from geoserver by REST api
 	static getWorldLayerListFromGeoserver(worldName) {
 		const urlGetLayers = `${configUrl.baseWorkspacesUrlGeoserver}/${worldName}/layers.json`;
-		console.log('GsLayers: start GET-ALL world\'s layers from Geoserver...', urlGetLayers);
+		console.log(`GsLayers: start GET-ALL world's layers from Geoserver...${urlGetLayers}`);
 		return axios.get(urlGetLayers, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {

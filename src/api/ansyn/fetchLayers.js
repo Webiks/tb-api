@@ -1,6 +1,36 @@
 const layerModel = require('../../database/schemas/LayerSchema');
 const worldModel = require('../../database/schemas/WorldSchema');
 
+const fetchLayers = (req, res) => {
+	let layers;
+	console.log("fetchLayers req.body: ", JSON.stringify(req.body));
+	console.log("fetchLayers worldName: ", req.body.worldName);
+	findWorld({ name: req.body.worldName })
+		.then((world) => {
+			if (!world) {
+				throw new Error('No World!');
+			}
+			return world;
+		})
+		.then((world) => {
+			const worldlayers = world.layersId,
+				start = req.body.dates.start,
+				end = req.body.dates.end,
+				geometry = req.body.geometry;
+			return findLayers(worldlayers, start, end, geometry)
+				.then((worldlayers) => {
+					layers = worldlayers;
+					res.send(layers);
+				});
+		})
+		.catch((err) => {
+			console.log(err);
+			layers = [];
+			res.send(layers);
+		});
+};
+
+// ========================================= private  F U N C T I O N S ============================================
 const findWorld = ({ name }) => worldModel.findOne({ name });
 
 const addTimeZoneToDate = (date, timeZone) => {
@@ -15,10 +45,10 @@ const addTimeZoneToDate = (date, timeZone) => {
 
 const findLayers = (layersId, start, end, $geometry) => {
 	console.log('before:' + JSON.stringify({ start, end }));
-	// find the world layers that are within the giving polygon
+	// find the world's layers that are within the giving polygon
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
-		'footprint.geometry': { $geoWithin: { $geometry } }
+		'goeData.footprint.geometry': { $geoWithin: { $geometry } }
 	})
 		.then(layers => {
 			const matchLayers = layers.map(layer => {
@@ -38,28 +68,6 @@ const findLayers = (layersId, start, end, $geometry) => {
 			} else {
 				return [];
 			}
-		});
-};
-
-const fetchLayers = (req, res) => {
-	findWorld({ name: req.body.worldName })
-		.then((world) => {
-			if (!world) {
-				throw new Error('No World!');
-			}
-			return world;
-		})
-		.then((world) => {
-			const layers = world.layersId,
-				start = req.body.dates.start,
-				end = req.body.dates.end,
-				geometry = req.body.geometry;
-			return findLayers(layers, start, end, geometry)
-				.then((layers) => res.send(layers));
-		})
-		.catch((err) => {
-			console.log(err);
-			res.send([]);
 		});
 };
 

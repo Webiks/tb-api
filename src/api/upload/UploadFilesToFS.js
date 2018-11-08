@@ -3,9 +3,7 @@ const exif = require('exif-parser');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const { configBaseUrl } = require('../../../config/serverConfig');
-
-const { configUrl } = configBaseUrl;
+const { configUrl } = require('../../../config/serverConfig');
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -19,13 +17,13 @@ class UploadFilesToFS {
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
-				const dirPath = `${configUrl.uploadUrlRelativy}/${file._id}`;
+				const dirPath = `${configUrl.uploadRelativeImageDir}/${file._id}`;
 				const filePath = `${dirPath}/${file.name}`;
 				console.log(`filePath: ${filePath}`);
 				createDir(dirPath);
 				fs.renameSync(file.filePath, filePath);
 				console.log(`the '${file.name}' was rename!`);
-				const fullPath = `${configUrl.uploadUrl}/${file._id}/${file.name}`;
+				const fullPath = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
 
 				// 2. set the file Data from the upload file
 				const fileData = setFileData(file);
@@ -103,7 +101,9 @@ class UploadFilesToFS {
 			const parser = exif.create(buffer);
 			const result = parser.parse();
 			const imageData = result.tags;
-			file.fileData.fileCreatedDate = new Date(imageData.ModifyDate || Date.now()).toISOString();
+			const ModifyDate = imageData.ModifyDate;
+			file.fileData.lastModified = ModifyDate;
+			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };
 		}

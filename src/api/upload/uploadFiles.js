@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const formidable = require('express-formidable');
-const uploadUtils = require('./uploadUtils');
+const { uploadPath, uploadFiles } = require('./uploadUtils');
 require('../fs/fileMethods')();
 
-router.use(formidable(opts));
+router.use(formidable(getOptions(uploadPath)));
 
-router.post('/:worldId', uploadUtils.uploadFiles);
+router.post('/:worldId', uploadFiles);
 
 module.exports = router;

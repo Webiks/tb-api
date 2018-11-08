@@ -1,7 +1,7 @@
 const express = require('express');
 const checkAuth = require('./check-auth');
 const router = express.Router();
-const { configParams } = require('../../config/serverConfig');
+const { login } = require('../../config/config');
 
 router.post('/checkAuth', checkAuth, (req, res) => res.send('o.k'));
 
@@ -10,8 +10,8 @@ function isEqual(str1 = '', srt2 = '') {
 }
 
 router.post('/login', (req, res) => {
-	const correctUsername = isEqual(req.body.username, process.env[configParams.login.usernameKey]);
-	const correctPassword = isEqual(req.body.password, process.env[configParams.login.passwordKey]);
+	const correctUsername = isEqual(req.body.username, process.env[login.usernameKey]);
+	const correctPassword = isEqual(req.body.password, process.env[login.passwordKey]);
 	const isAuthenticated = correctUsername && correctPassword;
 	req.session.authenticated = isAuthenticated;
 	if (isAuthenticated) {

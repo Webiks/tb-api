@@ -6,11 +6,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const { port, yamlsPort, yamlsPath } = require('./config/config');
+
+const { appPort, mongodb, swagger } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
-const { configParams } = require('./config/serverConfig');
 
 const app = express();
 
@@ -18,6 +18,7 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.json());
 
 const yamls = express();
+const swaggerUi = express();
 
 const config = {
 	appRoot: __dirname
@@ -25,9 +26,9 @@ const config = {
 
 /* yamls */
 yamls.use(cors());
-yamls.use(yamlsPath, express.static(__dirname + '/api/swagger/yamls'));
-yamls.listen(yamlsPort, () => {
-	console.log(`Yamls listen on port: ${yamlsPort}`);
+yamls.use(swagger.yamls.path, express.static(__dirname + swagger.yamls.staticUrl));
+yamls.listen(swagger.yamls.port, () => {
+	console.log(`Yamls listen on port: ${swagger.yamls.port}`);
 });
 
 SwaggerExpress.create(config, function (err, swaggerExpress) {
@@ -35,27 +36,27 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 		throw err;
 	}
 
-	/* app */
-	app.use(SwaggerUi(swaggerExpress.runner.swagger));
-	swaggerExpress.register(app);
-	app.use(cors());
-	app.listen(port, () => {
-		console.log(`Swagger-ui available on ${port}, on: http://localhost:${port}/docs`);
+	/* swaggerUi */
+	swaggerUi.use(SwaggerUi(swaggerExpress.runner.swagger));
+	swaggerExpress.register(swaggerUi);
+	swaggerUi.use(cors());
+	swaggerUi.listen(swagger.port, () => {
+		console.log(`Swagger-ui available on ${swagger.port}, on: http://localhost:${swagger.port}/docs`);
 	});
 
 });
 
-function initializeOld(app) {
+function initializeApp(app) {
 
-// DB Connection URL
-	const url = `${configParams.mongoBaseUrl}/${configParams.dbName}`;
+	// DB Connection URL
+	const url = `${mongodb.url}/${mongodb.name}`;
 
-// start the connection to the mongo Database
+	// start the connection to the mongo Database
 	DBManager.connect(url).catch(() => {
 		console.log("No connection for mongo!")
 	});
 
-// define the session
+	// define the session
 	app.use(session({
 		secret: 'keyboard cat',
 		resave: false,
@@ -66,9 +67,12 @@ function initializeOld(app) {
 	}));
 
 	app.use('/login', login);
-// app.use('/api', checkAuth);
+	// app.use('/api', checkAuth);
 	app.use('/api', api);
+
+	// start the App server
+	app.listen(appPort, () => console.log('listen to ', appPort));
 
 }
 
-initializeOld(app);
+initializeApp(app);

@@ -1,8 +1,7 @@
 const axios = require('axios');
-
-const { configParams, configBaseUrl } = require('../../../config/serverConfig');
-const { configUrl } = configBaseUrl;
-const headers = configParams.headers;
+const { upload } = require('../../../config/config');
+const { configUrl } = require('../../../config/serverConfig');
+const headers = upload.headers;
 
 class GsWorlds {
 	// ==============
@@ -10,12 +9,14 @@ class GsWorlds {
 	// ==============
 	// CREATE a new world (workspace) in geoserver by REST api
 	static createNewWorldOnGeoserver(name) {
+		console.log(`headers: ${JSON.stringify(headers)}`);
+		console.log(`configUrl.baseWorkspacesUrlGeoserver: ${JSON.stringify(configUrl.baseWorkspacesUrlGeoserver)}`);
 		console.log('start createNewWorldOnGeoserver...' + name);
 		// 1. create the JSON file with the desire workspace
 		const workspaceJSON = JSON.stringify(createWorkspaceObject(name));
 
 		// 2. send a POST request to create the new workspace
-		return axios.post(`${configUrl.baseWorkspacesUrlGeoserver}`, workspaceJSON, { headers: headers })
+		return axios.post(`${configUrl.baseWorkspacesUrlGeoserver}`, workspaceJSON, { headers })
 			.then(response => {
 				console.log('GsWorlds: create world response: ' + response.data);
 				return response.data;
@@ -31,8 +32,9 @@ class GsWorlds {
 	// =================
 	// delete a world (workspace) from geoserver by REST api
 	static deleteWorldFromGeoserver(name) {
-		console.log('start deleteWorldFromGeoserver...' + name);
-		return axios.delete(`${configUrl.baseWorkspacesUrlGeoserver}/${name}?recurse=true`, { headers: headers })
+		console.log(`start deleteWorldFromGeoserver...${configUrl.baseWorkspacesUrlGeoserver}/${name}`);
+		console.log(`headers: ${headers}`);
+		return axios.delete(`${configUrl.baseWorkspacesUrlGeoserver}/${name}?recurse=true`, { headers })
 			.then(response => {
 				console.log('GsWorld delete respone: ' + response);
 				return response.data;

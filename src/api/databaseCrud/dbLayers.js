@@ -8,8 +8,8 @@ const dbUtils = require('./dbUtils');
 const gsUtils = require('../geoserverCrud/gsUtils');
 const GsLayers = require('../geoserverCrud/GsLayers');
 const createNewLayer = require('./createNewLayer');
-const { configParams, configBaseUrl } = require('../../../config/serverConfig');
-const { configUrl } = configBaseUrl;
+const { geoserver } = require('../../../config/config');
+const { configUrl } = require('../../../config/serverConfig');
 
 const dbWorldCrud = new MongoCrud(worldModel);
 const dbLayerCrud = new MongoCrud(layerModel);
@@ -99,7 +99,7 @@ router.get('/geoserver/:worldId/:layerName', (req, res) => {
 
 // get Capabilities XML file - WMTS Request for display the selected layer
 router.get('/geoserver/wmts/:worldId/:layerName', (req, res) => {
-	const capabilitiesUrl = `${configUrl.baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${configParams.wmtsServiceUrl}`;
+	const capabilitiesUrl = `${configUrl.baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
 	console.log('geo LAYER SERVER: start GetCapabilities url = ', capabilitiesUrl);
 	GsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
 		.then(response => res.send(response))

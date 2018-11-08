@@ -1,4 +1,5 @@
 'use strict';
+const { layers } = require('../../src/api/ansyn/fetchLayers');
 
 module.exports = {
 	uploadImage,
@@ -10,5 +11,6 @@ function uploadImage(req, res) {
 }
 
 function fetchLayers(req, res) {
-	res.json([]);
+	res.json({ layers: layers });
+	// res.json([]);
 }

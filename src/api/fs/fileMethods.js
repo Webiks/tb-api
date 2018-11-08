@@ -1,16 +1,18 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { uploadPath } = require('../upload/uploadUtils');
-const { configParams } = require('../../../config/serverConfig');
+const { upload } = require('../../../config/config');
 
 module.exports = function () {
 
-	this.opts = {
-		encoding: 'utf-8',
-		maxFileSize: configParams.maxFileSize,
-		uploadDir: uploadPath,
-		multiples: true, // req.files to be arrays of files
-		keepExtensions: true
+	this.getOptions = (uploadPath) => {
+		console.log("start getOptions... ", uploadPath);
+		return {
+			encoding: 'utf-8',
+			maxFileSize: upload.maxFileSize,
+			uploadDir: uploadPath,
+			multiples: true, // req.files to be arrays of files
+			keepExtensions: true
+		};
 	};
 
 	this.findFileType = (reqType) => {
