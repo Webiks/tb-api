@@ -7,6 +7,7 @@
 	},
 	"remote": {
 		"ip": "://34.218.228.21",
+		"domain": "http://tb-admin.webiks.com",
 		"serverDomain": "http://tb-server.webiks.com",
 		"staticDomain": "http://tb-static.webiks.com",
 		"gsDatadir": "D:/GeoServer/data_dir",

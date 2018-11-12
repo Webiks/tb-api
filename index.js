@@ -7,7 +7,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
-const { appPort, mongodb, swagger } = require('./config/config');
+const { appPort, mongodb, swagger, remote } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
@@ -41,7 +41,7 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 	swaggerExpress.register(swaggerUi);
 	swaggerUi.use(cors());
 	swaggerUi.listen(swagger.port, () => {
-		console.log(`Swagger-ui available on ${swagger.port}, on: http://localhost:${swagger.port}/docs`);
+		console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.domain}:${swagger.port}/docs`);
 	});
 
 });

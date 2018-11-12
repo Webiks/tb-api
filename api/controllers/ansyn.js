@@ -11,6 +11,6 @@ function uploadImage(req, res) {
 }
 
 function fetchLayers(req, res) {
-	res.json({ layers: layers });
-	// res.json([]);
+	// res.json({ layers: layers });
+	res.json([]);
 }

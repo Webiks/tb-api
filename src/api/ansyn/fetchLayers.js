@@ -2,9 +2,7 @@ const layerModel = require('../../database/schemas/LayerSchema');
 const worldModel = require('../../database/schemas/WorldSchema');
 
 const fetchLayers = (req, res) => {
-	let layers;
 	console.log("fetchLayers req.body: ", JSON.stringify(req.body));
-	console.log("fetchLayers worldName: ", req.body.worldName);
 	findWorld({ name: req.body.worldName })
 		.then((world) => {
 			if (!world) {
@@ -13,20 +11,29 @@ const fetchLayers = (req, res) => {
 			return world;
 		})
 		.then((world) => {
+			let start = req.body.dates.start,
+					end = req.body.dates.end;
 			const worldlayers = world.layersId,
-				start = req.body.dates.start,
-				end = req.body.dates.end,
-				geometry = req.body.geometry;
-			return findLayers(worldlayers, start, end, geometry)
-				.then((worldlayers) => {
-					layers = worldlayers;
-					res.send(layers);
+						geometry = req.body.geometry;
+			console.log(`world layersId: ${JSON.stringify(worldlayers)}`);
+			// define the dates
+			start = addTimeZoneToDate(start.toString());
+			end = addTimeZoneToDate(end.toString());
+			console.log(`find layers date numbers: ${JSON.stringify({ start, end })}`);
+
+			findLayers(worldlayers, start, end, geometry)
+				.then(layers => {
+					console.log(`fetchLayers: find ${layers.length} layers!`);
+					if (layers){
+						res.send(layers);
+					} else {
+						res.send([]);
+					}
 				});
 		})
 		.catch((err) => {
 			console.log(err);
-			layers = [];
-			res.send(layers);
+			res.send(`No World! ${err}`);
 		});
 };
 
@@ -34,40 +41,29 @@ const fetchLayers = (req, res) => {
 const findWorld = ({ name }) => worldModel.findOne({ name });
 
 const addTimeZoneToDate = (date, timeZone) => {
-	if (date.endsWith('Z')) {
-		// change the time zone to be like the giving one
-		date = date.substr(0, date.indexOf('.') + 1);
+	// check if the date inculde time
+	if (date.indexOf(':') !== -1) {
+		// check if the time include a time zone or GMT
+		if (!(date.indexOf('Z') !== -1) && !(date.indexOf('GMT') !== -1)) {
+			// add 'GMT' in the end of the date
+			date = `${date} GMT`;
+		}
 	}
-	console.log(`addTimeZoneToDate: ${date}${timeZone}`);
 	// return the date as a number
-	return Date.parse(`${date}${timeZone}`);
+	return Date.parse(date);
 };
 
 const findLayers = (layersId, start, end, $geometry) => {
-	console.log('before:' + JSON.stringify({ start, end }));
-	// find the world's layers that are within the giving polygon
+	console.log(`start findLayers...`);
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
-		'goeData.footprint.geometry': { $geoWithin: { $geometry } }
-	})
+		'geoData.footprint.geometry': { $geoWithin: { $geometry } }
+		})
 		.then(layers => {
-			const matchLayers = layers.map(layer => {
-				console.log('date: ' + layer.fileData.fileCreatedDate);
-				const subDate = layer.fileData.fileCreatedDate.substr(layer.fileData.fileCreatedDate.indexOf('.'));
-				console.log('subDate: ' + subDate);
-				const timeZone = subDate;
-				start = addTimeZoneToDate(start, timeZone);
-				end = addTimeZoneToDate(end, timeZone);
-				console.log('after:' + JSON.stringify({ start, end }));
-				if (layer.fileData.lastModified >= start && layer.fileData.lastModified <= end) {
-					return layer;
-				}
-			});
-			if (matchLayers) {
-				return matchLayers;
-			} else {
-				return [];
-			}
+			console.log(`find ${layers.length} layers by geometry!`);
+			const matchLayers = layers.filter(layer => (layer.fileData.lastModified >= start && layer.fileData.lastModified <= end));
+			console.log(`find ${matchLayers.length} layers by dates!`);
+			return matchLayers;
 		});
 };
 
