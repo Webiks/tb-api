@@ -26,6 +26,7 @@
     "form-data": "^2.3.2",
     "formidable": "^1.2.1",
     "fs-extra": "^6.0.1",
+    "json-refs": "^3.0.12",
     "lodash": "^4.17.10",
     "mongod": "^2.0.0",
     "mongodb": "^3.1.1",
@@ -42,8 +43,8 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
-		"start": "node index",
-		"start:inspect": "node --inspect index",
-		"test": "swagger project test"
+    "start": "node index",
+    "start:inspect": "node --inspect index",
+    "test": "swagger project test"
   }
 }
