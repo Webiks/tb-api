@@ -1,20 +1,19 @@
 swagger: '2.0'
+
 info:
   version: '0.0.1'
   title: 'Ansyn-TB API'
 
-host: 'localhost:10010'
 basePath: '/v2/api'
-schemes:
-- http
-- https
+
 consumes:
 - application/json
 produces:
 - application/json
+
 paths:
   /swagger:
-    x-swagger-pipe: swagger_raw
+    x-swagger-pipe: 'swagger_raw'
   /ansyn/upload:
     $ref: './yamls/ansyn/upload.yaml'
   /ansyn/fetch:

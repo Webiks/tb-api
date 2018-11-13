@@ -1,5 +1,4 @@
 'use strict';
-// const { layers } = require('../../src/api/ansyn/fetchLayers');
 const fetch = require('../../src/api/ansyn/fetchLayers');
 
 module.exports = {
@@ -15,7 +14,7 @@ function fetchLayers(req, res) {
 	console.log('fetchLayers controller req: ', req.body);
 	fetch(req, res)
 		.then(layers => {
-			console.log(`fetchLayers controller response: succedd to find ${layers.length} layers`);
+			console.log(`fetchLayers controller response: succeed to find ${layers.length} layers`);
 			res.json(layers)
 		})
 		.catch(error => {
