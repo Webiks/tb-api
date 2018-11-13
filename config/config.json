@@ -20,12 +20,7 @@
 		"url": "mongodb://127.0.0.1:27017"
 	},
 	"swagger": {
-		"port": 10010,
-		"yamls": {
-			"port": 10011,
-			"staticUrl": "/api/swagger/yamls",
-			"path": "/yamls"
-		}
+		"port": 10010
 	},
 	"login":	{
 		"usernameKey": "TB_USERNAME",

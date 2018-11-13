@@ -62,7 +62,7 @@ definitions:
     properties:
       layers:
         type: "array"
-        tems:
+        items:
           type: "object"
 
 

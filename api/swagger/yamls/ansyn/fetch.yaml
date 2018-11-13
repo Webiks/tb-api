@@ -11,14 +11,14 @@ post:
     in: body
     required: true
     schema:
-      $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/FetchLayers"
+      $ref: "./definition.yaml#/definitions/FetchLayers"
   responses:
     "200":
       description: Fetch Success
       schema:
-        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/FetchSuccess"
+        $ref: "./definition.yaml#/definitions/FetchSuccess"
     default:
       description: Error
       schema:
-        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/ErrorResponse"
+        $ref: "./definition.yaml#/definitions/ErrorResponse"
 
