@@ -5,7 +5,6 @@ const { uploadPath, uploadFiles } = require('./uploadUtils');
 require('../fs/fileMethods')();
 
 router.use(formidable(getOptions(uploadPath)));
-
-router.post('/:worldId', uploadFiles);
+router.post('/', uploadFiles);
 
 module.exports = router;

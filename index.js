@@ -6,19 +6,14 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-
-const { appPort, mongodb, swagger, remote } = require('./config/config');
+const { mongodb, swagger, remote } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
 
-const app = express();
-
-app.use(cors({ credentials: true, origin: true }));
-app.use(bodyParser.json());
 
 const yamls = express();
-const swaggerUi = express();
+const app = express();
 
 const config = {
 	appRoot: __dirname
@@ -37,16 +32,11 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 	}
 
 	/* swaggerUi */
-	swaggerUi.use(SwaggerUi(swaggerExpress.runner.swagger));
-	swaggerExpress.register(swaggerUi);
-	swaggerUi.use(cors());
-	swaggerUi.listen(swagger.port, () => {
-		console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.domain}:${swagger.port}/docs`);
-	});
+	app.use(SwaggerUi(swaggerExpress.runner.swagger));
+	swaggerExpress.register(app);
+	app.use(cors());
 
-});
-
-function initializeApp(app) {
+	/* v1 api - no swagger */
 
 	// DB Connection URL
 	const url = `${mongodb.url}/${mongodb.name}`;
@@ -55,8 +45,9 @@ function initializeApp(app) {
 	DBManager.connect(url).catch(() => {
 		console.log("No connection for mongo!")
 	});
+	app.use(cors({ credentials: true, origin: true }));
+	app.use(bodyParser.json());
 
-	// define the session
 	app.use(session({
 		secret: 'keyboard cat',
 		resave: false,
@@ -67,12 +58,10 @@ function initializeApp(app) {
 	}));
 
 	app.use('/login', login);
-	// app.use('/api', checkAuth);
-	app.use('/api', api);
+	app.use('/v1/api', api);
 
-	// start the App server
-	app.listen(appPort, () => console.log('listen to ', appPort));
+	app.listen(swagger.port, () => {
+		console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.domain}:${swagger.port}/docs`);
+	});
 
-}
-
-initializeApp(app);
+});

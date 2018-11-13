@@ -8,16 +8,36 @@ post:
   consumes:
   - multipart/form-data
   parameters:
-  - name: worldId
-    description: id of the world
-    in: path
-    default: public
-    type: string
-  - name: file
-    type: file
-    description: login by auth token
+  - name: title
+    description: title
     in: formData
+    type: string
+    required: false
+
+  - name: sensorType
+    description: sensorType
+    in: formData
+    type: string
     required: true
+
+  - name: sensorName
+    description: sensorName
+    in: formData
+    type: string
+    required: true
+
+  - name: sharing
+    description: sharing
+    in: formData
+    type: string
+    required: true
+
+  - name: files
+    type: file
+    description: files
+    in: formData
+    required: false
+
   responses:
     "200":
       description: Upload Success

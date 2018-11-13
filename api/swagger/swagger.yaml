@@ -2,23 +2,9 @@ swagger: '2.0'
 info:
   version: '0.0.1'
   title: 'Ansyn-TB API'
-#servers:
-#- url: '{protocol}://{host}:{port}/api'
-#  variables:
-#    protocol:
-#      enum:
-#      - http
-#      - https
-#      default: http
-#    host:
-#      enum:
-#      - localhost
-#      - tb-admin.webiks.com
-#      default: localhost
-#    port:
-#      default: 10010
+
 host: 'localhost:10010'
-basePath: '/v1/api'
+basePath: '/v2/api'
 schemes:
 - http
 - https
@@ -29,7 +15,7 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
-  /ansyn/upload/{worldId}:
+  /ansyn/upload:
     $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'
   /ansyn/upload/fetch:
     $ref: 'http://localhost:10011/yamls/ansyn/fetch.yaml'
