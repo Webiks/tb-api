@@ -13,6 +13,12 @@ function uploadImage(req, res) {
 
 function fetchLayers(req, res) {
 	console.log('fetchLayers controller req: ', req.body);
-	const layers = fetch(req, res);
-	res.json(layers);
+	fetch(req, res)
+		.then(layers => {
+			console.log(`fetchLayers controller response: succedd to find ${layers.length} layers`);
+			res.json(layers)
+		})
+		.catch(error => {
+			res.json(error.message);
+		});
 }
