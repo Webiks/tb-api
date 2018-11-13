@@ -1,9 +1,9 @@
 swagger: '2.0'
+
 info:
   version: '0.0.1'
   title: 'Ansyn-TB API'
 
-#host: 'tb-server.webiks.com'
 basePath: '/v2/api'
 schemes:
 - http
