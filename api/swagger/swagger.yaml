@@ -18,7 +18,7 @@ info:
 #    port:
 #      default: 10010
 host: 'localhost:10010'
-basePath: '/v1/api'
+basePath: '/v2/api'
 schemes:
 - http
 - https
@@ -29,7 +29,7 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
-  /ansyn/upload/{worldId}:
+  /ansyn/upload:
     $ref: 'http://localhost:10011/yamls/ansyn/upload.yaml'
   /ansyn/upload/fetch:
     $ref: 'http://localhost:10011/yamls/ansyn/fetch.yaml'
