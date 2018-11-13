@@ -1,5 +1,52 @@
 {
-	"port": 10010,
-	"yamlsPort": 10011,
-	"yamlsPath": "/yamls"
+	"appPort": 4000,
+	"local": {
+		"ip": "://127.0.0.1",
+		"imageDir": "/../images",
+		"imageDirRel": "./images"
+	},
+	"remote": {
+		"ip": "://34.218.228.21",
+		"domain": "http://tb-admin.webiks.com",
+		"serverDomain": "http://tb-server.webiks.com",
+		"staticDomain": "http://tb-static.webiks.com",
+		"gsDatadir": "D:/GeoServer/data_dir",
+		"imageDir": "/../../images",
+		"imageDirRel": "../images"
+	},
+	"mongodb": {
+		"port": 27017,
+		"name": "tb_database",
+		"url": "mongodb://127.0.0.1:27017"
+	},
+	"swagger": {
+		"port": 10010,
+		"yamls": {
+			"port": 10011,
+			"staticUrl": "/api/swagger/yamls",
+			"path": "/yamls"
+		}
+	},
+	"login":	{
+		"usernameKey": "TB_USERNAME",
+		"passwordKey": "TB_PASSWORD"
+	},
+	"geoserver": {
+		"port": 8080,
+		"path": "geoserver",
+		"rest": "geoserver/rest",
+		"workspaces": "geoserver/rest/workspaces",
+		"imports": "geoserver/rest/imports",
+		"getLayerUrl": "api/gsLayers/layer",
+		"wmtsServiceUrl": "gwc/service/wmts?SERVICE=wmts&REQUEST=getcapabilities&VERSION=1%2E0%2E0",
+		"baseCurl": "curl -u admin:geoserver"
+	},
+	"upload": {
+		"headers": {
+			"authorization": "Basic YWRtaW46Z2Vvc2VydmVy",
+			"Content-Type": "application/json",
+			"accept": "application/json"
+		},
+		"maxFileSize": 50000000000
+	}
 }

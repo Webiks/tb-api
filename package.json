@@ -43,7 +43,7 @@
   },
   "scripts": {
 		"start": "node index.js",
-		"start:old": "node old/index.js",
+		"start:old": "node app.js",
     "test": "swagger project test"
   }
 }

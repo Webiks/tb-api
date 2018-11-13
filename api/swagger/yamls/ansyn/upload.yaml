@@ -22,7 +22,7 @@ post:
     "200":
       description: Upload Success
       schema:
-        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/UploadSuccess"
+        $ref: "http://localhost:10011/yamls/ansyn/definition.yaml#/definitions/Success"
     default:
       description: Error
       schema:

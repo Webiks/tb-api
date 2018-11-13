@@ -4,15 +4,15 @@ const UploadFilesToFS = require('./UploadFilesToFS');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 
-const uploadPath = `${__dirname.replace(/\\\\/g, '/')}/public/uploads/`;
+const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
+	console.log('start upload utils to: ', uploadPath);
 	const worldId = req.params.worldId;
 	console.log('worldId: ', worldId);
 	let reqFiles = req.files.uploads;
 	console.log('req Files: ', JSON.stringify(reqFiles));
 	console.log('req length: ', reqFiles.length);
-	console.log('uploadPath: ', uploadPath);
 
 	// convert the request Files to JSON and back to an Object
 	const jsonFiles = JSON.stringify(reqFiles);

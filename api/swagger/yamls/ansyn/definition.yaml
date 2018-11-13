@@ -1,19 +1,19 @@
 definitions:
-  UploadSuccess:
+  Success:
     required:
-    - message
+    - "message"
     properties:
       message:
-        type: string
+        type: "string"
   ErrorResponse:
     required:
-    - message
+    - "message"
     properties:
       message:
-        type: string
+        type: "string"
   FetchLayers:
     type: "object"
-    description: "fetch by worldName, geometry and dates."
+    description: "fetch by worldName, geometry and dates"
     required:
     - "worldName"
     - "geometry"
@@ -21,10 +21,28 @@ definitions:
     properties:
       worldName:
         type: "string"
-        description: "The id of worlds"
+        description: "The id of world"
       geometry:
         type: "object"
-        description: "Geometry object (geoJSON)"
+        description: "Geometry object ('Feature'/'CollectionFeature'...)"
+        required:
+        - "type"
+        - "coordinates"
+        properties:
+          type:
+            type: "string"
+            description: "the geometry type ('Feature'/'Polygon'...)"
+          coordinates:
+            type: "array"
+            items:
+              type: "array"
+              items:
+                type: "array"
+                items:
+                  type: "number"
+                  minItems: 2
+                  maxItems: 2
+            description: "the coordinate of the bbox"
       dates:
         type: "object"
         description: "Start & end dates"
@@ -38,6 +56,14 @@ definitions:
           end:
             type: "string"
             description: "end date"
+  FetchSuccess:
+    required:
+    - "layers"
+    properties:
+      layers:
+        type: "array"
+        tems:
+          type: "object"
 
 
 

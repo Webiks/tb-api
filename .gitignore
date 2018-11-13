@@ -1,5 +1,6 @@
 # IDE files
 .idea
+./app.js
 
 # Logs
 logs
