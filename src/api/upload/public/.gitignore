@@ -1,8 +1,10 @@
 # Ignore everything
-/*
+*
 
 # Not these directories
 !/uploads/
+!/json/
+!/json/*
 
 # Not these files
-!/.gitignore
+!.gitignore
