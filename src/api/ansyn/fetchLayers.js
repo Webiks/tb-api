@@ -3,7 +3,7 @@ const worldModel = require('../../database/schemas/WorldSchema');
 
 const fetchLayers = (req, res) => {
 	console.log("fetchLayers req.body: ", JSON.stringify(req.body));
-	findWorld({ name: req.body.worldName })
+	return findWorld({ name: req.body.worldName })
 		.then((world) => {
 			if (!world) {
 				throw new Error('No World!');
@@ -21,15 +21,15 @@ const fetchLayers = (req, res) => {
 			end = addTimeZoneToDate(end.toString());
 			console.log(`find layers date numbers: ${JSON.stringify({ start, end })}`);
 
-			findLayers(worldlayers, start, end, geometry)
+			return findLayers(worldlayers, start, end, geometry)
 				.then((layers = []) => {
 					console.log(`fetchLayers: find ${layers.length} layers!`);
 						return layers;
-				});
+				})
 		})
 		.catch((err) => {
 			console.log(err);
-			return `No World! ${err}`;
+			return `There is No such World! ${err}`;
 		});
 };
 
