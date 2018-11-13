@@ -29,7 +29,7 @@ const fetchLayers = (req, res) => {
 		})
 		.catch((err) => {
 			console.log(err);
-			return `There is No such World! ${err}`;
+			return [];
 		});
 };
 
