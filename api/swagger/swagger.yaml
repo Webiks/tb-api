@@ -2,21 +2,7 @@ swagger: '2.0'
 info:
   version: '0.0.1'
   title: 'Ansyn-TB API'
-#servers:
-#- url: '{protocol}://{host}:{port}/api'
-#  variables:
-#    protocol:
-#      enum:
-#      - http
-#      - https
-#      default: http
-#    host:
-#      enum:
-#      - localhost
-#      - tb-admin.webiks.com
-#      default: localhost
-#    port:
-#      default: 10010
+
 host: 'localhost:10010'
 basePath: '/v2/api'
 schemes:
