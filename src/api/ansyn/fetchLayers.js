@@ -22,18 +22,14 @@ const fetchLayers = (req, res) => {
 			console.log(`find layers date numbers: ${JSON.stringify({ start, end })}`);
 
 			findLayers(worldlayers, start, end, geometry)
-				.then(layers => {
+				.then((layers = []) => {
 					console.log(`fetchLayers: find ${layers.length} layers!`);
-					if (layers){
-						res.send(layers);
-					} else {
-						res.send([]);
-					}
+						return layers;
 				});
 		})
 		.catch((err) => {
 			console.log(err);
-			res.send(`No World! ${err}`);
+			return `No World! ${err}`;
 		});
 };
 

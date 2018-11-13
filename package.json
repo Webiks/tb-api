@@ -42,8 +42,8 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
-		"start": "node index.js",
-		"start:old": "node app.js",
-    "test": "swagger project test"
+		"start": "node index",
+		"start:inspect": "node --inspect index",
+		"test": "swagger project test"
   }
 }
