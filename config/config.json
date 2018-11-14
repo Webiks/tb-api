@@ -19,9 +19,6 @@
 		"name": "tb_database",
 		"url": "mongodb://127.0.0.1:27017"
 	},
-	"swagger": {
-		"port": 10010
-	},
 	"login":	{
 		"usernameKey": "TB_USERNAME",
 		"passwordKey": "TB_PASSWORD"
@@ -42,6 +39,7 @@
 			"Content-Type": "application/json",
 			"accept": "application/json"
 		},
-		"maxFileSize": 50000000000
+		"maxFileSize": 50000000000,
+		"defaultWorldId": "public"
 	}
 }

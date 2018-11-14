@@ -1,4 +1,5 @@
 const AdmZip = require('adm-zip');
+const { upload } = require('../../../config/config');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const UploadFilesToFS = require('./UploadFilesToFS');
 const fs = require('fs-extra');
@@ -16,9 +17,9 @@ const uploadFiles = (req, res) => {
 		worldId = req.params.worldId;
 	} else {
 		if (req.fields){
-			worldId = reqFields.sharing ? reqFields.sharing : 'public';
+			worldId = reqFields.sharing ? reqFields.sharing.toLowerCase() : upload.defaultWorldId;
 		} else {
-			worldId = 'public';
+			worldId = upload.defaultWorldId;
 		}
 	}
 	console.log(`req Fields: ${JSON.stringify(reqFields)}`);

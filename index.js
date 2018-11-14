@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const JsonRefs = require('json-refs');
 const YAML = require('js-yaml');
-const { mongodb, swagger, remote } = require('./config/config');
+const { mongodb, appPort, remote } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
@@ -34,7 +34,6 @@ JsonRefs.resolveRefsAt('./api/swagger/swagger.yaml', {
 		/* swaggerUi */
 		app.use(SwaggerUi(swaggerExpress.runner.swagger));
 		swaggerExpress.register(app);
-		// app.use(cors());
 
 		/* v1 api - no swagger */
 
@@ -60,8 +59,8 @@ JsonRefs.resolveRefsAt('./api/swagger/swagger.yaml', {
 		app.use('/login', login);
 		app.use('/v1/api', api);
 
-		app.listen(swagger.port, () => {
-			console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.serverDomain}/docs`);
+		app.listen(appPort, () => {
+			console.log(`Swagger-ui available on ${appPort}, on: ${remote.serverDomain}/docs`);
 		});
 
 	});

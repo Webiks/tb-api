@@ -135,13 +135,13 @@ class UploadFilesToFS {
 					GSD: 0,
 					sensor: {
 						type: fields.sensorType,
-						name: fields.sensorName,
+						name: fields.sensorName | layer.imageData.Model,
 						maker: layer.imageData.Make,
 						bands: []
 					},
 					ansyn: {
 						title: fields.title | '',
-						sharing: fields.sharing | 'public'
+						sharing: fields.sharing.toLowerCase() | worldId
 					},
 					flightAltitude: layer.imageData.GPSAltitude,
 					cloudCoveragePercentage: 0
