@@ -273,8 +273,7 @@ const inputData = {
 		bands: [String]
 	},
 	ansyn: {
-		title: String,
-		sharing: { type: String, lowercase: true }
+		title: String
 	}
 };
 
