@@ -5,12 +5,12 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const JsonRefs = require('json-refs');
+const YAML = require('js-yaml');
 const { mongodb, swagger, remote } = require('./config/config');
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
-const JsonRefs = require('json-refs');
-const YAML = require('js-yaml');
 
 JsonRefs.resolveRefsAt('./api/swagger/swagger.yaml', {
 	filter: ['relative', 'remote'],
@@ -34,7 +34,7 @@ JsonRefs.resolveRefsAt('./api/swagger/swagger.yaml', {
 		/* swaggerUi */
 		app.use(SwaggerUi(swaggerExpress.runner.swagger));
 		swaggerExpress.register(app);
-		app.use(cors());
+		// app.use(cors());
 
 		/* v1 api - no swagger */
 
@@ -61,7 +61,7 @@ JsonRefs.resolveRefsAt('./api/swagger/swagger.yaml', {
 		app.use('/v1/api', api);
 
 		app.listen(swagger.port, () => {
-			console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.domain}:${swagger.port}/docs`);
+			console.log(`Swagger-ui available on ${swagger.port}, on: ${remote.serverDomain}/docs`);
 		});
 
 	});

@@ -1,5 +1,5 @@
 {
-	"appPort": 4000,
+	"appPort": 10010,
 	"local": {
 		"ip": "://127.0.0.1",
 		"imageDir": "/../images",

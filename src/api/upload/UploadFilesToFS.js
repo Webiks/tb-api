@@ -8,10 +8,11 @@ const { configUrl } = require('../../../config/serverConfig');
 // upload files to the File System
 class UploadFilesToFS {
 
-	static uploadFile(worldId, reqFiles, name, path) {
+	static uploadFile(worldId, reqFiles, name, path, fields) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
 		console.log('uploadFile to FS files: ' + JSON.stringify(files));
+		console.log('uploadFile to FS fields: ' + JSON.stringify(fields));
 		console.log('uploadFile PATH: ' + path);
 
 		if (files.length !== 0) {
@@ -89,7 +90,7 @@ class UploadFilesToFS {
 				fileName: file.name,
 				filePath: fullPath,
 				fileType: 'image',
-				format: 'JPG',
+				format: 'JPEG',
 				fileData: file
 			};
 		}
@@ -133,9 +134,14 @@ class UploadFilesToFS {
 					affiliation: 'UNKNOWN',
 					GSD: 0,
 					sensor: {
+						type: fields.sensorType,
+						name: fields.sensorName,
 						maker: layer.imageData.Make,
-						name: layer.imageData.Model,
 						bands: []
+					},
+					ansyn: {
+						title: fields.title | '',
+						sharing: fields.sharing | 'public'
 					},
 					flightAltitude: layer.imageData.GPSAltitude,
 					cloudCoveragePercentage: 0

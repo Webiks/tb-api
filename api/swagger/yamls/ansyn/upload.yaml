@@ -15,13 +15,13 @@ post:
     required: false
 
   - name: sensorType
-    description: sensorType
+    description: the sensor type
     in: formData
     type: string
     required: true
 
   - name: sensorName
-    description: sensorName
+    description: the sensor name
     in: formData
     type: string
     required: true
@@ -31,10 +31,11 @@ post:
     in: formData
     type: string
     required: true
+    default: 'public'
 
-  - name: files
+  - name: uploads
     type: file
-    description: files
+    description: the upload's files
     in: formData
     required: false
 

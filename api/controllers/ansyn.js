@@ -7,6 +7,8 @@ module.exports = {
 };
 
 function uploadImage(req, res) {
+	console.log('uploadImage controller req BODY: ', req.body);
+	console.log('uploadImage controller req FILES uploads: ', req.files.uploads);
 	res.json({ message: 'Not implemented yet' });
 }
 

@@ -267,9 +267,14 @@ const inputData = {
 	zoom: Number,
 	opacity: { type: Number, min: 0, max: 1 },
 	sensor: {
+		type: String,
 		name: String,
 		maker: String,
 		bands: [String]
+	},
+	ansyn: {
+		title: String,
+		sharing: { type: String, lowercase: true }
 	}
 };
 
@@ -281,7 +286,7 @@ const LayerSchema = new Schema({
 	fileName: String,
 	filePath: String,
 	fileType: { type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
-	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPG'] },
+	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	geoData,
 	layer,
 	store,
