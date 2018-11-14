@@ -6,5 +6,6 @@ require('../fs/fileMethods')();
 
 router.use(formidable(getOptions(uploadPath)));
 router.post('/', uploadFiles);
+router.post('/:worldId', uploadFiles);
 
 module.exports = router;

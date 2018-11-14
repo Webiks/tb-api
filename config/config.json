@@ -1,5 +1,5 @@
 {
-	"appPort": 4000,
+	"appPort": 10010,
 	"local": {
 		"ip": "://127.0.0.1",
 		"imageDir": "/../images",
@@ -18,9 +18,6 @@
 		"port": 27017,
 		"name": "tb_database",
 		"url": "mongodb://127.0.0.1:27017"
-	},
-	"swagger": {
-		"port": 10010
 	},
 	"login":	{
 		"usernameKey": "TB_USERNAME",
@@ -42,6 +39,7 @@
 			"Content-Type": "application/json",
 			"accept": "application/json"
 		},
-		"maxFileSize": 50000000000
+		"maxFileSize": 50000000000,
+		"defaultWorldId": "public"
 	}
 }

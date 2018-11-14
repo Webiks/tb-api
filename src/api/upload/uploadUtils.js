@@ -1,4 +1,5 @@
 const AdmZip = require('adm-zip');
+const { upload } = require('../../../config/config');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const UploadFilesToFS = require('./UploadFilesToFS');
 const fs = require('fs-extra');
@@ -8,18 +9,31 @@ const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
 	console.log('start upload utils to: ', uploadPath);
-	const worldId = req.fields.sharing.toLowerCase();
-	console.log(req.fields);
 
+	// getting the user's input data from the request
+	const reqFields = req.fields ? req.fields : {} ;
+	let worldId;
+	if (req.params.worldId){
+		worldId = req.params.worldId;
+	} else {
+		if (req.fields){
+			worldId = reqFields.sharing ? reqFields.sharing.toLowerCase() : upload.defaultWorldId;
+		} else {
+			worldId = upload.defaultWorldId;
+		}
+	}
+	console.log(`req Fields: ${JSON.stringify(reqFields)}`);
 	console.log('worldId: ', worldId);
-	let reqFiles = req.files.uploads;
-	console.log('req Files: ', JSON.stringify(reqFiles));
-	console.log('req length: ', reqFiles.length);
 
-	// convert the request Files to JSON and back to an Object
+	// Define the request Files
+	// 1. convert it to JSON and back to an Object
+	let reqFiles = req.files.uploads;
 	const jsonFiles = JSON.stringify(reqFiles);
 	reqFiles = JSON.parse(jsonFiles);
+	console.log(`req Files: ${jsonFiles}`);
+	console.log('req length: ', reqFiles.length);
 
+	// 2. find the file type
 	let name;
 	let path;
 	let file;
@@ -28,10 +42,9 @@ const uploadFiles = (req, res) => {
 	} else {
 		file = reqFiles[0];
 	}
-	// find the file type
 	const fileType = findFileType(file.type);
 
-	// check if need to make a ZIP file
+	// 3. check if need to make a ZIP file
 	if (!reqFiles.length) {
 		// set a single file before upload
 		reqFiles = setBeforeUpload(reqFiles, fileType, uploadPath);
@@ -70,7 +83,7 @@ const uploadFiles = (req, res) => {
 	// send to the right upload handler according to the type
 	if (fileType === 'image') {
 		// save the file in the File System
-		UploadFilesToFS.uploadFile(worldId, reqFiles, name, path)
+		UploadFilesToFS.uploadFile(worldId, reqFiles, name, path, reqFields)
 			.then(files => res.send(returnFiles(files, path)));
 	} else {
 		// upload the file to GeoServer
