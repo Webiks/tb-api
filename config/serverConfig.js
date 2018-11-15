@@ -1,30 +1,24 @@
 const path = require('path');
-const { appPort, geoserver, remote, local } = require('./config');
+const { appPort, geoserver, remote, local, images } = require('./config');
 
 const createConfigUrl = () => {
 
 	// set the local/remote urls
 	let baseUrl = '';
-	let uploadImageDir = '';
-	let uploadRelativeImageDir = '';
-
 	if (process.env.NODE_ENV === 'production') {
 		baseUrl = remote.ip;
-		uploadImageDir = path.resolve(__dirname + remote.imageDir);
-		uploadRelativeImageDir = remote.imageDirRel;
 	} else {
 		baseUrl = local.ip;
-		uploadImageDir = path.resolve(__dirname + local.imageDir);
-		uploadRelativeImageDir = local.imageDirRel;
 	}
-
-	const serverBaseUrl = `http${baseUrl}:${appPort}`;
-	const geoserverBaseUrl = `http${baseUrl}:${geoserver.port}`;
-
 	console.log('Config Base URL: ' + baseUrl);
-	console.log('Config uploadImageDir: ' + uploadImageDir);
+	const serverBaseUrl = `http${baseUrl}:${appPort}`;
 
-	// set the geoserver urls
+	// set the Images Directory
+	const uploadImageDir = path.resolve(__dirname + images.dir);
+	const uploadRelativeImageDir = images.relativeDir;
+
+	// set the Geoserver Urls
+	const geoserverBaseUrl = `http${baseUrl}:${geoserver.port}`;
 	const baseUrlGeoserver = `${geoserverBaseUrl}/${geoserver.path}`;
 	const baseRestUrlGeoserver = `${geoserverBaseUrl}/${geoserver.rest}`;
 	const baseWorkspacesUrlGeoserver = `${geoserverBaseUrl}/${geoserver.workspaces}`;

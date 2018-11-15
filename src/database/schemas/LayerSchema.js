@@ -267,8 +267,8 @@ const inputData = {
 	zoom: Number,
 	opacity: { type: Number, min: 0, max: 1 },
 	sensor: {
-		type: String,
 		name: String,
+		type: { type: String },
 		maker: String,
 		bands: [String]
 	},

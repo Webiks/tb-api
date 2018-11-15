@@ -1,18 +1,14 @@
 {
 	"appPort": 10010,
 	"local": {
-		"ip": "://127.0.0.1",
-		"imageDir": "/../images",
-		"imageDirRel": "./images"
+		"ip": "://127.0.0.1"
 	},
 	"remote": {
 		"ip": "://34.218.228.21",
 		"domain": "http://tb-admin.webiks.com",
 		"serverDomain": "http://tb-server.webiks.com",
 		"staticDomain": "http://tb-static.webiks.com",
-		"gsDatadir": "D:/GeoServer/data_dir",
-		"imageDir": "/../../images",
-		"imageDirRel": "../images"
+		"gsDatadir": "D:/GeoServer/data_dir"
 	},
 	"mongodb": {
 		"port": 27017,
@@ -41,5 +37,9 @@
 		},
 		"maxFileSize": 50000000000,
 		"defaultWorldId": "public"
+	},
+	"images": {
+		"dir": "/../images",
+		"relativeDir": "./images"
 	}
 }
