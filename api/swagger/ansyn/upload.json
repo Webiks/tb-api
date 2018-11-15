@@ -3,37 +3,37 @@
 
 	"post": {
 		"tags": ["Ansyn"],
-		"description": "Upload image file",
+		"description": "Upload image file.",
 		"operationId": "uploadImage",
-		"consumes": "multipart/form-data",
+		"consumes": ["multipart/form-data"],
 		"parameters": [
 			{
 				"name": "title",
 				"description": "title",
 				"in": "formData",
 				"type": "string",
-				"required": "false"
+				"required": false
 			},
 			{
 				"name": "sensorType",
 				"description": "the sensor's type",
 				"in": "formData",
 				"type": "string",
-				"required": "true"
+				"required": true
 			},
 			{
 				"name": "sensorName",
 				"description": "the sensor's name",
 				"in": "formData",
 				"type": "string",
-				"required": "true"
+				"required": true
 			},
 			{
 				"name": "sharing",
 				"description": "the world's name",
 				"in": "formData",
 				"type": "string",
-				"required": "true",
+				"required": true,
 				"default": "public"
 			},
 			{
@@ -41,7 +41,7 @@
 				"description": "the upload's files",
 				"in": "formData",
 				"type": "file",
-				"required": "false"
+				"required": false
 			}
 		],
 		"responses": {

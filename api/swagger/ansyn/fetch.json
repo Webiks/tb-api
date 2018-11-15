@@ -3,14 +3,14 @@
 
 	"post": {
 		"tags": ["Ansyn"],
-		"description": "Fetch layers for ansyn",
+		"description": "Fetch layers for ansyn.",
 		"operationId": "fetchLayers",
 		"parameters": [
 			{
 				"name": "payload",
 				"description": "The name of the world",
 				"in": "body",
-				"required": "true",
+				"required": true,
 				"schema": {
 					"$ref": "./definition.json#/definitions/FetchLayers"
 				}

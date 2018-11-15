@@ -50,8 +50,8 @@
 									"type": "array",
 									"items": {
 										"type": "number",
-										"minItems": "2",
-										"maxItems": "2"
+										"minItems": 2,
+										"maxItems": 2
 									}
 								}
 							}
@@ -84,7 +84,7 @@
 			"properties": {
 				"layers": {
 					"type": "array",
-					"items": "object"
+					"items": { "type": "object" }
 				}
 			}
 		}
