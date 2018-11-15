@@ -1,9 +1,11 @@
 'use strict';
 const fetch = require('../../src/api/ansyn/fetchLayers');
+const layerModel = require('../../src/database/schemas/LayerSchema');
 
 module.exports = {
 	uploadImage,
-	fetchLayers
+	fetchLayers,
+	layerById
 };
 
 function uploadImage(req, res) {
@@ -21,6 +23,25 @@ function fetchLayers(req, res) {
 		})
 		.catch(error => {
 			console.log('fetchLayers failed:', error.message);
-			res.status(500).send({ message: error.message });
+			res.status(500).json({ message: error.message });
+		});
+}
+
+function layerById(req, res) {
+	console.log(req.swagger.params.id.value);
+	layerModel.findOne({ _id: req.swagger.params.id.value })
+		.then((layer) => {
+
+			if (!layer) {
+				console.log('layerById not found');
+				res.status(404).json({ message: 'Layer not found' })
+			} else {
+				console.log('layerById success');
+				res.json(layer);
+			}
+		})
+		.catch(error => {
+			console.log('layerById failed:', error.message);
+			res.status(500).json({ message: 'failed to find layer' });
 		});
 }
