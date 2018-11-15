@@ -13,12 +13,14 @@ function uploadImage(req, res) {
 }
 
 function fetchLayers(req, res) {
+	console.log('fetchLayers...');
 	fetch(req.body)
 		.then(layers => {
-			res.json(layers)
+			console.log('fetchLayers success:', layers.length);
+			res.json(layers);
 		})
 		.catch(error => {
-			res.status = 500;
-			res.json({ message: error });
+			console.log('fetchLayers failed:', error.message);
+			res.status(500).send({ message: error.message });
 		});
 }

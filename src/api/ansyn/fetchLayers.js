@@ -4,31 +4,27 @@ const DBManger = require('../../database/DBManager');
 
 const fetchLayers = ({ worldName, dates, geometry }) => {
 	if (!DBManger.isConnected()) {
-		return Promise.reject({ message: 'No connection for mongodb!' });
+		return Promise.reject(new Error('No connection for mongodb!'));
 	}
 	return worldModel.findOne({ name: worldName })
-		.then((world = { layersId: [] }) => world)
-		.then((world) => {
+		.then(world => world || { layersId: [] })
+		.then(world => {
 			const start = Date.parse(dates.start);
 			const end = Date.parse(dates.end);
-			return findLayers(world.layersId, start, end, geometry)
+			return _findLayers(world.layersId, start, end, geometry)
 				.then((layers = []) => layers);
 		});
 };
 
-// ========================================= private  F U N C T I O N S ============================================
-const findLayers = (layersId, start, end, $geometry) => {
-	console.log(`start findLayers...`);
+const _findLayers = (layersId, $gt, $lt, $geometry) => {
+	if (!layersId.length) {
+		return Promise.resolve([]);
+	}
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
+		'fileData.lastModified': { $gt, $lt },
 		'geoData.footprint.geometry': { $geoWithin: { $geometry } }
 	})
-		.then(layers => {
-			console.log(`find ${layers.length} layers by geometry!`);
-			const matchLayers = layers.filter(layer => (layer.fileData.lastModified >= start && layer.fileData.lastModified <= end));
-			console.log(`find ${matchLayers.length} layers by dates!`);
-			return matchLayers;
-		});
 };
 
 module.exports = fetchLayers;

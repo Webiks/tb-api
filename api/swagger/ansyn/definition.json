@@ -32,7 +32,19 @@
 				},
 				"geometry": {
 					"description": "Geometry object ('Feature'/'CollectionFeature'...)",
-					"type": "object"
+					"type": "object",
+					"example": {
+						"type": "Polygon",
+						"coordinates": [
+							[
+								[0.0, -50.0],
+								[150.0, -50.0],
+								[150.0, 50.0],
+								[0.0, 50.0],
+								[0.0, -50.0]
+							]
+						]
+					}
 				},
 				"dates": {
 					"description": "Start & end dates",
@@ -59,13 +71,8 @@
 			}
 		},
 		"FetchSuccess": {
-			"required": ["layers"],
-			"properties": {
-				"layers": {
-					"type": "array",
-					"items": { "type": "object" }
-				}
-			}
+			"type": "array",
+			"items": { "type": "object" }
 		}
 	}
 }
