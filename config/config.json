@@ -8,9 +8,7 @@
 		"domain": "http://tb-admin.webiks.com",
 		"serverDomain": "http://tb-server.webiks.com",
 		"staticDomain": "http://tb-static.webiks.com",
-		"gsDatadir": "D:/GeoServer/data_dir",
-		"imageDir": "/../../images",
-		"imageDirRel": "../images"
+		"gsDatadir": "D:/GeoServer/data_dir"
 	},
 	"mongodb": {
 		"port": 27017,
