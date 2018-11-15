@@ -24,7 +24,7 @@ post:
     description: the sensor name
     in: formData
     type: string
-    required: true
+    required: false
 
   - name: sharing
     description: sharing
