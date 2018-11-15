@@ -23,6 +23,10 @@ class DBManager {
 	static disconnect(done) {
 		mongoose.disconnect(done);
 	}
+
+	static isConnected() {
+		return mongoose.connection.readyState === 1;
+	}
 }
 
 module.exports = DBManager;

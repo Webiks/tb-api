@@ -26,38 +26,13 @@
 			],
 			"properties": {
 				"worldName": {
+					"example": "public",
 					"description": "The id of world",
 					"type": "string"
 				},
 				"geometry": {
 					"description": "Geometry object ('Feature'/'CollectionFeature'...)",
-					"type": "object",
-					"required": [
-						"type",
-						"coordinates"
-					],
-					"properties": {
-						"type": {
-							"description": "the geometry type ('Feature'/'Polygon'...)",
-							"type": "string"
-						},
-						"coordinates": {
-							"description": "the coordinate of the bbox",
-							"type": "array",
-							"items": {
-								"type": "array",
-								"items": {
-									"type": "array",
-									"items": {
-										"type": "number",
-										"minItems": 2,
-										"maxItems": 2
-									}
-								}
-							}
-						}
-
-					}
+					"type": "object"
 				},
 				"dates": {
 					"description": "Start & end dates",
@@ -69,11 +44,15 @@
 					"properties": {
 						"start": {
 							"description": "start date",
-							"type": "string"
+							"type": "string",
+							"format": "date-time",
+							"example": "1970-01-01T00:00:00.000Z"
 						},
 						"end": {
 							"description": "end date",
-							"type": "string"
+							"type": "string",
+							"format": "date-time",
+							"example": "2018-11-15T13:01:15.537Z"
 						}
 					}
 				}
