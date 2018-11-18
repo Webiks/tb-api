@@ -4,7 +4,7 @@ const createConfigUrl = () => {
 	// set the local/remote urls
 	const baseUrl = process.env.NODE_ENV === 'production' ? remote.domain : remote.localDomain;
 
-	const uploadImageDir = `${baseUrl}:${appPort}/${paths.staticPath}`;
+	const uploadImageDir = `${baseUrl}:${appPort}${paths.staticPath}${paths.imagesPath}`;
 	// set the Geoserver Urls
 	const geoserverBaseUrl = `${baseUrl}:${geoserver.port}`;
 	const baseUrlGeoserver = `${geoserverBaseUrl}/${geoserver.path}`;

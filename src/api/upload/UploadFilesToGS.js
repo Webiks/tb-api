@@ -1,4 +1,3 @@
-require('../fs/fileMethods')();
 require('../geoserverCrud/curlMethods')();
 
 // upload files to GeoServer
