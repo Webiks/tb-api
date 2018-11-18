@@ -5,8 +5,12 @@
 		"title": "Ansyn-TB API"
 	},
 	"basePath": "/v2/api",
-	"consumes": ["application/json"],
-	"produces": ["application/json"],
+	"consumes": [
+		"application/json"
+	],
+	"produces": [
+		"application/json"
+	],
 	"paths": {
 		"/swagger": {
 			"x-swagger-pipe": "swagger_raw"
@@ -14,8 +18,11 @@
 		"/ansyn/upload": {
 			"$ref": "./ansyn/upload.json"
 		},
-		"/ansyn/fetch": {
-			"$ref": "./ansyn/fetch.json"
+		"/ansyn/layers": {
+			"$ref": "./ansyn/layers.json"
+		},
+		"/ansyn/layers/{id}": {
+			"$ref": "./ansyn/layerById.json"
 		}
 	}
 }

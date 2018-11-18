@@ -1,66 +1,30 @@
 const layerModel = require('../../database/schemas/LayerSchema');
 const worldModel = require('../../database/schemas/WorldSchema');
+const DBManger = require('../../database/DBManager');
 
-const fetchLayers = (req, res) => {
-	console.log("fetchLayers req.body: ", JSON.stringify(req.body));
-	return findWorld({ name: req.body.worldName })
-		.then((world) => {
-			if (!world) {
-				throw new Error('No World!');
-			}
-			return world;
-		})
-		.then((world) => {
-			let start = req.body.dates.start,
-					end = req.body.dates.end;
-			const worldlayers = world.layersId,
-						geometry = req.body.geometry;
-			console.log(`world layersId: ${JSON.stringify(worldlayers)}`);
-			// define the dates
-			start = addTimeZoneToDate(start.toString());
-			end = addTimeZoneToDate(end.toString());
-			console.log(`find layers date numbers: ${JSON.stringify({ start, end })}`);
-
-			return findLayers(worldlayers, start, end, geometry)
-				.then((layers = []) => {
-					console.log(`fetchLayers: find ${layers.length} layers!`);
-						return layers;
-				})
-		})
-		.catch((err) => {
-			console.log(err);
-			return [];
+const fetchLayers = ({ worldName, dates, geometry }) => {
+	if (!DBManger.isConnected()) {
+		return Promise.reject(new Error('No connection for mongodb!'));
+	}
+	return worldModel.findOne({ name: worldName })
+		.then(world => world || { layersId: [] })
+		.then(world => {
+			const start = Date.parse(dates.start);
+			const end = Date.parse(dates.end);
+			return _findLayers(world.layersId, start, end, geometry)
+				.then((layers = []) => layers);
 		});
 };
 
-// ========================================= private  F U N C T I O N S ============================================
-const findWorld = ({ name }) => worldModel.findOne({ name });
-
-const addTimeZoneToDate = (date, timeZone) => {
-	// check if the date inculde time
-	if (date.indexOf(':') !== -1) {
-		// check if the time include a time zone or GMT
-		if (!(date.indexOf('Z') !== -1) && !(date.indexOf('GMT') !== -1)) {
-			// add 'GMT' in the end of the date
-			date = `${date} GMT`;
-		}
+const _findLayers = (layersId, $gt, $lt, $geometry) => {
+	if (!layersId.length) {
+		return Promise.resolve([]);
 	}
-	// return the date as a number
-	return Date.parse(date);
-};
-
-const findLayers = (layersId, start, end, $geometry) => {
-	console.log(`start findLayers...`);
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
+		'fileData.lastModified': { $gt, $lt },
 		'geoData.footprint.geometry': { $geoWithin: { $geometry } }
-		})
-		.then(layers => {
-			console.log(`find ${layers.length} layers by geometry!`);
-			const matchLayers = layers.filter(layer => (layer.fileData.lastModified >= start && layer.fileData.lastModified <= end));
-			console.log(`find ${matchLayers.length} layers by dates!`);
-			return matchLayers;
-		});
+	})
 };
 
 module.exports = fetchLayers;
