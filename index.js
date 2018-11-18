@@ -6,7 +6,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const $RefParser = require('json-schema-ref-parser');
-const { mongodb, appPort, remote, paths } = require('./config/config');
+const { mongodb, appPort, paths } = require('./config/config');
+const { domain } = require('./config/serverConfig');
+
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
@@ -29,7 +31,7 @@ $RefParser.dereference('./api/swagger/swagger.json')
 			swaggerExpress.register(app);
 
 			app.listen(appPort, () => {
-				console.log(`Swagger-ui available on ${appPort}, on: ${remote.serverDomain}/docs`);
+				console.log(`Swagger-ui available on ${appPort}, on: ${domain}/docs`);
 			});
 
 			/* v1 api - no swagger */

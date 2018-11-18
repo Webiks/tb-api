@@ -6,8 +6,7 @@
 	},
 	"remote": {
 		"localDomain": "http://127.0.0.1",
-		"domain": "http://tb-admin.webiks.com",
-		"serverDomain": "http://tb-server.webiks.com",
+		"domain": "http://tb-server.webiks.com",
 		"gsDatadir": "D:/GeoServer/data_dir"
 	},
 	"mongodb": {
