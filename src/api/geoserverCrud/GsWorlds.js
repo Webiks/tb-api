@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { upload } = require('../../../config/config');
-const { configUrl } = require('../../../config/serverConfig');
+const configUrl = require('../../../config/serverConfig');
 const headers = upload.headers;
 
 class GsWorlds {

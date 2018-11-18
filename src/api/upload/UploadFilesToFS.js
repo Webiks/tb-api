@@ -3,7 +3,8 @@ const exif = require('exif-parser');
 const fs = require('fs-extra');
 require('../fs/fileMethods')();
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const { configUrl } = require('../../../config/serverConfig');
+const configUrl = require('../../../config/serverConfig');
+const { paths } = require('../../../config/config');
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -18,7 +19,7 @@ class UploadFilesToFS {
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
-				const dirPath = `${configUrl.uploadRelativeImageDir}/${file._id}`;
+				const dirPath = `${paths.imagesPath}/${file._id}`;
 				const filePath = `${dirPath}/${file.name}`;
 				console.log(`filePath: ${filePath}`);
 				createDir(dirPath);
