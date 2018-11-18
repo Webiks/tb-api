@@ -1,6 +1,6 @@
 const { execSync } = require('child_process');          // for using the cURL command line
 const { geoserver } = require('../../../config/config');
-const { configUrl } = require('../../../config/serverConfig');
+const configUrl = require('../../../config/serverConfig');
 
 // // setting the cURL commands line (name and password, headers, request url)
 const baseCurl = geoserver.baseCurl;

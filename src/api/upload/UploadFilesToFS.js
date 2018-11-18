@@ -1,9 +1,10 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const fs = require('fs-extra');
-require('../fs/fileMethods')();
+const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const { configUrl } = require('../../../config/serverConfig');
+const configUrl = require('../../../config/serverConfig');
+const { paths } = require('../../../config/config');
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -18,20 +19,20 @@ class UploadFilesToFS {
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
-				const dirPath = `${configUrl.uploadRelativeImageDir}/${file._id}`;
+				const dirPath = `.${paths.staticPath}${paths.imagesPath}/${file._id}`;
 				const filePath = `${dirPath}/${file.name}`;
 				console.log(`filePath: ${filePath}`);
-				createDir(dirPath);
+				createDirSync(dirPath);
 				fs.renameSync(file.filePath, filePath);
 				console.log(`the '${file.name}' was rename!`);
-				const fullPath = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
+				const imageUrl = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
 
 				// 2. set the file Data from the upload file
 				const fileData = setFileData(file);
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 3. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, fullPath);
+				let worldLayer = setLayerFields(file._id, fileData, imageUrl, filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 5. get the metadata of the image file
@@ -81,14 +82,15 @@ class UploadFilesToFS {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, fullPath) {
+		function setLayerFields(id, file, imageUrl, filePath) {
 			const name = (file.name).split('.')[0];
 
 			return {
 				_id: id,
 				name,
 				fileName: file.name,
-				filePath: fullPath,
+				imageUrl,
+				filePath: filePath,
 				fileType: 'image',
 				format: 'JPEG',
 				fileData: file

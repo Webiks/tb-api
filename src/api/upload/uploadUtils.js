@@ -3,7 +3,7 @@ const { upload } = require('../../../config/config');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const UploadFilesToFS = require('./UploadFilesToFS');
 const fs = require('fs-extra');
-require('../fs/fileMethods')();
+const { findFileType } = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 

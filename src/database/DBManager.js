@@ -14,7 +14,7 @@ class DBManager {
 				return reject(err);
 			});
 			db.once('open', function () {
-				console.log('connected to mongo!!!');
+				console.log('Connected to mongo!');
 				return resolve();
 			});
 		});

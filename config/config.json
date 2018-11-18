@@ -1,13 +1,12 @@
 {
 	"appPort": 10010,
-	"local": {
-		"ip": "://127.0.0.1"
+	"paths": {
+		"staticPath": "/static",
+		"imagesPath": "/images"
 	},
 	"remote": {
-		"ip": "://34.218.228.21",
-		"domain": "http://tb-admin.webiks.com",
-		"serverDomain": "http://tb-server.webiks.com",
-		"staticDomain": "http://tb-static.webiks.com",
+		"localDomain": "http://127.0.0.1",
+		"domain": "http://tb-server.webiks.com",
 		"gsDatadir": "D:/GeoServer/data_dir"
 	},
 	"mongodb": {
@@ -22,7 +21,6 @@
 	"geoserver": {
 		"port": 8080,
 		"path": "geoserver",
-		"rest": "geoserver/rest",
 		"workspaces": "geoserver/rest/workspaces",
 		"imports": "geoserver/rest/imports",
 		"getLayerUrl": "api/gsLayers/layer",
@@ -37,9 +35,5 @@
 		},
 		"maxFileSize": 50000000000,
 		"defaultWorldId": "public"
-	},
-	"images": {
-		"dir": "/../images",
-		"relativeDir": "./images"
 	}
 }

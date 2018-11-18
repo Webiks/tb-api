@@ -284,6 +284,7 @@ const LayerSchema = new Schema({
 	href: String,                                  // href to the Layer page
 	fileName: String,
 	filePath: String,
+	imageUrl: String,
 	fileType: { type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
 	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	geoData,

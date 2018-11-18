@@ -9,7 +9,7 @@ const gsUtils = require('../geoserverCrud/gsUtils');
 const GsLayers = require('../geoserverCrud/GsLayers');
 const createNewLayer = require('./createNewLayer');
 const { geoserver } = require('../../../config/config');
-const { configUrl } = require('../../../config/serverConfig');
+const configUrl = require('../../../config/serverConfig');
 
 const dbWorldCrud = new MongoCrud(worldModel);
 const dbLayerCrud = new MongoCrud(layerModel);
