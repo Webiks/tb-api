@@ -103,16 +103,7 @@ class UploadFilesToFS {
 			const parser = exif.create(buffer);
 			const result = parser.parse();
 			const imageData = result.tags;
-			const hasThumbnail = result.hasThumbnail("image/jpeg");
-			const thumbnailSize = result.getThumbnailSize();
-			console.log("hasThumbnail: ", hasThumbnail);
-			const getThumbnailBuffer = result.getThumbnailBuffer();
-			console.log("getThumbnailBuffer: ", getThumbnailBuffer);
-			const thumbnailBase64 = getThumbnailBuffer.toString('base64');
-			console.log("thumbnailBase64: ", thumbnailBase64);
-
-			const ModifyDate = imageData.ModifyDate;
-			file.createdDate = ModifyDate;
+			file.createdDate = imageData.ModifyDate;
 			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };
