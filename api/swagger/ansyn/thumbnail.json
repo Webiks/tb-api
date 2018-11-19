@@ -1,0 +1,33 @@
+{
+	"x-swagger-router-controller": "ansyn",
+	"get": {
+		"tags": [
+			"Ansyn"
+		],
+		"description": "Get layer Thumbnail by id",
+		"operationId": "layerThumbnailById",
+		"produces": [
+			"text/html"
+		],
+		"parameters": [
+			{
+				"name": "id",
+				"description": "id",
+				"in": "path",
+				"type": "string",
+				"required": true
+			}
+		],
+		"responses": {
+			"200": {
+				"description": "Get layer thumbnail By id",
+				"schema": {
+					"type": "string"
+				}
+			},
+			"default": {
+				"description": "Error"
+			}
+		}
+	}
+}
