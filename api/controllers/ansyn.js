@@ -5,8 +5,13 @@ const layerModel = require('../../src/database/schemas/LayerSchema');
 module.exports = {
 	uploadImage,
 	fetchLayers,
-	layerById
+	layerById,
+	layerThumbnailById
 };
+function layerThumbnailById(req, res) {
+	const id = req.swagger.params.id.value;
+	res.send('base 64.........')
+}
 
 function uploadImage(req, res) {
 	console.log('uploadImage controller req BODY: ', req.body);
