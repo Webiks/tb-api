@@ -75,19 +75,22 @@ router.get('/geoserver/:worldId', (req, res) => {
 
 // get World's Layer DATA from GeoServer
 router.get('/geoserver/:worldId/:layerName', (req, res) => {
+	const worldId = req.params.worldId;
 	const layerName = req.params.layerName;
-	const worldLayer = { name: layerName };
+	const worldLayer = {
+		name: layerName,
+		displayUrl: `${configUrl.baseUrlGeoserver}/${worldId}/${layerName}/${geoserver.wmtsServiceUrl}`
+	};
 	console.log(`geo LAYER SERVER: start GET ${layerName} layer DATA...`);
 	// 1. get the layer's info
 	gsUtils.getLayerInfoFromGeoserver(worldLayer, req.params.worldId, layerName)
-		.then(resourceUrl => {
+		.then(layerInfo => {
 			// 2. get the layer's details
-			return gsUtils.getLayerDetailsFromGeoserver(worldLayer, resourceUrl);
+			return gsUtils.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);
 		})
-		.then(storeUrl => {
+		.then(layerDetails => {
 			// 3. get the store's data
-			console.log('dbLayer storeUrl: ', storeUrl);
-			return gsUtils.getStoreDataFromGeoserver(worldLayer, storeUrl);
+			return gsUtils.getStoreDataFromGeoserver(layerDetails, layerDetails.geoserver.data.store.href);
 		})
 		.then(worldLayer => res.send(worldLayer))
 		.catch(error => {

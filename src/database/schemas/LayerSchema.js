@@ -32,7 +32,6 @@ const geoData = {
 // LAYER: from GeoServer - Layer page
 const layer = {
 	name: String,
-	type: { type: String, uppercase: true, enum: ['RASTER', 'VECTOR'] },
 	defaultStyle: {
 		name: String,
 		href: String                                // href to the style page
@@ -40,33 +39,30 @@ const layer = {
 	resource: {
 		class: String,                             // @class field
 		name: String,                              // the worldLayer Id ( worldname: layername )
-		href: String                                // href to the details (RASTER/VECTOR) page
+		href: String                               // href to the details (RASTER/VECTOR) page
 	},
 	attribution: {
 		logoWidth: Number,
 		logoHeight: Number
-	},
-	storeId: String,                               // get from the details page (RASTER/VECTOR) store's name field
-	storeName: String                             // get from the store's name field
+	}
 };
 
 // STORE: from GeoServer - Store page (coveragestores(RASTER) / datastores(VECTOR))
 const store = {
-	storeId: String,                               // get from the details page (RASTER/VECTOR) store's name field
+	storeId: String,                              // get from the details page (RASTER/VECTOR) store's name field
 	name: String,
-	type: { type: String, uppercase: true, enum: ['RASTER', 'VECTOR'] },      // get from the Layer page's type
 	enabled: Boolean,
 	_default: Boolean,
 	workspace: {
-		name: String,                              // the name of the world
-		href: String                                // href to the workspace page
+		name: String,                              	// the name of the world
+		href: String                               	// href to the workspace page
 	},
-	connectionParameters: {                         // was translated from a map
+	connectionParameters: {                    		 // was translated from a map
 		namespace: String,
-		url: String                                 // VECTOR only
+		url: String                               	 // VECTOR only
 	},
 	url: String,                                   // RASTER only
-	href: String                                    // get from the "coverages"  in RASTERS or "featureTypes" in VECTORS
+	href: String                                   // get from the "coverages"  in RASTERS or "featureTypes" in VECTORS
 };
 
 // LAYER DETAILS: from GeoServer - RASTER (coverage object) / VECTOR (featureType object) page
@@ -97,7 +93,6 @@ const data = {
 		maxy: Number,
 		crs: String
 	},
-	center: [Number, Number],
 	projectionPolicy: String,
 	enabled: Boolean,
 	metadata: {                                     // was translated from a map
@@ -189,111 +184,116 @@ const data = {
 const fileData = {
 	name: String,														// the original name
 	size: Number,                           // MB or KB
-	lastModified: Number,										// the file created date in number
 	fileCreatedDate: Date | String,					// the file created date
 	fileUploadDate: Date | String,				  // the upload file date
 	fileExtension: String,
 	fileType: String,												// 'raster' or 'vector'
 	filePath: String,
 	encodeFileName: String,									// the encoded file name (differ when there is special charecters in the name)
-	encodePathName: String,									// the encoded file path (differ when there is special charecters in the name)
-	splitPath: String												// the zip path of the upload vector (for removing it later)
+	zipPath: String									 				// the zip path of the upload vector (for removing it later)
 };
 
 // IMAGE DATA: metadata of the upload JPG image
 const imageData = {
 	ImageDescription: String,
-	Make: String,
-	Model: String,
-	SerialNumber: String,
-	InteropIndex: String,
-	Software: String,
-	ExifImageWidth: Number,									// the picture size in pixels
-	ExifImageHeight: Number,								// the picture size in pixels
-	Orientation: Number,
-	XResolution: Number,										// resolution
-	YResolution: Number,										// resolution
-	ResolutionUnit: Number,									// resolution
+	Make: String,														// sensor maker
+	Model: String,													// sensor model
 	ModifyDate: Number,											// modified date
 	DateTimeOriginal: Number,								// original date
 	CreatedDate: Number,										// created date
 	JPGModifiedDate: Date | String,
 	JPGOriginalDate: Date | String,
-	YCbCrPosition: Number,
-	XPComment: [Number],
-	XPKeywords: [Number],
-	GPSVersionId: [Number, Number, Number, Number],
 	GPSLatitudeRef: String,									// x-point orientation (latitude)
 	GPSLatitude: Number,										// x-point (latitude)
 	GPSLongitudeRef: String,								// y-point orientation (longitude)
 	GPSLongitude: Number,										// y-point (longitude)
-	GPSAltitude: Number,										// relative altitude
-	ExposureTime: Number,
-	ExposureProgram: Number,
-	ExposureCompensation: Number,
-	ExposureIndex: String,
-	ExposureMode: Number,
-	FNumber: Number,
-	ISO: Number,
-	CompressedBitPerPixel: Number,
-	ShutterSpeedValue: Number,
-	ApertureValue: Number,
-	MaxApertureValue: Number,
-	SubjectDistance: Number,
-	SubjectDistanceRange: Number,
-	MeteringMode: Number,
-	LightSource: Number,
-	Flash: Number,
-	FocalLength: Number,
-	FocalLengthIn35mmFormat: Number,
-	ColorSpace: Number,
-	CustumRendered: Number,
-	WhiteBalance: Number,
-	DigitalZoomRatio: String,
-	SceneCaptureType: Number,
-	GainControl: Number,
-	Contrast: Number,
-	Saturation: Number,
-	Sharpness: Number
+	GPSAltitude: Number, 										// relative altitude
+	ExifImageWidth: Number,								  // the picture size in pixels
+	ExifImageHeight: Number							 	  // the picture size in pixels
+	// SerialNumber: String,
+	// InteropIndex: String,
+	// Software: String,
+	// Orientation: Number,
+	// XResolution: Number,										// resolution
+	// YResolution: Number,										// resolution
+	// ResolutionUnit: Number,								// resolution
+	// YCbCrPosition: Number,
+	// GPSVersionId: [Number, Number, Number, Number],
+	// ExposureTime: Number,
+	// ExposureProgram: Number,
+	// ExposureCompensation: Number,
+	// ExposureIndex: String,
+	// ExposureMode: Number,
+	// FNumber: Number,
+	// ISO: Number,
+	// CompressedBitPerPixel: Number,
+	// ShutterSpeedValue: Number,
+	// ApertureValue: Number,
+	// MaxApertureValue: Number,
+	// SubjectDistance: Number,
+	// SubjectDistanceRange: Number,
+	// MeteringMode: Number,
+	// LightSource: Number,
+	// Flash: Number,
+	// FocalLength: Number,
+	// FocalLengthIn35mmFormat: Number,
+	// ColorSpace: Number,
+	// CustumRendered: Number,
+	// WhiteBalance: Number,
+	// DigitalZoomRatio: String,
+	// SceneCaptureType: Number,
+	// GainControl: Number,
+	// Contrast: Number,
+	// Saturation: Number,
+	// Sharpness: Number
 };
 
 // INPUT DATA: data from the user
 const inputData = {
-	fileName: String,
-	affiliation: { type: String, uppercase: true, enum: ['INPUT', 'OUTPUT', 'UNKNOWN'] },  // 'INPUT' or 'OUTPUT'
-	GSD: Number,
-	flightAltitude: Number,
-	cloudCoveragePercentage: Number,
-	zoom: Number,
-	opacity: { type: Number, min: 0, max: 1 },
+	name: String,
 	sensor: {
 		name: String,
 		type: { type: String },
 		maker: String,
 		bands: [String]
 	},
+	tb: {
+		affiliation: { type: String, uppercase: true, enum: ['INPUT', 'OUTPUT', 'UNKNOWN'] },  // 'INPUT' or 'OUTPUT'
+		GSD: Number,
+		flightAltitude: Number,
+		cloudCoveragePercentage: Number
+	},
+	ol: {
+		zoom: Number,
+		opacity: { type: Number, min: 0, max: 1 }
+	},
 	ansyn: {
 		title: String
 	}
+};
+
+// field for GeoServer layers
+const geoserver = {
+	layer,
+	store,
+	data
 };
 
 // create the World-Layer Schema
 const LayerSchema = new Schema({
 	_id: { type: String },         				   		 	 // get the id from uuid function
 	name: String,                                  // from GeoServer
-	href: String,                                  // href to the Layer page
 	fileName: String,
 	filePath: String,
-	imageUrl: String,
+	lastModified: Number,													 // the file created date in number
+	displayUrl: String,														 // url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
 	fileType: { type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
 	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
-	geoData,
-	layer,
-	store,
-	data,
 	fileData,
 	imageData,
-	inputData
+	geoData,
+	inputData,
+	geoserver
 });
 
 // create the layer MODEL

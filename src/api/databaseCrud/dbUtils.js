@@ -32,9 +32,9 @@ const findAndRemoveLayer = (layerId, worldId) => {
 					layerId: layer._id,
 					layerName: layer.name,
 					type: layer.fileType,
-					resourceUrl: layer.layer.resource.href,
-					storeUrl: layer.data.store.href,
-					path: layer.fileData.splitPath
+					resourceUrl: layer.geoserver.layer.resource.href,
+					storeUrl: layer.geoserver.data.store.href,
+					path: layer.fileData.zipPath
 				};
 			}
 		})
