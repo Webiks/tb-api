@@ -104,7 +104,7 @@ class UploadFilesToFS {
 			const result = parser.parse();
 			const imageData = result.tags;
 			const ModifyDate = imageData.ModifyDate;
-			file.lastModified = ModifyDate;
+			file.createdDate = ModifyDate;
 			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };

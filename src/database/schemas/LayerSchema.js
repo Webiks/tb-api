@@ -285,7 +285,7 @@ const LayerSchema = new Schema({
 	name: String,                                  // from GeoServer
 	fileName: String,
 	filePath: String,
-	lastModified: Number,													 // the file created date in number
+	createdDate: Number,													 // the file created date in number
 	displayUrl: String,														 // url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
 	fileType: { type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
 	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },

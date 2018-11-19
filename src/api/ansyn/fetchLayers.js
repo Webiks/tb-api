@@ -22,7 +22,7 @@ const _findLayers = (layersId, $gt, $lt, $geometry) => {
 	}
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
-		'lastModified': { $gt, $lt },
+		'createdDate': { $gt, $lt },
 		'geoData.footprint.geometry': { $geoIntersects: { $geometry } }
 	})
 };
