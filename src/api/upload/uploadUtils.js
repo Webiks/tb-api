@@ -103,9 +103,9 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 
 	const newFile = {
 		_id: guid(),
-		name,
+		name,													// file name (include the extension)
 		size: file.size,
-		path: file.path,
+		// path: file.path,						// the temporary upload directory
 		fileUploadDate: new Date(file.mtime).toISOString(),
 		fileType,
 		filePath,
@@ -124,15 +124,15 @@ const returnFiles = (files, path) => {
 	// remove the zip file from the temporary uploads directory
 	fs.removeSync(path);
 	// if ZIP files: remove the zip directory
-	const splitPath = path.split('.');
-	if (splitPath[1] === 'zip') {
+	const zipPath = path.split('.');
+	if (zipPath[1] === 'zip') {
 		files.map(file => {
 			if (file.fileType === 'vector') {
-				file.splitPath = splitPath[0].trim();
+				file.zipPath = zipPath[0].trim();
 			} else {
-				file.splitPath = null;
+				file.zipPath = null;
 				// remove the zip directory
-				fs.removeSync(splitPath[0]);
+				fs.removeSync(zipPath[0]);
 			}
 			// remove files from the temporary uploads directory
 			if (file.fileType !== 'image') {
@@ -141,8 +141,8 @@ const returnFiles = (files, path) => {
 		});
 	} else {
 		console.log('this file is not a ZIP!');
-		files[0].splitPath = null;
-		console.log('splitPath: ', files[0].splitPath);
+		files[0].zipPath = null;
+		console.log('zipPath: ', files[0].zipPath);
 	}
 	console.log('return files: ', JSON.stringify(files));
 	return files;

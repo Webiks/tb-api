@@ -25,14 +25,14 @@ class UploadFilesToFS {
 				createDirSync(dirPath);
 				fs.renameSync(file.filePath, filePath);
 				console.log(`the '${file.name}' was rename!`);
-				const imageUrl = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
+				const displayUrl = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
 
 				// 2. set the file Data from the upload file
 				const fileData = setFileData(file);
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 3. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, imageUrl, filePath);
+				let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 5. get the metadata of the image file
@@ -76,20 +76,19 @@ class UploadFilesToFS {
 				fileExtension,
 				fileType: 'image',
 				encodeFileName: file.encodeFileName,
-				encodePathName: file.encodePathName,
 				splitPath: null
 			};
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, imageUrl, filePath) {
+		function setLayerFields(id, file, displayUrl, filePath) {
 			const name = (file.name).split('.')[0];
 
 			return {
 				_id: id,
 				name,
 				fileName: file.name,
-				imageUrl,
+				displayUrl,
 				filePath: filePath,
 				fileType: 'image',
 				format: 'JPEG',
@@ -105,7 +104,7 @@ class UploadFilesToFS {
 			const result = parser.parse();
 			const imageData = result.tags;
 			const ModifyDate = imageData.ModifyDate;
-			file.fileData.lastModified = ModifyDate;
+			file.createdDate = ModifyDate;
 			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
 			// exif.enableXmp(); - need to check
 			return { ...file, imageData };
@@ -132,20 +131,22 @@ class UploadFilesToFS {
 			return {
 				...layer,
 				inputData: {
-					fileName: layer.fileData.name,
-					affiliation: 'UNKNOWN',
-					GSD: 0,
+					name: layer.fileData.name,
 					sensor: {
 						type: fields.sensorType,
 						name: fields.sensorName || layer.imageData.Model,
 						maker: layer.imageData.Make,
 						bands: []
 					},
+					tb: {
+						affiliation: 'UNKNOWN',
+						GSD: 0,
+						flightAltitude: layer.imageData.GPSAltitude,
+						cloudCoveragePercentage: 0
+					},
 					ansyn: {
 						title: fields.title || ''
-					},
-					flightAltitude: layer.imageData.GPSAltitude,
-					cloudCoveragePercentage: 0
+					}
 				}
 			};
 		}
