@@ -209,7 +209,7 @@ const imageData = {
 	GPSLongitude: Number,										// y-point (longitude)
 	GPSAltitude: Number, 										// relative altitude
 	ExifImageWidth: Number,								  // the picture size in pixels
-	ExifImageHeight: Number							 	  // the picture size in pixels
+	ExifImageHeight: Number,						 	  // the picture size in pixels
 	// SerialNumber: String,
 	// InteropIndex: String,
 	// Software: String,
