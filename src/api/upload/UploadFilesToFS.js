@@ -1,5 +1,6 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
+const xmpReader = require('xmp-reader');
 const fs = require('fs-extra');
 const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
@@ -35,31 +36,37 @@ class UploadFilesToFS {
 				let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
-				// 5. get the metadata of the image file
+				// 4. get the metadata of the image file
 				const metadata = getMetadata(worldLayer);
 				console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
-				// 6. set the geoData of the image file
-				const geoData = setGeoData({ ...metadata });
-				console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
+				// 5. get the XMP metadata of the image file
+				return getXmpData({ ...metadata })
+					.then(xmpdata => {
+						// 6. set the geoData of the image file
+						const geoData = setGeoData({ ...xmpdata });
+						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
 
-				// 7. set the inputData of the image file
-				const inputData = setInputData({ ...geoData });
-				const newFile = { ...inputData };
-				console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
+						// 7. set the inputData of the image file
+						const inputData = setInputData({ ...geoData });
+						const newFile = { ...inputData };
+						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-				// 8. save the file to mongo database and return the new file is succeed
-				return createNewLayer(newFile, worldId)
-					.then(newLayer => {
-						console.log('createNewLayer result: ' + newLayer);
-						return newLayer;
+						// 8. save the file to mongo database and return the new file is succeed
+						return createNewLayer(newFile, worldId)
+							.then(newLayer => {
+								console.log('createNewLayer result: ' + newLayer);
+								return newLayer;
+							})
+							.catch(error => {
+								console.error('ERROR createNewLayer: ' + error);
+								return null;
+							});
 					})
-					.catch(error => {
-						console.error('ERROR createNewLayer: ' + error);
-						return null;
-					});
 			});
+
 			return Promise.all(images);
+
 		} else {
 			console.log('there ara no files to upload!');
 			return [];
@@ -101,28 +108,80 @@ class UploadFilesToFS {
 			console.log('start get Metadata...');
 			const buffer = fs.readFileSync(file.filePath);
 			const parser = exif.create(buffer);
-			const result = parser.parse();
-			const imageData = result.tags;
-			file.createdDate = imageData.ModifyDate;
-			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
-			// exif.enableXmp(); - need to check
+			// get the image's MetaData as numbers
+			const tags = exifParser(parser, true);
+
+			let imageData = {
+				Make: tags.Make,
+				Model: tags.Model,
+				GPSLatitudeRef: tags.GPSLatitudeRef,
+				GPSLatitude: tags.GPSLatitude,
+				GPSLongitudeRef: tags.GPSLongitudeRef,
+				GPSLongitude: tags.GPSLongitude,
+				GPSAltitude: tags.GPSAltitude,
+				ExifImageWidth: tags.ExifImageWidth,
+				ExifImageHeight: tags.ExifImageHeight
+			};
+
+			// get the Dates as strings
+			const simpleTags = exifParser(parser, false);
+
+			imageData = {
+				...imageData,
+				CreateDate: dateFormat(simpleTags.CreateDate),
+				ModifyDate: dateFormat(simpleTags.ModifyDate),
+				DateTimeOriginal: dateFormat(simpleTags.DateTimeOriginal)
+			};
+
+			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
+			console.log("type of fileCreatedDate: ", typeof file.fileData.fileCreatedDate);
+			file.createdDate = Date.parse((file.fileData.fileCreatedDate));
 			return { ...file, imageData };
+		}
+
+		// read the image's MetaData by EXIF
+		function exifParser(parser,enableSimpleValues) {
+			console.log('start exifParser...', enableSimpleValues);
+			parser.enableSimpleValues(enableSimpleValues);
+			const result = parser.parse();
+			return result.tags;
+		}
+
+		function dateFormat(dateString){
+			const date = dateString.split(" ");
+			const newDate = date[0].replace(/:/g, "-");
+			return `${newDate}T${date[1]}`;
+		}
+
+		// get the XMP metadata of the image file
+		function getXmpData(file) {
+			return xmpReader.fromFile(file.filePath)
+				.then(data => {
+					console.log("XMP DATA: " ,data);
+					file.imageData.xmp = data;
+					return { ...file };
+				})
+				.catch(err => {
+					console.log(err);
+					file.imageData.xmp = {};
+					return { ...file };
+				});
 		}
 
 		// set the geoData from the image GPS
 		function setGeoData(layer) {
 			// set the center point
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
-			console.log('setGeoData center point: ' + JSON.stringify(centerPoint));
+			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// get the Bbox
 			const bbox = getBbboxFromPoint(centerPoint, 200);
-			console.log('setGeoData polygon: ' + JSON.stringify(bbox));
+			console.log('setGeoData polygon: ', JSON.stringify(bbox));
 			// get the footprint
 			const footprint = getFootprintFromBbox(bbox);
-			console.log('setGeoData footprint: ' + JSON.stringify(footprint));
+			console.log('setGeoData footprint: ', JSON.stringify(footprint));
 			// set the geoData
 			const geoData = { centerPoint, bbox, footprint };
-			console.log('setGeoData: ' + JSON.stringify(geoData));
+			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
 		}
 

@@ -36,7 +36,8 @@
     "stream-multipart-upload": "^0.4.6",
     "swagger-express-mw": "^0.1.0",
     "swagger-tools": "^0.10.4",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "xmp-reader": "0.0.3"
   },
   "devDependencies": {
     "eslint": "^5.9.0",
@@ -50,7 +51,7 @@
   },
   "scripts": {
     "start": "node index",
-		"lint": "eslint **/*.js .eslintrc.json",
+    "lint": "eslint **/*.js .eslintrc.json",
     "start:inspect": "node --inspect index",
     "test": "swagger project test"
   }

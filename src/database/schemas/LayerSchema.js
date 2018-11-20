@@ -195,21 +195,21 @@ const fileData = {
 
 // IMAGE DATA: metadata of the upload JPG image
 const imageData = {
-	ImageDescription: String,
 	Make: String,														// sensor maker
 	Model: String,													// sensor model
-	ModifyDate: Number,											// modified date
-	DateTimeOriginal: Number,								// original date
-	CreatedDate: Number,										// created date
-	JPGModifiedDate: Date | String,
-	JPGOriginalDate: Date | String,
+	ModifyDate: Date | String,				  		// modified date
+	DateTimeOriginal: Date | String,				// original date
+	CreatedDate: Date | String,							// created date
 	GPSLatitudeRef: String,									// x-point orientation (latitude)
 	GPSLatitude: Number,										// x-point (latitude)
 	GPSLongitudeRef: String,								// y-point orientation (longitude)
 	GPSLongitude: Number,										// y-point (longitude)
 	GPSAltitude: Number, 										// relative altitude
 	ExifImageWidth: Number,								  // the picture size in pixels
-	ExifImageHeight: Number,						 	  // the picture size in pixels
+	ExifImageHeight: Number, 						 	  // the picture size in pixels
+	xmp: {}																	// XMP MetaData
+	// xmp: { raw: {} }												// XMP MetaData
+	// ImageDescription: String,
 	// SerialNumber: String,
 	// InteropIndex: String,
 	// Software: String,
