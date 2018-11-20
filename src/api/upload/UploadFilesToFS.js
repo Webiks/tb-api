@@ -107,7 +107,9 @@ class UploadFilesToFS {
 		function getMetadata(file) {
 			console.log('start get Metadata...');
 			const buffer = fs.readFileSync(file.filePath);
+			// get the image metadata
 			const parser = exif.create(buffer);
+
 			// get the image's MetaData as numbers
 			const tags = exifParser(parser, true);
 
@@ -136,6 +138,7 @@ class UploadFilesToFS {
 			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
 			console.log("type of fileCreatedDate: ", typeof file.fileData.fileCreatedDate);
 			file.createdDate = Date.parse((file.fileData.fileCreatedDate));
+		
 			return { ...file, imageData };
 		}
 

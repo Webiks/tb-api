@@ -197,6 +197,7 @@ const fileData = {
 const imageData = {
 	Make: String,														// sensor maker
 	Model: String,													// sensor model
+
 	ModifyDate: Date | String,				  		// modified date
 	DateTimeOriginal: Date | String,				// original date
 	CreatedDate: Date | String,							// created date
