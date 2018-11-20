@@ -1,6 +1,5 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
-const xmpReader = require('kopparmora-xmp-reader');
 const fs = require('fs-extra');
 const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
