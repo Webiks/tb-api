@@ -1,5 +1,6 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
+const xmpReader = require('kopparmora-xmp-reader');
 const fs = require('fs-extra');
 const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
@@ -100,12 +101,12 @@ class UploadFilesToFS {
 		function getMetadata(file) {
 			console.log('start get Metadata...');
 			const buffer = fs.readFileSync(file.filePath);
+			// get the image metadata
 			const parser = exif.create(buffer);
 			const result = parser.parse();
 			const imageData = result.tags;
-			file.createdDate = imageData.ModifyDate;
-			file.fileData.fileCreatedDate = new Date(ModifyDate || file.fileData.fileUploadDate).toISOString();
-			// exif.enableXmp(); - need to check
+			file.createdDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
+			file.fileData.fileCreatedDate = new Date(file.createdDate || file.fileData.fileUploadDate).toISOString();
 			return { ...file, imageData };
 		}
 

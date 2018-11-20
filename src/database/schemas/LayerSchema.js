@@ -198,9 +198,9 @@ const imageData = {
 	ImageDescription: String,
 	Make: String,														// sensor maker
 	Model: String,													// sensor model
+	CreatedDate: Number,								 	  // created date
 	ModifyDate: Number,											// modified date
 	DateTimeOriginal: Number,								// original date
-	CreatedDate: Number,										// created date
 	JPGModifiedDate: Date | String,
 	JPGOriginalDate: Date | String,
 	GPSLatitudeRef: String,									// x-point orientation (latitude)
@@ -209,7 +209,7 @@ const imageData = {
 	GPSLongitude: Number,										// y-point (longitude)
 	GPSAltitude: Number, 										// relative altitude
 	ExifImageWidth: Number,								  // the picture size in pixels
-	ExifImageHeight: Number,						 	  // the picture size in pixels
+	ExifImageHeight: Number 						 	  // the picture size in pixels
 	// SerialNumber: String,
 	// InteropIndex: String,
 	// Software: String,
