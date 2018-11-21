@@ -28,6 +28,7 @@
     "fs-extra": "^6.0.1",
     "json-schema-ref-parser": "^6.0.2",
     "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "mongod": "^2.0.0",
     "mongodb": "^3.1.1",
     "mongoose": "^5.2.4",
@@ -50,7 +51,7 @@
   },
   "scripts": {
     "start": "node index",
-		"lint": "eslint **/*.js .eslintrc.json",
+    "lint": "eslint **/*.js .eslintrc.json",
     "start:inspect": "node --inspect index",
     "test": "swagger project test"
   }

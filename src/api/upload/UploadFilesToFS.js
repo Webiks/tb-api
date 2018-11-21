@@ -5,6 +5,7 @@ const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
 const configUrl = require('../../../config/serverConfig');
 const { paths } = require('../../../config/config');
+const moment = require('moment');
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -35,9 +36,11 @@ class UploadFilesToFS {
 				let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
-				// 5. get the metadata of the image file
+				// 4. get the metadata of the image file
 				const metadata = getMetadata(worldLayer);
 				console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
+
+				// 5. ?
 
 				// 6. set the geoData of the image file
 				const geoData = setGeoData({ ...metadata });
@@ -59,7 +62,9 @@ class UploadFilesToFS {
 						return null;
 					});
 			});
+
 			return Promise.all(images);
+
 		} else {
 			console.log('there ara no files to upload!');
 			return [];
@@ -102,27 +107,62 @@ class UploadFilesToFS {
 			const buffer = fs.readFileSync(file.filePath);
 			// get the image metadata
 			const parser = exif.create(buffer);
-			const result = parser.parse();
-			const imageData = result.tags;
-			file.createdDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
-			file.fileData.fileCreatedDate = new Date(file.createdDate || file.fileData.fileUploadDate).toISOString();
+
+			// get the image's MetaData as numbers
+			const tags = exifParser(parser, true);
+
+			let imageData = {
+				Make: tags.Make,
+				Model: tags.Model,
+				GPSLatitudeRef: tags.GPSLatitudeRef,
+				GPSLatitude: tags.GPSLatitude,
+				GPSLongitudeRef: tags.GPSLongitudeRef,
+				GPSLongitude: tags.GPSLongitude,
+				GPSAltitude: tags.GPSAltitude,
+				ExifImageWidth: tags.ExifImageWidth,
+				ExifImageHeight: tags.ExifImageHeight
+			};
+
+			// get the Dates as strings
+			const { CreateDate, ModifyDate, DateTimeOriginal } = exifParser(parser, false);
+			const dateFormat = 'YYYY:MM:DD hh:mm:ss';
+
+			imageData = {
+				...imageData,
+				CreateDate: moment(CreateDate, dateFormat).toString(),
+				ModifyDate: moment(ModifyDate, dateFormat).toString(),
+				DateTimeOriginal: moment(DateTimeOriginal, dateFormat).toString()
+			};
+
+			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
+			console.log("type of fileCreatedDate: ", typeof file.fileData.fileCreatedDate);
+			file.createdDate = Date.parse((file.fileData.fileCreatedDate));
+		
 			return { ...file, imageData };
+		}
+
+		// read the image's MetaData by EXIF
+		function exifParser(parser,enableSimpleValues) {
+			console.log('start exifParser...', enableSimpleValues);
+			parser.enableSimpleValues(enableSimpleValues);
+			const result = parser.parse();
+			return result.tags;
 		}
 
 		// set the geoData from the image GPS
 		function setGeoData(layer) {
 			// set the center point
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
-			console.log('setGeoData center point: ' + JSON.stringify(centerPoint));
+			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// get the Bbox
 			const bbox = getBbboxFromPoint(centerPoint, 200);
-			console.log('setGeoData polygon: ' + JSON.stringify(bbox));
+			console.log('setGeoData polygon: ', JSON.stringify(bbox));
 			// get the footprint
 			const footprint = getFootprintFromBbox(bbox);
-			console.log('setGeoData footprint: ' + JSON.stringify(footprint));
+			console.log('setGeoData footprint: ', JSON.stringify(footprint));
 			// set the geoData
 			const geoData = { centerPoint, bbox, footprint };
-			console.log('setGeoData: ' + JSON.stringify(geoData));
+			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
 		}
 
