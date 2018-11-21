@@ -197,10 +197,9 @@ const fileData = {
 const imageData = {
 	Make: String,														// sensor maker
 	Model: String,													// sensor model
-
-	ModifyDate: Date | String,				  		// modified date
-	DateTimeOriginal: Date | String,				// original date
-	CreatedDate: Date | String,							// created date
+	modifyDate: Date | String,				  		// modified date
+	dateTimeOriginal: Date | String,				// original date
+	createDate: Date | String,							// created date
 	GPSLatitudeRef: String,									// x-point orientation (latitude)
 	GPSLatitude: Number,										// x-point (latitude)
 	GPSLongitudeRef: String,								// y-point orientation (longitude)
@@ -208,7 +207,12 @@ const imageData = {
 	GPSAltitude: Number, 										// relative altitude
 	ExifImageWidth: Number,								  // the picture size in pixels
 	ExifImageHeight: Number, 						 	  // the picture size in pixels
-	xmp: {}																	// XMP MetaData
+	gimbalRollDegree: Number,
+	gimbalYawDegree: Number,
+	gimbalPitchDegree: Number,
+	flightRollDegree: Number,
+	flightYawDegree: Number,
+	flightPitchDegree: Number
 	// xmp: { raw: {} }												// XMP MetaData
 	// ImageDescription: String,
 	// SerialNumber: String,
