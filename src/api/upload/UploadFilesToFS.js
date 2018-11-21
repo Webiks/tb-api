@@ -1,6 +1,5 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
-const xmpReader = require('xmp-reader');
 const fs = require('fs-extra');
 const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
@@ -41,29 +40,27 @@ class UploadFilesToFS {
 				const metadata = getMetadata(worldLayer);
 				console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
-				// 5. get the XMP metadata of the image file
-				return getXmpData({ ...metadata })
-					.then(xmpdata => {
-						// 6. set the geoData of the image file
-						const geoData = setGeoData({ ...xmpdata });
-						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
+				// 5. ?
 
-						// 7. set the inputData of the image file
-						const inputData = setInputData({ ...geoData });
-						const newFile = { ...inputData };
-						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
+				// 6. set the geoData of the image file
+				const geoData = setGeoData({ ...metadata });
+				console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
 
-						// 8. save the file to mongo database and return the new file is succeed
-						return createNewLayer(newFile, worldId)
-							.then(newLayer => {
-								console.log('createNewLayer result: ' + newLayer);
-								return newLayer;
-							})
-							.catch(error => {
-								console.error('ERROR createNewLayer: ' + error);
-								return null;
-							});
+				// 7. set the inputData of the image file
+				const inputData = setInputData({ ...geoData });
+				const newFile = { ...inputData };
+				console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
+
+				// 8. save the file to mongo database and return the new file is succeed
+				return createNewLayer(newFile, worldId)
+					.then(newLayer => {
+						console.log('createNewLayer result: ' + newLayer);
+						return newLayer;
 					})
+					.catch(error => {
+						console.error('ERROR createNewLayer: ' + error);
+						return null;
+					});
 			});
 
 			return Promise.all(images);
@@ -150,21 +147,6 @@ class UploadFilesToFS {
 			parser.enableSimpleValues(enableSimpleValues);
 			const result = parser.parse();
 			return result.tags;
-		}
-
-		// get the XMP metadata of the image file
-		function getXmpData(file) {
-			return xmpReader.fromFile(file.filePath)
-				.then(data => {
-					console.log("XMP DATA: " ,data);
-					file.imageData.xmp = data;
-					return { ...file };
-				})
-				.catch(err => {
-					console.log(err);
-					file.imageData.xmp = {};
-					return { ...file };
-				});
 		}
 
 		// set the geoData from the image GPS
