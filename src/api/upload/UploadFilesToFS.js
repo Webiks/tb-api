@@ -6,6 +6,7 @@ const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
 const configUrl = require('../../../config/serverConfig');
 const { paths } = require('../../../config/config');
+const moment = require('moment');
 
 // upload files to the File System
 class UploadFilesToFS {
@@ -126,13 +127,14 @@ class UploadFilesToFS {
 			};
 
 			// get the Dates as strings
-			const simpleTags = exifParser(parser, false);
+			const { CreateDate, ModifyDate, DateTimeOriginal } = exifParser(parser, false);
+			const dateFormat = 'YYYY:MM:DD hh:mm:ss';
 
 			imageData = {
 				...imageData,
-				CreateDate: dateFormat(simpleTags.CreateDate),
-				ModifyDate: dateFormat(simpleTags.ModifyDate),
-				DateTimeOriginal: dateFormat(simpleTags.DateTimeOriginal)
+				CreateDate: moment(CreateDate, dateFormat).toString(),
+				ModifyDate: moment(ModifyDate, dateFormat).toString(),
+				DateTimeOriginal: moment(DateTimeOriginal, dateFormat).toString()
 			};
 
 			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
@@ -148,12 +150,6 @@ class UploadFilesToFS {
 			parser.enableSimpleValues(enableSimpleValues);
 			const result = parser.parse();
 			return result.tags;
-		}
-
-		function dateFormat(dateString){
-			const date = dateString.split(" ");
-			const newDate = date[0].replace(/:/g, "-");
-			return `${newDate}T${date[1]}`;
 		}
 
 		// get the XMP metadata of the image file
