@@ -141,8 +141,12 @@ class UploadFilesToFS {
 					console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
 
 					const {
+						relativeAltitude, fieldOfView,
+						pitch, yaw, roll,
+						cameraPitch, cameraYaw,	cameraRoll,
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
-						flightRollDegree, flightYawDegree, flightPitchDegree, fieldOfView,
+						flightRollDegree, flightYawDegree, flightPitchDegree,
+						camReverse,	gimbalReverse,
 						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate	} = metadata;
 
 					// format the dates
@@ -152,9 +156,12 @@ class UploadFilesToFS {
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
+						relativeAltitude, fieldOfView,
+						pitch, yaw, roll,
+						cameraPitch, cameraYaw,	cameraRoll,
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
 						flightRollDegree, flightYawDegree, flightPitchDegree,
-						fieldOfView,
+						camReverse,	gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
 						createDate: moment(createDate, exifDateFormat).toString()
