@@ -136,9 +136,13 @@ class UploadFilesToFS {
 					});
 					console.log("metadata object:", JSON.stringify(metadata));
 
+					// convert the 'fieldOfView' to a number
+					metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(" ")[0]);
+					console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
+
 					const {
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
-						flightRollDegree, flightYawDegree, flightPitchDegree,
+						flightRollDegree, flightYawDegree, flightPitchDegree, fieldOfView,
 						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate	} = metadata;
 
 					// format the dates
@@ -150,6 +154,7 @@ class UploadFilesToFS {
 						ExifImageWidth, ExifImageHeight,
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
 						flightRollDegree, flightYawDegree, flightPitchDegree,
+						fieldOfView,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
 						createDate: moment(createDate, exifDateFormat).toString()
@@ -158,8 +163,6 @@ class UploadFilesToFS {
 					// set the Date's fields in the layer's model
 					file.fileData.fileCreatedDate = imageData.createDate;
 					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
-
-					console.log("imageData:", JSON.stringify({ ...file, imageData }));
 
 					resolve({ ...file, imageData });
 				})
