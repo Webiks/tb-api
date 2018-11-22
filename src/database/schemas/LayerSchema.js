@@ -212,7 +212,8 @@ const imageData = {
 	gimbalPitchDegree: Number,
 	flightRollDegree: Number,
 	flightYawDegree: Number,
-	flightPitchDegree: Number
+	flightPitchDegree: Number,
+	fieldOfView: Number
 	// xmp: { raw: {} }												// XMP MetaData
 	// ImageDescription: String,
 	// SerialNumber: String,
