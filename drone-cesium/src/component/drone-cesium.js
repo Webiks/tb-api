@@ -89,13 +89,15 @@ export class DroneCesiumComponent extends HTMLElement {
 			if (this.fileInput.files && this.fileInput.files.length) {
 				const file = this.fileInput.files.item(0);
 				this.fileReader.readAsText(file);
-				this.setViewViaFile(file);
 			}
 		});
 
 		this.fileReader.addEventListener('load', () => {
 			const jsonResult = JSON.parse(this.fileReader.result);
 			this.setViewViaFile(jsonResult);
+			if (jsonResult.displayUrl) {
+				this.imgElement.src = jsonResult.displayUrl;
+			}
 		});
 
 	}

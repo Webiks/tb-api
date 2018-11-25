@@ -53,7 +53,7 @@
   "scripts": {
 		"build:drone-cesium": "npm run build --prefix ./drone-cesium",
 		"install:drone-cesium": "npm install --prefix ./drone-cesium",
-		"postinstall": "npm run build:drone-cesium",
+		"postinstall": "npm run install:drone-cesium && npm run build:drone-cesium",
     "start": "node index",
     "lint": "eslint src/**/*.js --ignore-pattern .eslintrc.json",
     "start:inspect": "node --inspect index",
