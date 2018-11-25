@@ -3,7 +3,7 @@ import 'cesium/Widgets/widgets.css';
 import { featureCollection, point, polygon } from '@turf/turf';
 
 const example = {
-	'displayUrl': 'http://tb-server.webiks.com:10010/static/images/cbc8757c-2870-c4ce-2cbe-8570470c12c9/DJI_0160.JPG',
+	'displayUrl': 'http://tb-server.webiks.com:10010/static/images/d7c6055f-8d7e-1870-5f8d-fbffc59f4ff2/DJI_0025.JPG',
 	'GPSLongitude': 35.006097777777775,
 	'GPSLatitude': 32.479078,
 	'relativeAltitude': 42.4,
@@ -14,6 +14,7 @@ const example = {
 	'ExifImageWidth': 4864,
 	'ExifImageHeight': 3648
 };
+
 export const selector = 'drone-cesium';
 
 export class DroneCesiumComponent extends HTMLElement {
@@ -27,6 +28,9 @@ export class DroneCesiumComponent extends HTMLElement {
 	connectedCallback() {
 		this.innerHTML = `
 			<style>
+			.cesium-viewer-bottom{
+				display: none !important;
+			}
 			:host {
 					position: relative;
 					width: 100vw;
@@ -68,6 +72,7 @@ export class DroneCesiumComponent extends HTMLElement {
 
 		this.imgElement = this.querySelector('img');
 		this.exampleButton = this.querySelector('button#example');
+		this.fileInput = this.querySelector('input[type="file"]');
 
 		this.viewer = new Cesium.Viewer(this.querySelector('#cesiumContainer'), {
 			terrainProvider: Cesium.createWorldTerrain()
@@ -77,6 +82,22 @@ export class DroneCesiumComponent extends HTMLElement {
 			this.setViewViaFile(example);
 			this.imgElement.src = example.displayUrl;
 		});
+
+		this.fileReader = new FileReader();
+
+		this.fileInput.addEventListener('change', () => {
+			if (this.fileInput.files && this.fileInput.files.length) {
+				const file = this.fileInput.files.item(0);
+				this.fileReader.readAsText(file);
+				this.setViewViaFile(file);
+			}
+		});
+
+		this.fileReader.addEventListener('load', () => {
+			const jsonResult = JSON.parse(this.fileReader.result);
+			this.setViewViaFile(jsonResult);
+		});
+
 	}
 
 	constructor() {
