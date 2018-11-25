@@ -1,0 +1,22 @@
+{
+  "name": "drone-cesium",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack",
+		"start": "webpack-dev-server --hot"
+  },
+  "devDependencies": {
+    "cesium": "^1.51.0",
+    "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^1.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.26.0",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  },
+  "dependencies": {
+    "@turf/turf": "^5.1.6"
+  }
+}

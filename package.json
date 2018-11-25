@@ -51,8 +51,11 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
+		"build:drone-cesium": "npm run build --prefix ./drone-cesium",
+		"install:drone-cesium": "npm install --prefix ./drone-cesium",
+		"postinstall": "npm run build:drone-cesium",
     "start": "node index",
-    "lint": "eslint **/*.js --ignore-pattern .eslintrc.json",
+    "lint": "eslint src/**/*.js --ignore-pattern .eslintrc.json",
     "start:inspect": "node --inspect index",
     "test": "swagger project test"
   }

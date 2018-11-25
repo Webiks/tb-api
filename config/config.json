@@ -1,6 +1,10 @@
 {
 	"appPort": 10010,
 	"paths": {
+		"drone": {
+			"path": "/drone-cesium",
+			"resolve": "./drone-cesium/dist"
+		},
 		"staticPath": "/static",
 		"imagesPath": "/images"
 	},
