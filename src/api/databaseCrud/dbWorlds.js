@@ -18,7 +18,7 @@ router.post('/:worldName', (req, res) => {
 	console.log(`db WORLD SERVER: start to CREATE new World: ${world._id} in Geoserver`);
 	// 1. in GeoServer
 	GsWorlds.createNewWorldOnGeoserver(world._id)
-		.then(response => {
+		.then(() => {
 			// 2. in the DataBase
 			console.log('db WORLD SERVER: start to CREATE new World in the DataBase...');
 			dbWorldCrud.add(world)
@@ -106,7 +106,7 @@ router.delete('/delete/:worldId', (req, res) => {
 	console.log('dbWorlds: delete world id: ', worldId);
 	// 1. delete the world(workspace) from GeoServer:
 	GsWorlds.deleteWorldFromGeoserver(worldId)
-		.then(response => {
+		.then(() => {
 			// 2. get the world's layersId Array
 			dbWorldCrud.get({ _id: worldId })
 				.then(({ layersId }) => {

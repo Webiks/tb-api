@@ -24,7 +24,7 @@ const _findLayers = (layersId, $gt, $lt, $geometry) => {
 		$or: layersId.map((_id) => ({ _id })),
 		'createdDate': { $gt, $lt },
 		'geoData.footprint.geometry': { $geoIntersects: { $geometry } }
-	})
+	});
 };
 
 module.exports = fetchLayers;

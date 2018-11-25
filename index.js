@@ -57,7 +57,7 @@ $RefParser.dereference('./api/swagger/swagger.json')
 
 			app.use('/login', login);
 			app.use('/v1/api', api);
-			app.use(paths.staticPath, express.static('static'))
+			app.use(paths.staticPath, express.static('static'));
 		});
 	})
 	.catch(err =>  console.log(err));

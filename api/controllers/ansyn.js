@@ -36,7 +36,7 @@ function layerById(req, res) {
 		.then(layer => {
 			if (!layer) {
 				console.log('layerById not found');
-				res.status(404).json({ message: 'Layer not found' })
+				res.status(404).json({ message: 'Layer not found' });
 			} else {
 				console.log('layerById success');
 				res.json(layer);
@@ -54,7 +54,7 @@ function layerThumbnailById(req, res) {
 		.then(layer => {
 			if (!layer) {
 				console.log('layerById not found');
-				res.status(404).json('Layer not found')
+				res.status(404).json('Layer not found');
 			} else {
 				console.log('layerById success');
 
@@ -65,7 +65,7 @@ function layerThumbnailById(req, res) {
 				const result = parser.parse();
 
 				// 3. get the thumbnail of the image
-				if (result.hasThumbnail("image/jpeg")){
+				if (result.hasThumbnail('image/jpeg')){
 					res.json(`data:image/jpeg;base64,${result.getThumbnailBuffer().toString('base64')}`);
 
 				} else {

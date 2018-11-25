@@ -66,7 +66,7 @@ class UploadFilesToFS {
 					.catch(error => {
 						console.log(error);
 						return null;
-					})
+					});
 			});
 
 			return Promise.all(images);
@@ -115,9 +115,11 @@ class UploadFilesToFS {
 
 			// 1. get the image's MetaData from the exif-parser
 			const result = parser.parse();
-			const { Make, Model,
-							GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
-							ExifImageWidth, ExifImageHeight } = result.tags;
+			const {
+				Make, Model,
+				GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
+				ExifImageWidth, ExifImageHeight
+			} = result.tags;
 
 			// 2. get the image's MetaData from the exif-tool
 			return new Promise((resolve, reject) => {
@@ -134,20 +136,21 @@ class UploadFilesToFS {
 						const value = entry[1];
 						metadata[key] = value;
 					});
-					console.log("metadata object:", JSON.stringify(metadata));
+					console.log('metadata object:', JSON.stringify(metadata));
 
 					// convert the 'fieldOfView' to a number
-					metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(" ")[0]);
+					metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(' ')[0]);
 					console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
 
 					const {
 						relativeAltitude, fieldOfView,
 						pitch, yaw, roll,
-						cameraPitch, cameraYaw,	cameraRoll,
+						cameraPitch, cameraYaw, cameraRoll,
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
 						flightRollDegree, flightYawDegree, flightPitchDegree,
-						camReverse,	gimbalReverse,
-						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate	} = metadata;
+						camReverse, gimbalReverse,
+						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate
+					} = metadata;
 
 					// format the dates
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
@@ -158,10 +161,10 @@ class UploadFilesToFS {
 						ExifImageWidth, ExifImageHeight,
 						relativeAltitude, fieldOfView,
 						pitch, yaw, roll,
-						cameraPitch, cameraYaw,	cameraRoll,
+						cameraPitch, cameraYaw, cameraRoll,
 						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
 						flightRollDegree, flightYawDegree, flightPitchDegree,
-						camReverse,	gimbalReverse,
+						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
 						createDate: moment(createDate, exifDateFormat).toString()
@@ -172,8 +175,8 @@ class UploadFilesToFS {
 					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
 
 					resolve({ ...file, imageData });
-				})
-			})
+				});
+			});
 		}
 
 		// set the geoData from the image GPS

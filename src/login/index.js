@@ -21,7 +21,7 @@ router.post('/login', (req, res) => {
 	}
 });
 
-router.post('/logout', (req, res, next) => {
+router.post('/logout', (req, res) => {
 	req.session.authenticated = false;
 	res.send('o.k');
 });

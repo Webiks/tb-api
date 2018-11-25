@@ -1,4 +1,14 @@
-require('../geoserverCrud/curlMethods')();
+const {
+	createImportObject,
+	createImportObjectWithData,
+	postImportObj,
+	getTaskObj,
+	layerSrsUpdate,
+	sendToTask,
+	updateTaskField,
+	executeFileToGeoserver,
+	deleteUncompleteImports
+} = require('../geoserverCrud/curlMethods');
 
 // upload files to GeoServer
 class UploadFilesToGS {

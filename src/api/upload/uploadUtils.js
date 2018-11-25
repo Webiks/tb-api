@@ -155,7 +155,7 @@ function guid() {
 			.substring(1);
 	}
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-};
+}
 
 
 module.exports = {

@@ -219,7 +219,7 @@ class MongoCrud {
 	handleError(reject, err, message) {
 		console.error('MongoCrud: ' + message);
 		return reject(err);
-	};
+	}
 }
 
 module.exports = MongoCrud;
