@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { geoserver, upload } = require('../../../config/config');
+const { upload } = require('../../../config/config');
 const configUrl = require('../../../config/serverConfig');
 
 // const headers = upload.headers;
@@ -104,7 +104,7 @@ class GsLayers {
 	handleError(error, message) {
 		console.error('gs LAYER: ' + message);
 		return error;
-	};
+	}
 }
 
 module.exports = GsLayers;

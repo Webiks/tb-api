@@ -51,7 +51,7 @@
   },
   "scripts": {
     "start": "node index",
-    "lint": "eslint **/*.js .eslintrc.json",
+    "lint": "eslint **/*.js --ignore-pattern .eslintrc.json",
     "start:inspect": "node --inspect index",
     "test": "swagger project test"
   }

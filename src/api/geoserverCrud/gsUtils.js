@@ -37,9 +37,8 @@ const getLayerDetailsFromGeoserver = (worldLayer, resourceUrl) => {
 				data = parseLayerDetails(worldLayer, layerDetails.featureType);
 				// worldLayer.geoserver.data = parseLayerDetails(worldLayer, layerDetails.featureType);
 				data.metadata = { recalculateBounds: layerDetails.featureType.metadata.entry.$ };
-			}
-			else {
-				res.status(500).send('ERROR: unknown layer TYPE!');
+			} else {
+				throw new Error('ERROR: unknown layer TYPE!');
 			}
 			worldLayer.geoserver.data = data;
 
@@ -70,7 +69,6 @@ const getStoreDataFromGeoserver = (worldLayer, storeUrl) => {
 			console.log('3. got Store Data...');
 			const storeName = worldLayer.geoserver.store.name;
 			// get the store data according to the layer's type
-			let url;
 			if (worldLayer.fileType === 'raster') {
 				console.log('gsUtils get RASTER data...');
 				worldLayer.geoserver.store = store.coverageStore;
