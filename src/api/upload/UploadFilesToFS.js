@@ -1,5 +1,6 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
+const exiftool = require('exiftool');
 const fs = require('fs-extra');
 const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
@@ -37,28 +38,33 @@ class UploadFilesToFS {
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 4. get the metadata of the image file
-				const metadata = getMetadata(worldLayer);
-				console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
+				// const metadata = getMetadata(worldLayer);
+				return getMetadata(worldLayer)
+					.then(metadata => {
+						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
-				// 5. ?
+						// 5. set the geoData of the image file
+						const geoData = setGeoData({ ...metadata });
+						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
 
-				// 6. set the geoData of the image file
-				const geoData = setGeoData({ ...metadata });
-				console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
+						// 6. set the inputData of the image file
+						const inputData = setInputData({ ...geoData });
+						const newFile = { ...inputData };
+						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-				// 7. set the inputData of the image file
-				const inputData = setInputData({ ...geoData });
-				const newFile = { ...inputData };
-				console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
-
-				// 8. save the file to mongo database and return the new file is succeed
-				return createNewLayer(newFile, worldId)
-					.then(newLayer => {
-						console.log('createNewLayer result: ' + newLayer);
-						return newLayer;
+						// 7. save the file to mongo database and return the new file is succeed
+						return createNewLayer(newFile, worldId)
+							.then(newLayer => {
+								console.log('createNewLayer result: ' + newLayer);
+								return newLayer;
+							})
+							.catch(error => {
+								console.error('ERROR createNewLayer: ', error);
+								return null;
+							});
 					})
 					.catch(error => {
-						console.error('ERROR createNewLayer: ' + error);
+						console.log(error);
 						return null;
 					});
 			});
@@ -105,48 +111,72 @@ class UploadFilesToFS {
 		function getMetadata(file) {
 			console.log('start get Metadata...');
 			const buffer = fs.readFileSync(file.filePath);
-			// get the image metadata
 			const parser = exif.create(buffer);
 
-			// get the image's MetaData as numbers
-			const tags = exifParser(parser, true);
-
-			let imageData = {
-				Make: tags.Make,
-				Model: tags.Model,
-				GPSLatitudeRef: tags.GPSLatitudeRef,
-				GPSLatitude: tags.GPSLatitude,
-				GPSLongitudeRef: tags.GPSLongitudeRef,
-				GPSLongitude: tags.GPSLongitude,
-				GPSAltitude: tags.GPSAltitude,
-				ExifImageWidth: tags.ExifImageWidth,
-				ExifImageHeight: tags.ExifImageHeight
-			};
-
-			// get the Dates as strings
-			const { CreateDate, ModifyDate, DateTimeOriginal } = exifParser(parser, false);
-			const dateFormat = 'YYYY:MM:DD hh:mm:ss';
-
-			imageData = {
-				...imageData,
-				CreateDate: moment(CreateDate, dateFormat).toString(),
-				ModifyDate: moment(ModifyDate, dateFormat).toString(),
-				DateTimeOriginal: moment(DateTimeOriginal, dateFormat).toString()
-			};
-
-			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
-			console.log('type of fileCreatedDate: ', typeof file.fileData.fileCreatedDate);
-			file.createdDate = Date.parse((file.fileData.fileCreatedDate));
-		
-			return { ...file, imageData };
-		}
-
-		// read the image's MetaData by EXIF
-		function exifParser(parser,enableSimpleValues) {
-			console.log('start exifParser...', enableSimpleValues);
-			parser.enableSimpleValues(enableSimpleValues);
+			// 1. get the image's MetaData from the exif-parser
 			const result = parser.parse();
-			return result.tags;
+			const {
+				Make, Model,
+				GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
+				ExifImageWidth, ExifImageHeight
+			} = result.tags;
+
+			// 2. get the image's MetaData from the exif-tool
+			return new Promise((resolve, reject) => {
+				exiftool.metadata(buffer, function (err, results) {
+					if (err) {
+						console.log(`ERROR exiftool: ${err}`);
+						reject(err);
+					}
+
+					// convert the results to an object
+					let metadata = {};
+					Object.entries(results).forEach((entry) => {
+						const key = entry[0];
+						const value = entry[1];
+						metadata[key] = value;
+					});
+					console.log('metadata object:', JSON.stringify(metadata));
+
+					// convert the 'fieldOfView' to a number
+					metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(' ')[0]);
+					console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
+
+					const {
+						relativeAltitude, fieldOfView,
+						pitch, yaw, roll,
+						cameraPitch, cameraYaw, cameraRoll,
+						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
+						flightRollDegree, flightYawDegree, flightPitchDegree,
+						camReverse, gimbalReverse,
+						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate
+					} = metadata;
+
+					// format the dates
+					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
+
+					const imageData = {
+						Make, Model,
+						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
+						ExifImageWidth, ExifImageHeight,
+						relativeAltitude, fieldOfView,
+						pitch, yaw, roll,
+						cameraPitch, cameraYaw, cameraRoll,
+						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
+						flightRollDegree, flightYawDegree, flightPitchDegree,
+						camReverse, gimbalReverse,
+						modifyDate: moment(modifyDate, exifDateFormat).toString(),
+						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
+						createDate: moment(createDate, exifDateFormat).toString()
+					};
+
+					// set the Date's fields in the layer's model
+					file.fileData.fileCreatedDate = imageData.createDate;
+					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
+
+					resolve({ ...file, imageData });
+				});
+			});
 		}
 
 		// set the geoData from the image GPS

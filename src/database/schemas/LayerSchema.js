@@ -37,9 +37,9 @@ const layer = {
 		href: String                                // href to the style page
 	},
 	resource: {
-		class: String,                             // @class field
-		name: String,                              // the worldLayer Id ( worldname: layername )
-		href: String                               // href to the details (RASTER/VECTOR) page
+		class: String,                              // @class field
+		name: String,                               // the worldLayer Id ( worldname: layername )
+		href: String                                // href to the details (RASTER/VECTOR) page
 	},
 	attribution: {
 		logoWidth: Number,
@@ -57,12 +57,12 @@ const store = {
 		name: String,                              	// the name of the world
 		href: String                               	// href to the workspace page
 	},
-	connectionParameters: {                    		 // was translated from a map
+	connectionParameters: {                    	  // was translated from a map
 		namespace: String,
-		url: String                               	 // VECTOR only
+		url: String                                 // VECTOR only
 	},
-	url: String,                                   // RASTER only
-	href: String                                   // get from the "coverages"  in RASTERS or "featureTypes" in VECTORS
+	url: String,                                  // RASTER only
+	href: String                                  // get from the "coverages"  in RASTERS or "featureTypes" in VECTORS
 };
 
 // LAYER DETAILS: from GeoServer - RASTER (coverage object) / VECTOR (featureType object) page
@@ -84,7 +84,7 @@ const data = {
 		maxx: Number,
 		miny: Number,
 		maxy: Number,
-		crs: String                                 // was translated from a map
+		crs: String                                 	// was translated from a map
 	},
 	latLonBoundingBox: {
 		minx: Number,
@@ -96,13 +96,13 @@ const data = {
 	projectionPolicy: String,
 	enabled: Boolean,
 	metadata: {                                     // was translated from a map
-		dirName: String,                           // RASTERS
-		recalculateBounds: String                   // VECTROS
+		dirName: String,                           		// RASTERS
+		recalculateBounds: String                  		// VECTROS
 	},
 	store: {
-		class: String,                              // @class field ('coverage' or 'datastore')
-		name: String,                               // the store id ( worldname: storename )
-		href: String                                // href to the store page
+		class: String,                              	// @class field ('coverage' or 'datastore')
+		name: String,                               	// the store id ( worldname: storename )
+		href: String                                	// href to the store page
 	},
 	// VECTORS only
 	maxFeatures: Number,
@@ -193,62 +193,6 @@ const fileData = {
 	zipPath: String									 				// the zip path of the upload vector (for removing it later)
 };
 
-// IMAGE DATA: metadata of the upload JPG image
-const imageData = {
-	Make: String,														// sensor maker
-	Model: String,													// sensor model
-
-	ModifyDate: Date | String,				  		// modified date
-	DateTimeOriginal: Date | String,				// original date
-	CreatedDate: Date | String,							// created date
-	GPSLatitudeRef: String,									// x-point orientation (latitude)
-	GPSLatitude: Number,										// x-point (latitude)
-	GPSLongitudeRef: String,								// y-point orientation (longitude)
-	GPSLongitude: Number,										// y-point (longitude)
-	GPSAltitude: Number, 										// relative altitude
-	ExifImageWidth: Number,								  // the picture size in pixels
-	ExifImageHeight: Number, 						 	  // the picture size in pixels
-	xmp: {}																	// XMP MetaData
-	// xmp: { raw: {} }												// XMP MetaData
-	// ImageDescription: String,
-	// SerialNumber: String,
-	// InteropIndex: String,
-	// Software: String,
-	// Orientation: Number,
-	// XResolution: Number,										// resolution
-	// YResolution: Number,										// resolution
-	// ResolutionUnit: Number,								// resolution
-	// YCbCrPosition: Number,
-	// GPSVersionId: [Number, Number, Number, Number],
-	// ExposureTime: Number,
-	// ExposureProgram: Number,
-	// ExposureCompensation: Number,
-	// ExposureIndex: String,
-	// ExposureMode: Number,
-	// FNumber: Number,
-	// ISO: Number,
-	// CompressedBitPerPixel: Number,
-	// ShutterSpeedValue: Number,
-	// ApertureValue: Number,
-	// MaxApertureValue: Number,
-	// SubjectDistance: Number,
-	// SubjectDistanceRange: Number,
-	// MeteringMode: Number,
-	// LightSource: Number,
-	// Flash: Number,
-	// FocalLength: Number,
-	// FocalLengthIn35mmFormat: Number,
-	// ColorSpace: Number,
-	// CustumRendered: Number,
-	// WhiteBalance: Number,
-	// DigitalZoomRatio: String,
-	// SceneCaptureType: Number,
-	// GainControl: Number,
-	// Contrast: Number,
-	// Saturation: Number,
-	// Sharpness: Number
-};
-
 // INPUT DATA: data from the user
 const inputData = {
 	name: String,
@@ -272,6 +216,137 @@ const inputData = {
 		title: String
 	}
 };
+
+// IMAGE DATA: metadata of the upload JPG image
+const imageData = {
+	Make: String,														// sensor maker
+	Model: String,													// sensor model
+	modifyDate: Date | String,				  		// modified date, format: "YYYY:MM:DD hh:mm:ss"
+	dateTimeOriginal: Date | String,				// original date "date/timeOriginal", format: "YYYY:MM:DD hh:mm:ss"
+	createDate: Date | String,							// created date, format: "YYYY:MM:DD hh:mm:ss"
+	GPSLatitudeRef: String,									// x-point orientation (latitude)
+	GPSLatitude: Number,										// x-point (latitude)
+	GPSLongitudeRef: String,								// y-point orientation (longitude)
+	GPSLongitude: Number,										// y-point (longitude)
+	GPSAltitude: Number, 										// absolute altitude
+	relativeAltitude: Number,								// relative altitude
+	ExifImageWidth: Number,								  // the picture size in pixels
+	ExifImageHeight: Number, 						 	  // the picture size in pixels
+	pitch: Number,
+	yaw: Number,
+	roll: Number,
+	cameraPitch: Number,
+	cameraYaw: Number,
+	cameraRoll: Number,
+	gimbalRollDegree: Number,
+	gimbalYawDegree: Number,
+	gimbalPitchDegree: Number,
+	flightRollDegree: Number,
+	flightYawDegree: Number,
+	flightPitchDegree: Number,
+	camReverse: Number,
+	gimbalReverse: Number,
+	fieldOfView: Number
+};
+
+/* exif-parser fields:
+	ImageDescription: String,							  // "DCIM\\100MEDIA\\DJI_0008.JPG"
+	SerialNumber: String,
+	InteropIndex: String,
+	Software: String,
+	Orientation: Number,
+	XResolution: Number,										// resolution
+	YResolution: Number,										// resolution
+	ResolutionUnit: Number,								  // resolution
+	YCbCrPosition: Number,
+	GPSVersionId: [Number, Number, Number, Number],
+	ExposureTime: Number,
+	ExposureProgram: Number,
+	ExposureCompensation: Number,
+	ExposureIndex: String,									// "undef"
+	ExposureMode: Number,
+	FNumber: Number,
+	ISO: Number,
+	CompressedBitPerPixel: Number,
+	ShutterSpeedValue: Number,
+	ApertureValue: Number,
+	MaxApertureValue: Number,
+	SubjectDistance: Number,
+	SubjectDistanceRange: Number,
+	MeteringMode: Number,
+	LightSource: Number,
+	Flash: Number,
+	FocalLength: Number,
+	FocalLengthIn35mmFormat: Number,
+	ColorSpace: Number,
+	CustumRendered: Number,
+	WhiteBalance: Number,
+	DigitalZoomRatio: String,							  // "undef"
+	SceneCaptureType: Number,
+	GainControl: Number,
+	Contrast: Number,
+	Saturation: Number,
+	Sharpness: Number
+*/
+
+/* exif-tool fields:
+	exiftoolVersionNumber: Number,
+	fileType: String,																// "JPEG"
+	fileTypeExtension: String, 											// "jpg"
+	mimeType: String,																// "image/jpeg"
+	exifByteOrder: String,													// "Little-endian (Intel, II)"
+	exifVersion: Number,
+	componentsConfiguration: String,								// "-, Cr, Cb, Y"
+	warning: String,																// "[minor] Possibly incorrect maker notes offsets (fix by 1783?)"
+	speedX: Number,
+	speedY: Number,
+	speedZ: Number,
+	flashpixVersion: Number,
+	interoperabilityIndex: String,	 								// "R98 - DCF basic file (sRGB)",
+	interoperabilityVersion: Number,
+	fileSource: String,															// "Digital Camera"
+	sceneType: String,															// "Directly photographed"
+	gpsVersionID: String,														// "2.3.0.0"
+	gpsAltitudeRef: String, 												// "Above Sea Level"
+	xpComment: String, 															// "Type=N, Mode=P, DE=None"
+	xpKeywords: String, 														// "v01.05.1577;1.1.6;v1.0.0"
+	compression: String, 														// "JPEG (old-style)"
+	thumbnailOffset: Number,
+	thumbnailLength: Number,
+	about: String, 																	// "DJI Meta Data"
+	format: String, 																// "image/jpg"
+	absoluteAltitude: Number,
+	selfData: String,
+	version: Number,
+	hasSettings: String, 														// "False" (need to convert to boolean)
+	hasCrop: String, 																// "False" (need to convert to boolean)
+	alreadyApplied: String, 												// "False" (need to convert to boolean)
+	mpfVersion: Number,
+	numberOfImages: Number,
+	mpImageFlags: String, 													// "Dependent child image"
+	mpImageFormat: String, 													// "JPEG"
+	mpImageType: String, 														// "Large Thumbnail (VGA equivalent)"
+	mpImageLength: Number,
+	mpImageStart: Number,
+	dependentImage1EntryNumber: Number,
+	dependentImage2EntryNumber: Number,
+	imageUIDList: String, 													// "(Binary data 66 bytes, use -b option to extract)"
+	totalFrames: Number,
+	encodingProcess: String, 												// "Baseline DCT, Huffman coding"
+	bitsPerSample: Number,
+	colorComponents: Number,
+	yCbCrSubSampling: String, 											// "YCbCr4:2:2 (2 1)",
+	gpsPosition: String, 														// "32 deg 4' 35.64\" N, 34 deg 47' 42.20\" E" (lan, long)
+	imageSize: String, 															// "5472x3078" ("width X height")
+	previewImage: String, 													// "(Binary data 251980 bytes, use -b option to extract)"
+	megapixels: Number,
+	scaleFactorTo35MmEquivalent: Number,
+	shutterSpeed: String, 													// "1/500"
+	thumbnailImage: String, 												// "(Binary data 10685 bytes, use -b option to extract)"
+	circleOfConfusion: String, 											// "0.011 mm"	(need to convert to float-number)
+	hyperfocalDistance: String, 										// "1.12 m" (need to convert to float-number)
+	lightValue: Number
+*/
 
 // field for GeoServer layers
 const geoserver = {
