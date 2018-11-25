@@ -124,11 +124,11 @@ const removeLayerFromGeoserver = (resourceUrl, storeUrl) => {
 // parse layer data
 const parseLayerDetails = (worldLayer, data) => {
 	worldLayer.geoserver = {
-			layer: worldLayer.geoserver.layer,
-			data,
-			store: {
-				storeId: data.store.name
-			}
+		layer: worldLayer.geoserver.layer,
+		data,
+		store: {
+			storeId: data.store.name
+		}
 	};
 	// set the latLonBoundingBox
 	worldLayer.geoserver.data.latLonBoundingBox = data.latLonBoundingBox;

@@ -18,7 +18,7 @@ const findAndRemoveLayer = (layerId, worldId) => {
 	console.log(`start find and remove layer: ${layerId}`);
 	dbLayerCrud.get({ _id: layerId })
 		.then(layer => {
-			if (layer.fileType === 'image'){
+			if (layer.fileType === 'image') {
 				return {
 					worldId,
 					layerId: layer._id,
@@ -45,7 +45,7 @@ const findAndRemoveLayer = (layerId, worldId) => {
 const removeLayer = (removedLayer, worldId, removeFromGeoserver) => {
 	console.log('removedLayer: ', JSON.stringify(removedLayer));
 	// 1. get all the worlds except to the current world
-	return dbWorldCrud.getListByQuery({ _id: { $not: { $eq: worldId } }})
+	return dbWorldCrud.getListByQuery({ _id: { $not: { $eq: worldId } } })
 		.then(worlds => {
 			console.log('removeLayer worlds: ' + JSON.stringify(worlds));
 			// 2. check if a giving layer exists in another world
@@ -56,12 +56,12 @@ const removeLayer = (removedLayer, worldId, removeFromGeoserver) => {
 				console.log('start to remove layer: ', removedLayer.layerId);
 				// a. remove the layer from the Layers list in the DataBase
 				let path = removedLayer.path;
-				if (removedLayer.type === 'image'){
-					path = path.substring(0,removedLayer.path.lastIndexOf('/'));
+				if (removedLayer.type === 'image') {
+					path = path.substring(0, removedLayer.path.lastIndexOf('/'));
 				}
 				console.log('dbUtils removeLayer path: ', path);
 				return removeLayerFromDB(removedLayer.layerId, path)
-					.then ( () => {
+					.then(() => {
 						// b. if it isn't an image - delete the layer from GeoServer:
 						if (removeFromGeoserver) {
 							return removeLayerFromGeoServer(removedLayer);
@@ -87,8 +87,8 @@ const removeLayerFromDB = (layerId, path) => {
 };
 
 const removeLayerFromGeoServer = (layer) => {
-		console.log('dbUtils remove layer: start to delete layer from the GeoServer!');
-		return gsUtils.removeLayerFromGeoserver(layer.resourceUrl, layer.storeUrl);
+	console.log('dbUtils remove layer: start to delete layer from the GeoServer!');
+	return gsUtils.removeLayerFromGeoserver(layer.resourceUrl, layer.storeUrl);
 };
 
 module.exports = {

@@ -11,8 +11,8 @@
 	"rules": {
 		"quotes": ["error", "single"],
 		"semi": ["error", "always"],
+		"indent": ["error", "tab",  { "SwitchCase": 1 } ],
 		"no-console": "off",
 		"no-useless-escape": "off"
-
 	}
 }
