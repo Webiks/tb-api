@@ -135,7 +135,7 @@ class UploadFilesToFS {
 			};
 
 			file.fileData.fileCreatedDate = imageData.CreateDate ? imageData.CreateDate : imageData.ModifyDate;
-			console.log("type of fileCreatedDate: ", typeof file.fileData.fileCreatedDate);
+			console.log('type of fileCreatedDate: ', typeof file.fileData.fileCreatedDate);
 			file.createdDate = Date.parse((file.fileData.fileCreatedDate));
 		
 			return { ...file, imageData };

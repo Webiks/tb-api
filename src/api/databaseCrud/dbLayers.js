@@ -36,7 +36,7 @@ router.post('/:worldId/:layerName', (req, res) => {
 // ============
 // get all the Layers list from the Database
 router.get('/', (req, res) => {
-	console.log(`db LAYER SERVER: start GET ALL Layers...`);
+	console.log('db LAYER SERVER: start GET ALL Layers...');
 	dbLayerCrud.getAll()
 		.then(response => res.send(response))
 		.catch(error => {

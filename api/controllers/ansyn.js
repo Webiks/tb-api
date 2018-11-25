@@ -65,7 +65,7 @@ function layerThumbnailById(req, res) {
 				const result = parser.parse();
 
 				// 3. get the thumbnail of the image
-				if (result.hasThumbnail("image/jpeg")){
+				if (result.hasThumbnail('image/jpeg')){
 					res.json(`data:image/jpeg;base64,${result.getThumbnailBuffer().toString('base64')}`);
 
 				} else {

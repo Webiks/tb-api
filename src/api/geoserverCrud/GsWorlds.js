@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { upload } = require('../../../config/config');
 const configUrl = require('../../../config/serverConfig');
-const { createWorkspaceObject } = require("../geoserverCrud/curlMethods");
+const { createWorkspaceObject } = require('../geoserverCrud/curlMethods');
 const headers = upload.headers;
 
 class GsWorlds {
