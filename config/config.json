@@ -2,7 +2,8 @@
 	"appPort": 10010,
 	"paths": {
 		"staticPath": "/static",
-		"imagesPath": "/images"
+		"imagesPath": "/images",
+		"swaggerUi": "/"
 	},
 	"remote": {
 		"localDomain": "http://127.0.0.1",

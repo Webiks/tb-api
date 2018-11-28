@@ -27,11 +27,11 @@ $RefParser.dereference('./api/swagger/swagger.json')
 			}
 
 			/* swaggerUi */
-			app.use(SwaggerUi(swaggerExpress.runner.swagger));
+			app.use(SwaggerUi(swaggerExpress.runner.swagger, { swaggerUi: paths.swaggerUi }));
 			swaggerExpress.register(app);
 
 			app.listen(appPort, () => {
-				console.log(`Swagger-ui available on ${appPort}, on: ${domain}/docs`);
+				console.log(`Swagger-ui available on ${appPort}, on: ${domain}${paths.swaggerUi}`);
 			});
 
 			/* v1 api - no swagger */
