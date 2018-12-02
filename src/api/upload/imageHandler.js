@@ -29,7 +29,8 @@ class ImageHandler {
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 3. get the metadata of the image file
-				return getMetadata(worldLayer, file.encodePathName, buffer)
+				console.log('3. metadata imageData thumbnailUrl: ' + file.imageData.thumbnailUrl);
+				return getMetadata(worldLayer, file.encodePathName, buffer, file.imageData.thumbnailUrl)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
@@ -99,8 +100,9 @@ class ImageHandler {
 		}
 
 		// get the metadata of the image file
-		function getMetadata(file, filePath, buffer) {
-			console.log(`start get Metadata...`);
+		function getMetadata(file, filePath, buffer, thumbnailUrl) {
+			let imageData = file.imageData;
+			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
 			const parser = exif.create(buffer);
 
 			// 1. get the image's MetaData from the exif-parser
@@ -145,7 +147,7 @@ class ImageHandler {
 					// format the dates
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
 
-					const imageData = {
+					imageData = {
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
@@ -157,7 +159,8 @@ class ImageHandler {
 						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
-						createDate: moment(createDate, exifDateFormat).toString()
+						createDate: moment(createDate, exifDateFormat).toString(),
+						thumbnailUrl
 					};
 
 					// set the Date's fields in the layer's model

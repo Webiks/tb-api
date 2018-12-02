@@ -1,10 +1,10 @@
 const AdmZip = require('adm-zip');
 const uuid = require('uuid');
+const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
-const fs = require('fs-extra');
 const { findFileType } = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
@@ -100,7 +100,7 @@ const uploadFiles = (req, res) => {
 				const files = zipFiles.map(file => {
 					console.log(`zipFile file: ${file.name}`);
 					buffer = fs.readFileSync(file.filePath);
-					return uploadFilesToS3(worldId, file, buffer);
+					return uploadFilesToS3(worldId, file, buffer)
 				});
 
 				// send to the right upload handler according to the type
@@ -118,12 +118,20 @@ const uploadFiles = (req, res) => {
 };
 
 // ========================================= private  F U N C T I O N S ============================================
-// upload the file to S3 amazon storage
+// upload the file to S3 amazon storage and get its url (including the thumbnail's url)
 const uploadFilesToS3 = (worldId, file, buffer) => {
 	return uploadToS3(worldId, file, buffer)
-		.then(fileUrl => {
-			file.filePath = fileUrl;
-			console.log(`succeed to upload file To S3: ${fileUrl}`);
+		.then(uploadUrl => {
+			console.log(`uploadFilesToS3 uploadUrl: ${JSON.stringify(uploadUrl)}`);
+			file.filePath = uploadUrl.fileUrl;
+			console.log(`succeed to upload file To S3: ${JSON.stringify(file.filePath)}`);
+			file = {
+				...file,
+				imageData: {
+					thumbnailUrl: uploadUrl.thumbnailUrl
+				}
+			};
+			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.imageData.thumbnailUrl)}`);
 			return file;
 		})
 		.catch(err => {
@@ -136,6 +144,7 @@ const uploadFilesToS3 = (worldId, file, buffer) => {
 const uploadHandler = (res, worldId, reqFiles, fileType, name, path, reqFields, buffer) => {
 	if (fileType === 'image') {
 		// save all the file's data in the database
+		console.log(`uploadUtils uploadHandler file imageData: ${JSON.stringify(reqFiles.imageData)}`);
 		imageHandler.getImageData(worldId, reqFiles, name, path, reqFields, buffer)
 			.then(files => res.send(returnFiles(files, path)));
 	} else {

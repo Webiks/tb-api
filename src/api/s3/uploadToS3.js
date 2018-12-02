@@ -1,4 +1,7 @@
+const exif = require('exif-parser');
+const fs = require('fs-extra');
 const { s3 } = require('./getS3Object');
+const { s3Upload } = require('./s3Utils');
 
 const uploadToS3 = (worldId, file, buffer) => {
 	console.log(`start upload file To S3...${file.name}`);
@@ -17,7 +20,7 @@ const uploadToS3 = (worldId, file, buffer) => {
 			return createUserFolder(worldId, prefix)
 				.then(data => {
 					console.log(`Successfully create new folder: ${prefix}`);
-					return upload(fileKey, buffer);
+					return upload(fileType, fileKey, buffer);
 				})
 				.catch(err => {
 					console.error(err, err.stack);
@@ -25,30 +28,48 @@ const uploadToS3 = (worldId, file, buffer) => {
 				});
 		} else {
 			console.log(`exist file Key: ${fileKey}`);
-			return upload(fileKey, buffer);
+			return upload(fileType, fileKey, buffer);
 		}
 	} else {
 		const publicPrefix = `${prefix}/${file._id}`;
 		fileKey = getFileKey(publicPrefix, fileType, fileName);
 		console.log(`public file Key: ${fileKey}`);
-		return upload(fileKey, buffer);
+		return upload(fileType, fileKey, buffer);
 	}
 };
 
 // ================================================== Private F U N C T I O N S ========================================
-const upload = (fileKey, buffer) => {
-
-	const params = {
-		Key: fileKey,
-		Body: buffer,
-		ACL: 'public-read'
+// upload the file to S3 including the thumbnail (if it's an image file)
+const upload = (fileType, fileKey, buffer) => {
+	const uploadUrl = {
+		fileUrl: '',
+		thumbnailUrl: ''
 	};
-
-	// upload the file to s3 and return its location
-	return s3.upload(params).promise()
-		.then(data => {
-			console.log(`Successfully uploaded file to ${data.Location}`);
-			return data.Location;
+	return s3Upload(fileKey, buffer)
+		.then(fileUrl => {
+			uploadUrl.fileUrl = fileUrl;
+			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
+			// save the image thumbnail
+			if (fileType === 'image'){
+				console.log(`start s3Upload image...`);
+				const parser = exif.create(buffer);
+				const result = parser.parse();
+				// upload the thumbnail of the image to s3
+				if (result.hasThumbnail('image/jpeg')) {
+					const splitKey = fileKey.split('.');
+					const thumbnailBuffer = result.getThumbnailBuffer();
+					const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
+					console.log(`upload thumbnail key: ${thumbnailKey}`);
+					return s3Upload(thumbnailKey, thumbnailBuffer)
+						.then(thumbnailUrl => {
+							uploadUrl.thumbnailUrl = thumbnailUrl;
+							console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
+							return uploadUrl;
+						})
+				}
+			} else {
+				return uploadUrl;
+			}
 		})
 		.catch(err => {
 			console.error(err, err.stack);
