@@ -1,10 +1,7 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const exiftool = require('exiftool');
-const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const configUrl = require('../../../config/serverConfig');
-const { paths } = require('../../../config/config');
 const moment = require('moment');
 
 // upload files to the File System

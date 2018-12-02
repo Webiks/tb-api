@@ -1,5 +1,4 @@
 const aws = require('aws-sdk');
-const S3 = require('aws-sdk/clients/s3');
 const { s3config } = require('../../../config/config');
 
 // create a Logger
@@ -9,7 +8,7 @@ let myCredentials;
 // get the credentials
 if (process.env.NODE_ENV === 'production'){
 	// remote - get temporary credentials from the ec2
-	myCredentials = new AWS.EC2MetadataCredentials({
+	myCredentials = new aws.EC2MetadataCredentials({
 		httpOptions: { timeout: 5000 }, // 5 second timeout
 		maxRetries: 10, // retry 10 times
 		retryDelayOptions: { base: 200 }
@@ -19,7 +18,7 @@ if (process.env.NODE_ENV === 'production'){
 	myCredentials = {
 		accessKeyId: process.env[s3config.accessKeyId],
 		secretAccessKey: process.env[s3config.secretAccessKey]
-	}
+	};
 }
 
 // configure the s3 service object

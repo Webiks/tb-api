@@ -1,5 +1,4 @@
 const exif = require('exif-parser');
-const fs = require('fs-extra');
 const { s3 } = require('./getS3Object');
 const { s3Upload } = require('./s3Utils');
 
@@ -17,8 +16,8 @@ const uploadToS3 = (worldId, file, buffer) => {
 		// 1. check if the user's folder exists in the s3 bucket
 		if (!isFolderExist(worldId)) {
 			// 2. create new folders for new user
-			return createUserFolder(worldId, prefix)
-				.then(data => {
+			return createUserFolder(worldId)
+				.then(() => {
 					console.log(`Successfully create new folder: ${prefix}`);
 					return upload(fileType, fileKey, buffer);
 				})
@@ -51,7 +50,7 @@ const upload = (fileType, fileKey, buffer) => {
 			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
 			// save the image thumbnail
 			if (fileType === 'image'){
-				console.log(`start s3Upload image...`);
+				console.log('start s3Upload image...');
 				const parser = exif.create(buffer);
 				const result = parser.parse();
 				// upload the thumbnail of the image to s3
@@ -65,7 +64,7 @@ const upload = (fileType, fileKey, buffer) => {
 							uploadUrl.thumbnailUrl = thumbnailUrl;
 							console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
 							return uploadUrl;
-						})
+						});
 				}
 			} else {
 				return uploadUrl;
@@ -89,7 +88,7 @@ const getFileKey = (prefix, fileType, fileName) => {
 };
 
 const isFolderExist = (userName) => {
-	console.log(`start isFolderExist...`);
+	console.log('start isFolderExist...');
 	s3.listObjectsV2({ Delimiter: '/' }).promise()
 		.then(data => {
 			console.log(`isFolderExist data: ${JSON.stringify(data)}`);
@@ -112,12 +111,12 @@ const isFolderExist = (userName) => {
 };
 
 // create a new folder if the userName is a new one + return the prefix folder path
-const createUserFolder = (userKey, prefix) => {
+const createUserFolder = (userKey) => {
 	console.log(`userKey: ${userKey}`);
 	// create a new folder with the name of the the encoded userName + the sub-folders
 	return createS3Folder(`${userKey}/images/`)
-		.then(data => createS3Folder(`${userKey}/rasters/`))
-		.then(data => createS3Folder(`${userKey}/vectors/`))
+		.then(() => createS3Folder(`${userKey}/rasters/`))
+		.then(() => createS3Folder(`${userKey}/vectors/`))
 		.catch(err => {
 			console.error(err, err.stack);
 			throw new Error(err);
@@ -127,7 +126,7 @@ const createUserFolder = (userKey, prefix) => {
 const createS3Folder = (keyName) => {
 	const createNewFolder = s3.putObject({ Key: keyName }).promise();
 	return createNewFolder
-		.then(data => console.log(`Successfully to create a new folder: ${keyName}`))
+		.then(() => console.log(`Successfully to create a new folder: ${keyName}`))
 		.catch(err => {
 			console.error(err, err.stack);
 			throw new Error(`There was an error creating your folder: ${err.message}`);

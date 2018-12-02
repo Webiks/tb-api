@@ -100,7 +100,7 @@ const uploadFiles = (req, res) => {
 				const files = zipFiles.map(file => {
 					console.log(`zipFile file: ${file.name}`);
 					buffer = fs.readFileSync(file.filePath);
-					return uploadFilesToS3(worldId, file, buffer)
+					return uploadFilesToS3(worldId, file, buffer);
 				});
 
 				// send to the right upload handler according to the type
