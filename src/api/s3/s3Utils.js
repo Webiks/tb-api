@@ -19,7 +19,7 @@ class S3Utils {
 				console.error(err, err.stack);
 				throw new Error(err);
 			});
-	};
+	}
 
 	// download file from S3
 	static s3Download(fileKey) {
@@ -36,7 +36,7 @@ class S3Utils {
 				console.error(err, err.stack);
 				throw new Error(err);
 			});
-	};
+	}
 
 }
 

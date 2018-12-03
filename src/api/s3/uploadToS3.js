@@ -11,7 +11,7 @@ const uploadToS3 = (file, buffer, vectorId) => {
 
 // ================================================== Private F U N C T I O N S ========================================
 // upload the file to S3 including the thumbnail (if it's an image file)
-function upload(fileType, fileKey, buffer){
+function upload(fileType, fileKey, buffer) {
 	const uploadUrl = {
 		fileUrl: '',
 		thumbnailUrl: ''
@@ -21,7 +21,7 @@ function upload(fileType, fileKey, buffer){
 			uploadUrl.fileUrl = fileUrl;
 			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
 			// save the image thumbnail
-			if (fileType === 'image'){
+			if (fileType === 'image') {
 				console.log('start s3Upload image...');
 				const parser = exif.create(buffer);
 				const result = parser.parse();
@@ -48,7 +48,7 @@ function upload(fileType, fileKey, buffer){
 		});
 }
 
-function getFileKey(file, vectorId){
+function getFileKey(file, vectorId) {
 	const fileType = file.fileType;
 	const typeDir = `${fileType}s`;											// define the 'images','rasters','vectors' folders
 	const fileName = file.encodeFileName;

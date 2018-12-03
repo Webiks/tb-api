@@ -96,7 +96,7 @@ const uploadFiles = (req, res) => {
 				zip.writeZip(path);
 
 				// get the vector's Id of the SHP file
-				if (zipFiles[0].fileType === 'vector'){
+				if (zipFiles[0].fileType === 'vector') {
 					const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
 					vectorId = shpFile[0]._id;
 				}
@@ -126,7 +126,7 @@ const uploadFiles = (req, res) => {
 
 // ========================================= private  F U N C T I O N S ============================================
 // upload the file to S3 amazon storage and get its url (including the thumbnail's url)
-function uploadFilesToS3(file, buffer, vectorId){
+function uploadFilesToS3(file, buffer, vectorId) {
 	return uploadToS3(file, buffer, vectorId)
 		.then(uploadUrl => {
 			console.log(`uploadFilesToS3 uploadUrl: ${JSON.stringify(uploadUrl)}`);
@@ -148,7 +148,7 @@ function uploadFilesToS3(file, buffer, vectorId){
 }
 
 // send to the right upload handler according to the type
-function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, buffer){
+function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, buffer) {
 	if (fileType === 'image') {
 		// save all the file's data in the database
 		console.log(`uploadUtils uploadHandler file imageData: ${JSON.stringify(reqFiles.imageData)}`);
@@ -162,7 +162,7 @@ function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, 
 }
 
 // prepare the file before uploading it
-function setBeforeUpload(file, fileType, uploadPath){
+function setBeforeUpload(file, fileType, uploadPath) {
 	console.log('setBeforeUpload File: ', JSON.stringify(file));
 	const name = file.name;
 	// replace '/' to '_' in the file name
@@ -192,7 +192,7 @@ function setBeforeUpload(file, fileType, uploadPath){
 	return newFile;
 }
 
-function returnFiles(files, path){
+function returnFiles(files, path) {
 	console.log('upload files returnFiles path: ', path);
 	// remove the zip file from the temporary uploads directory
 	fs.removeSync(path);
