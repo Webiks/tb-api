@@ -66,13 +66,11 @@ class ImageHandler {
 		// ============================================= Private Functions =================================================
 		// set the File Data from the ReqFiles
 		function setFileData(file) {
-			const name = file.name;
-			const fileExtension = name.substring(name.lastIndexOf('.'));
 			return {
-				name,
+				name: file.name,
 				size: file.size,
 				fileUploadDate: file.fileUploadDate,
-				fileExtension,
+				fileExtension: file.fileExtension,
 				filePath: file.filePath,
 				fileType: 'image',
 				encodeFileName: file.encodeFileName,

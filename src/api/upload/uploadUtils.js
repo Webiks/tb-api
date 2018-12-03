@@ -40,6 +40,7 @@ const uploadFiles = (req, res) => {
 	let path;
 	let file;
 	let buffer;
+	let vectorId = null;
 
 	if (!reqFiles.length) {
 		file = reqFiles;
@@ -58,7 +59,7 @@ const uploadFiles = (req, res) => {
 		console.log('UploadFiles SINGLE req file(after): ', JSON.stringify(file));
 
 		// upload the file to S3 amazon storage
-		uploadFilesToS3(worldId, file, buffer)
+		uploadFilesToS3(file, buffer, vectorId)
 			.then(file => {
 				// send to the right upload handler according to the type
 				uploadHandler(res, worldId, file, fileType, name, path, reqFields, buffer);
@@ -82,7 +83,6 @@ const uploadFiles = (req, res) => {
 		// define the names of the files to be zipped (in Sync operation)
 		const zipFiles = reqFiles.map(file => {
 			const newFile = setBeforeUpload(file, fileType, uploadPath);
-
 			// add the local file to the zip file
 			zip.addLocalFile(newFile.encodePathName);
 
@@ -91,16 +91,23 @@ const uploadFiles = (req, res) => {
 
 		Promise.all(zipFiles)
 			.then(zipFiles => {
-				console.log(`zip file[0]: ${zipFiles[0].name}`);
 				// write the zip to the disk
-				console.log('write zip file: ' + path);
+				console.log(`write zip file: ${path}`);
 				zip.writeZip(path);
+
+				// get the vector's Id of the SHP file
+				if (zipFiles[0].fileType === 'vector'){
+					const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
+					vectorId = shpFile[0]._id;
+				}
 
 				// upload the files to S3 amazon storage
 				const files = zipFiles.map(file => {
 					console.log(`zipFile file: ${file.name}`);
 					buffer = fs.readFileSync(file.filePath);
-					return uploadFilesToS3(worldId, file, buffer);
+					// remove the file from the temporary uploads directory
+					fs.removeSync(file.encodePathName);
+					return uploadFilesToS3(file, buffer, vectorId);
 				});
 
 				// send to the right upload handler according to the type
@@ -119,8 +126,8 @@ const uploadFiles = (req, res) => {
 
 // ========================================= private  F U N C T I O N S ============================================
 // upload the file to S3 amazon storage and get its url (including the thumbnail's url)
-const uploadFilesToS3 = (worldId, file, buffer) => {
-	return uploadToS3(worldId, file, buffer)
+function uploadFilesToS3(file, buffer, vectorId){
+	return uploadToS3(file, buffer, vectorId)
 		.then(uploadUrl => {
 			console.log(`uploadFilesToS3 uploadUrl: ${JSON.stringify(uploadUrl)}`);
 			file.filePath = uploadUrl.fileUrl;
@@ -138,10 +145,10 @@ const uploadFilesToS3 = (worldId, file, buffer) => {
 			console.error(`Error upload the file to S3: ${err}`);
 			throw new Error(err);
 		});
-};
+}
 
 // send to the right upload handler according to the type
-const uploadHandler = (res, worldId, reqFiles, fileType, name, path, reqFields, buffer) => {
+function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, buffer){
 	if (fileType === 'image') {
 		// save all the file's data in the database
 		console.log(`uploadUtils uploadHandler file imageData: ${JSON.stringify(reqFiles.imageData)}`);
@@ -152,10 +159,10 @@ const uploadHandler = (res, worldId, reqFiles, fileType, name, path, reqFields, 
 		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
 		res.send(returnFiles(files, path));
 	}
-};
+}
 
 // prepare the file before uploading it
-const setBeforeUpload = (file, fileType, uploadPath) => {
+function setBeforeUpload(file, fileType, uploadPath){
 	console.log('setBeforeUpload File: ', JSON.stringify(file));
 	const name = file.name;
 	// replace '/' to '_' in the file name
@@ -165,14 +172,15 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 	const filePath = uploadPath + name;
 	const encodeFileName = encodeURIComponent(name);
 	const encodePathName = uploadPath + encodeFileName;
+	const fileExtension = name.substring(name.lastIndexOf('.'));
 
 	const newFile = {
 		_id: uuid.v4(),
 		name,													// file name (include the extension)
 		size: file.size,
-		// path: file.path,						// the temporary upload directory
 		fileUploadDate: new Date(file.mtime).toISOString(),
 		fileType,
+		fileExtension,
 		filePath,
 		encodeFileName,
 		encodePathName
@@ -182,26 +190,23 @@ const setBeforeUpload = (file, fileType, uploadPath) => {
 	fs.renameSync(file.path, newFile.encodePathName);
 
 	return newFile;
-};
+}
 
-const returnFiles = (files, path) => {
-	console.log('upload files: ', JSON.stringify(files));
+function returnFiles(files, path){
+	console.log('upload files returnFiles path: ', path);
 	// remove the zip file from the temporary uploads directory
 	fs.removeSync(path);
 	// if ZIP files: remove the zip directory
 	const zipPath = path.split('.');
 	if (zipPath[1] === 'zip') {
 		files.map(file => {
+			console.log('upload files returnFile file: ', JSON.stringify(file));
 			if (file.fileType === 'vector') {
 				file.zipPath = zipPath[0].trim();
 			} else {
 				file.zipPath = null;
 				// remove the zip directory
 				fs.removeSync(zipPath[0]);
-			}
-			// remove files from the temporary uploads directory
-			if (file.fileType !== 'image') {
-				fs.removeSync(file.encodePathName);
 			}
 		});
 	} else {
@@ -211,7 +216,7 @@ const returnFiles = (files, path) => {
 	}
 	console.log('return files: ', JSON.stringify(files));
 	return files;
-};
+}
 
 module.exports = {
 	uploadFiles,

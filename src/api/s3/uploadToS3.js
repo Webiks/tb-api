@@ -1,24 +1,17 @@
 const exif = require('exif-parser');
 const { s3Upload } = require('./s3Utils');
 
-const uploadToS3 = (worldId, file, buffer) => {
+const uploadToS3 = (file, buffer, vectorId) => {
 	console.log(`start upload file To S3...${file.name}`);
 
-	const fileType = file.fileType;
-	const typeDir = `${fileType}s`;											// define the 'images','rasters','vectors' folders
-	const fileName = file.encodeFileName;
-
-	const prefix = `${typeDir}/${file._id}`;
-	const fileKey = getFileKey(prefix, fileType, fileName);
+	const fileKey = getFileKey(file, vectorId);
 	console.log(`public file Key: ${fileKey}`);
-
-	return upload(fileType, fileKey, buffer);
-
+	return upload(file.fileType, fileKey, buffer);
 };
 
 // ================================================== Private F U N C T I O N S ========================================
 // upload the file to S3 including the thumbnail (if it's an image file)
-const upload = (fileType, fileKey, buffer) => {
+function upload(fileType, fileKey, buffer){
 	const uploadUrl = {
 		fileUrl: '',
 		thumbnailUrl: ''
@@ -53,17 +46,22 @@ const upload = (fileType, fileKey, buffer) => {
 			console.error(err, err.stack);
 			throw new Error(err);
 		});
-};
+}
 
-const getFileKey = (prefix, fileType, fileName) => {
+function getFileKey(file, vectorId){
+	const fileType = file.fileType;
+	const typeDir = `${fileType}s`;											// define the 'images','rasters','vectors' folders
+	const fileName = file.encodeFileName;
 	let fileKey;
-	if (fileType === 'vector') {
+
+	// if vector - save under the id of the SHX's file inside a directory with the vector's name
+	if (vectorId) {
 		const dirName = fileName.split('.')[0];
-		fileKey = `${prefix}/${dirName}/${fileName}`;
+		fileKey = `${typeDir}/${vectorId}/${dirName}/${fileName}`;
 	} else {
-		fileKey = `${prefix}/${fileName}`;
+		fileKey = `${typeDir}/${file._id}/${fileName}`;
 	}
 	return fileKey;
-};
+}
 
 module.exports = uploadToS3;

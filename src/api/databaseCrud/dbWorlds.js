@@ -15,11 +15,6 @@ const dbWorldCrud = new MongoCrud(worldModel);
 router.post('/:worldName', (req, res) => {
 	const world = req.body;
 	const worldName = req.params.worldName;
-	// replace '/' to '_' in the world name
-	if (worldName.indexOf('/') !== -1) {
-		worldName.replace('/\//g', '_');
-	}
-	world.name = worldName;
 	world._id = encodeURIComponent(worldName);
 	console.log(`db WORLD SERVER: start to CREATE new World: ${world._id} in Geoserver`);
 	// 1. in GeoServer

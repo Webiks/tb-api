@@ -35,4 +35,4 @@ const s3 = new aws.S3({
 	}
 });
 
-module.exports = { s3, aws };
+module.exports = s3 ;
