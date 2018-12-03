@@ -1,58 +1,46 @@
 const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const exiftool = require('exiftool');
-const fs = require('fs-extra');
-const { createDirSync } = require('../fs/fileMethods');
 const createNewLayer = require('../databaseCrud/createNewLayer');
-const configUrl = require('../../../config/serverConfig');
-const { paths } = require('../../../config/config');
 const moment = require('moment');
 
 // upload files to the File System
-class UploadFilesToFS {
+class ImageHandler {
 
-	static uploadFile(worldId, reqFiles, name, path, fields) {
+	static getImageData(worldId, reqFiles, name, path, fields, buffer) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
 		console.log('uploadFile to FS files: ' + JSON.stringify(files));
 		console.log('uploadFile to FS fields: ' + JSON.stringify(fields));
-		console.log('uploadFile PATH: ' + path);
 
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
-				const dirPath = `.${paths.staticPath}${paths.imagesPath}/${file._id}`;
-				const filePath = `${dirPath}/${file.name}`;
-				console.log(`filePath: ${filePath}`);
-				createDirSync(dirPath);
-				fs.renameSync(file.filePath, filePath);
-				console.log(`the '${file.name}' was rename!`);
-				const displayUrl = `${configUrl.uploadImageDir}/${file._id}/${file.name}`;
-
-				// 2. set the file Data from the upload file
+				// 1. set the file Data from the upload file
 				const fileData = setFileData(file);
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
-				// 3. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
+				// 2. set the world-layer data
+				// let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
+				let worldLayer = setLayerFields(file._id, fileData, file.filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
-				// 4. get the metadata of the image file
-				// const metadata = getMetadata(worldLayer);
-				return getMetadata(worldLayer)
+				// 3. get the metadata of the image file
+				console.log('3. metadata imageData thumbnailUrl: ' + file.imageData.thumbnailUrl);
+				return getMetadata(worldLayer, file.encodePathName, buffer, file.imageData.thumbnailUrl)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
-						// 5. set the geoData of the image file
+						// 4. set the geoData of the image file
 						const geoData = setGeoData({ ...metadata });
 						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
 
-						// 6. set the inputData of the image file
+						// 5. set the inputData of the image file
 						const inputData = setInputData({ ...geoData });
 						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-						// 7. save the file to mongo database and return the new file is succeed
+						// 6. save the file to mongo database and return the new file is succeed
 						return createNewLayer(newFile, worldId)
 							.then(newLayer => {
 								console.log('createNewLayer result: ' + newLayer);
@@ -78,13 +66,12 @@ class UploadFilesToFS {
 		// ============================================= Private Functions =================================================
 		// set the File Data from the ReqFiles
 		function setFileData(file) {
-			const name = file.name;
-			const fileExtension = name.substring(name.lastIndexOf('.'));
 			return {
-				name,
+				name: file.name,
 				size: file.size,
 				fileUploadDate: file.fileUploadDate,
-				fileExtension,
+				fileExtension: file.fileExtension,
+				filePath: file.filePath,
 				fileType: 'image',
 				encodeFileName: file.encodeFileName,
 				splitPath: null
@@ -92,15 +79,15 @@ class UploadFilesToFS {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, displayUrl, filePath) {
+		function setLayerFields(id, file, filePath) {
 			const name = (file.name).split('.')[0];
 
 			return {
 				_id: id,
 				name,
 				fileName: file.name,
-				displayUrl,
-				filePath: filePath,
+				displayUrl: filePath,
+				filePath,
 				fileType: 'image',
 				format: 'JPEG',
 				fileData: file
@@ -108,9 +95,9 @@ class UploadFilesToFS {
 		}
 
 		// get the metadata of the image file
-		function getMetadata(file) {
-			console.log('start get Metadata...');
-			const buffer = fs.readFileSync(file.filePath);
+		function getMetadata(file, filePath, buffer, thumbnailUrl) {
+			let imageData = file.imageData;
+			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
 			const parser = exif.create(buffer);
 
 			// 1. get the image's MetaData from the exif-parser
@@ -155,7 +142,7 @@ class UploadFilesToFS {
 					// format the dates
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
 
-					const imageData = {
+					imageData = {
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
@@ -167,7 +154,8 @@ class UploadFilesToFS {
 						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
-						createDate: moment(createDate, exifDateFormat).toString()
+						createDate: moment(createDate, exifDateFormat).toString(),
+						thumbnailUrl
 					};
 
 					// set the Date's fields in the layer's model
@@ -235,4 +223,4 @@ class UploadFilesToFS {
 	}
 }
 
-module.exports = UploadFilesToFS;
+module.exports = ImageHandler;

@@ -1,4 +1,3 @@
-// export class MongoCrud {
 class MongoCrud {
 
 	constructor(mongoModel) {

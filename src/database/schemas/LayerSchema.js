@@ -246,7 +246,8 @@ const imageData = {
 	flightPitchDegree: Number,
 	camReverse: Number,
 	gimbalReverse: Number,
-	fieldOfView: Number
+	fieldOfView: Number,
+	thumbnailUrl: String
 };
 
 /* exif-parser fields:

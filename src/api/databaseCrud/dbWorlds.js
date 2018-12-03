@@ -14,7 +14,8 @@ const dbWorldCrud = new MongoCrud(worldModel);
 // create a new world (passing a new world object in the req.body)
 router.post('/:worldName', (req, res) => {
 	const world = req.body;
-	world._id = req.params.worldName;
+	const worldName = req.params.worldName;
+	world._id = encodeURIComponent(worldName);
 	console.log(`db WORLD SERVER: start to CREATE new World: ${world._id} in Geoserver`);
 	// 1. in GeoServer
 	GsWorlds.createNewWorldOnGeoserver(world._id)

@@ -10,6 +10,16 @@
 		"domain": "http://tb-server.webiks.com",
 		"gsDatadir": "D:/GeoServer/data_dir"
 	},
+	"s3config": {
+		"accessKeyId": "AWS_ACCESS_KEY_ID",
+		"secretAccessKey": "AWS_SECRET_ACCESS_KEY",
+		"region": "AWS_REGION",
+		"apiVersion": {
+			"s3": "2006-03-01",
+			"ec2": "2016-11-15"
+		},
+		"bucketName": "tb-webiks"
+	},
 	"mongodb": {
 		"port": 27017,
 		"name": "tb_database",
