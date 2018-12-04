@@ -1,5 +1,5 @@
 const GsLayers = require('./GsLayers');
-const turf = require('@turf/turf');
+const { getFootprint } = require('../ansyn/getGeoData');
 
 // 1. get the layer's info (resource)
 const getLayerInfoFromGeoserver = (worldLayer, worldId, layerName) => {
@@ -45,19 +45,20 @@ const getLayerDetailsFromGeoserver = (worldLayer, resourceUrl) => {
 			// set the store's name
 			worldLayer.geoserver.store.name = (worldLayer.geoserver.store.storeId).split(':')[1];
 
-			// set the GeoData fields (bbox and centerPoint)
+			// set the GeoData fields (bbox , centerPoint and droneCenter, that it's the same point, for rasters and vectors)
 			const centerPoint =
 				[worldLayer.geoserver.data.latLonBoundingBox.minx, worldLayer.geoserver.data.latLonBoundingBox.maxy];
+			const droneCenter = centerPoint;
 			const polygon = worldLayer.geoserver.data.latLonBoundingBox;
 			console.log('getLayerDetailsFromGeoserver polygon: ', JSON.stringify(polygon));
 			const bbox = [polygon.minx, polygon.miny, polygon.maxx, polygon.maxy];
-			const footprint = turf.bboxPolygon(bbox);
+			const footprint = getFootprint(bbox);
 			console.log('getLayerDetailsFromGeoserver footprint: ', JSON.stringify(footprint));
-			worldLayer.geoData = { centerPoint, bbox, footprint };
+			worldLayer.geoData = { droneCenter, footprint, centerPoint, bbox };
 			console.log('getLayerDetailsFromGeoserver geoData: ', JSON.stringify(worldLayer.geoData));
 
 			console.log('2. return worldLayer: ', JSON.stringify(worldLayer));
-			// return worldLayer.geoserver.data.store.href;
+
 			return worldLayer;
 		});
 };
