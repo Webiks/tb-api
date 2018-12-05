@@ -2,31 +2,41 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-// for ANSYN: get the polygon from the latLonBoundingBox field in the data using the turf.bboxPolygon(bbox) function
 const footprint = {
 	type: {
-		type: String,
-		enum: ['Feature'],
-		required: true
+		$type: String,
+		enum: ['Feature']
+	},
+	properties: {},
+	geometry: {
+		type: {
+			$type: String,
+			enum: ['Polygon']
+		},
+		coordinates: [[[Number]]], // Array of arrays of arrays of 2 numbers
+	}
+};
+
+const droneCenter = {
+	type: {
+		$type: String,
+		enum: ['Feature']
 	},
 	geometry: {
 		type: {
-			type: String,
-			enum: ['Polygon'],
-			required: true
+			$type: String,
+			enum: ['Point']
 		},
-		coordinates: {
-			type: [[[Number]]], // Array of arrays of arrays of numbers
-			required: true
-		}
+		coordinates: [Number]  // Array of 2 numbers
 	},
 	properties: {}
 };
 
 const geoData = {
+	droneCenter,
+	footprint,
 	centerPoint: [Number, Number],
-	bbox: [Number, Number, Number, Number] | [Number, Number, Number, Number, Number, Number],				// [ minx, miny, maxx, maxy ]
-	footprint
+	bbox: [Number, Number, Number, Number]				// [ minx, miny, maxx, maxy ]
 };
 
 // LAYER: from GeoServer - Layer page
@@ -198,19 +208,19 @@ const inputData = {
 	name: String,
 	sensor: {
 		name: String,
-		type: { type: String },
+		type: String ,
 		maker: String,
 		bands: [String]
 	},
 	tb: {
-		affiliation: { type: String, uppercase: true, enum: ['INPUT', 'OUTPUT', 'UNKNOWN'] },  // 'INPUT' or 'OUTPUT'
+		affiliation: { $type: String, uppercase: true, enum: ['INPUT', 'OUTPUT', 'UNKNOWN'] },  // 'INPUT' or 'OUTPUT'
 		GSD: Number,
 		flightAltitude: Number,
 		cloudCoveragePercentage: Number
 	},
 	ol: {
 		zoom: Number,
-		opacity: { type: Number, min: 0, max: 1 }
+		opacity: { $type: Number, min: 0, max: 1 }
 	},
 	ansyn: {
 		title: String
@@ -358,20 +368,20 @@ const geoserver = {
 
 // create the World-Layer Schema
 const LayerSchema = new Schema({
-	_id: { type: String },         				   		 	 // get the id from uuid function
+	_id: String ,         				  	 						 // get the id from uuid function
 	name: String,                                  // from GeoServer
 	fileName: String,
 	filePath: String,
 	createdDate: Number,													 // the file created date in number
 	displayUrl: String,														 // url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
-	fileType: { type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
-	format: { type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
+	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
+	format: { $type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	fileData,
 	imageData,
 	geoData,
 	inputData,
 	geoserver
-});
+}, { typeKey: '$type' }, { _id : false });
 
 // create the layer MODEL
 const layerModel = mongoose.model('Layer', LayerSchema);

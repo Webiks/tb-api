@@ -1,8 +1,8 @@
-const turf = require('@turf/turf');
 const exif = require('exif-parser');
 const exiftool = require('exiftool');
-const createNewLayer = require('../databaseCrud/createNewLayer');
 const moment = require('moment');
+const { createNewLayer } = require('../databaseCrud/DbUtils');
+const { getFootprint, getBboxFromPoint } = require('../ansyn/getGeoData');
 
 // upload files to the File System
 class ImageHandler {
@@ -169,17 +169,18 @@ class ImageHandler {
 
 		// set the geoData from the image GPS
 		function setGeoData(layer) {
-			// set the center point
+			// set the center point and the droneCenter (the same point, for now)
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
+			const droneCenter = centerPoint;
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// get the Bbox
-			const bbox = getBbboxFromPoint(centerPoint, 200);
+			const bbox = getBboxFromPoint(centerPoint, 200);
 			console.log('setGeoData polygon: ', JSON.stringify(bbox));
 			// get the footprint
-			const footprint = getFootprintFromBbox(bbox);
+			const footprint = getFootprint(bbox);
 			console.log('setGeoData footprint: ', JSON.stringify(footprint));
 			// set the geoData
-			const geoData = { centerPoint, bbox, footprint };
+			const geoData = { droneCenter, footprint, centerPoint, bbox };
 			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
 		}
@@ -206,19 +207,6 @@ class ImageHandler {
 					}
 				}
 			};
-		}
-
-		// get the Boundry Box from a giving Center Point using turf
-		function getBbboxFromPoint(centerPoint, radius) {
-			const distance = radius / 1000; 					// the square size in kilometers
-			const point = turf.point(centerPoint);
-			const buffered = turf.buffer(point, distance, { units: 'kilometers', steps: 4 });
-			return turf.bbox(buffered);
-		}
-
-		// get footprint from the Bbox
-		function getFootprintFromBbox(bbox) {
-			return turf.bboxPolygon(bbox);
 		}
 	}
 }

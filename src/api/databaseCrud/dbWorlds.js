@@ -1,12 +1,10 @@
 const express = require('express');
-const worldModel = require('../../database/schemas/WorldSchema');
-const dbUtils = require('./dbUtils');
-const MongoCrud = require('../../database/MongoCrud');
+const dbUtils = require('./DbUtils');
 const GsWorlds = require('../geoserverCrud/GsWorlds');
 
 const router = express.Router();
 
-const dbWorldCrud = new MongoCrud(worldModel);
+const model = 'worldModel';
 
 // ==============
 //  CREATE (add)
@@ -22,7 +20,7 @@ router.post('/:worldName', (req, res) => {
 		.then(() => {
 			// 2. in the DataBase
 			console.log('db WORLD SERVER: start to CREATE new World in the DataBase...');
-			dbWorldCrud.add(world)
+			dbUtils.createNewWorld(world)
 				.then(response => res.send(response));
 		})
 		.catch(error => {
@@ -38,7 +36,7 @@ router.post('/:worldName', (req, res) => {
 // get all the Worlds from the Database
 router.get('/', (req, res) => {
 	console.log('db WORLD SERVER: start GET ALL Worlds...');
-	dbWorldCrud.getAll()
+	dbUtils.getAllEntities(model)
 		.then(response => res.send(response))
 		.catch(error => {
 			const consoleMessage = `db WORLD: ERROR in GET-ALL Worlds!: ${error}`;
@@ -50,7 +48,7 @@ router.get('/', (req, res) => {
 // get One World from the Database by its Name
 router.get('/:worldId', (req, res) => {
 	console.log(`db WORLD SERVER: start GET ${req.params.worldId} World by id...`);
-	dbWorldCrud.get({ _id: req.params.worldId })
+	dbUtils.getEntity(req.params.worldId, model)
 		.then(response => res.send(response))
 		.catch(error => {
 			const consoleMessage = `db WORLD: ERROR in GET the World!: ${error}`;
@@ -65,7 +63,7 @@ router.get('/:worldId', (req, res) => {
 // update all the World's fields (passing a new world object in the req.body)
 router.put('/:worldName', (req, res) => {
 	console.log(`db WORLD SERVER: start to UPDATE world ${req.params.worldName}`);
-	dbWorldCrud.update(req.body)
+	dbUtils.updateEntity(req.body,model)
 		.then(response => res.send(response))
 		.catch(error => {
 			const consoleMessage = `db WORLD: ERROR in UPDATE the World!: ${error}`;
@@ -77,19 +75,9 @@ router.put('/:worldName', (req, res) => {
 // update a single field in the World (passing the world's id + layers the new value of the field in the req.body)
 router.put('/:worldName/:fieldName', (req, res) => {
 	console.log(`db WORLD SERVER: start to UPDATE-FIELD world ${req.params.worldName}`);
-	const fieldName = req.params.fieldName;
-	const fieldValue = req.body['newValue'];
 	const entityId = { _id: req.body['_id'] };
 
-	let updatedField = {};
-	updatedField[fieldName] = fieldValue;
-	console.log('dbWorld updatedField: ', JSON.stringify(updatedField));
-	let operation = 'update';
-	if (Array.isArray(updatedField)) {
-		operation = 'updateArray';
-	}
-
-	dbWorldCrud.updateField(entityId, updatedField, operation)
+	dbUtils.updateEntityField(entityId, req.params.fieldName, req.body['newValue'], model)
 		.then(response => res.send(response))
 		.catch(error => {
 			const consoleMessage = `db WORLD: ERROR in UPDATE-FIELD the World!: ${error}`;
@@ -109,14 +97,10 @@ router.delete('/delete/:worldId', (req, res) => {
 	GsWorlds.deleteWorldFromGeoserver(worldId)
 		.then(() => {
 			// 2. get the world's layersId Array
-			dbWorldCrud.get({ _id: worldId })
+			dbUtils.getEntity(worldId, model)
 				.then(({ layersId }) => {
 					// 3. delete the world from the DataBase
-					dbWorldCrud.remove({ _id: worldId })
-						.then(() => {
-							// 4. remove the world's layers if non of them exist in another worlds
-							layersId.forEach(layerId => dbUtils.findAndRemoveLayer(layerId, worldId));
-						})
+					dbUtils.removeWorld(worldId, layersId)
 						.then(() => res.send(`succeed to delete ${worldId} world!`));
 				});
 		})

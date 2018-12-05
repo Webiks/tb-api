@@ -165,7 +165,6 @@ class MongoCrud {
 						this.handleError(reject, err, `FIND-AND-UPDATE-FIELD error: ${err}`);
 					}
 					else {
-						// console.log("update entity: " + entityReturn.id);
 						console.log('update entity: ' + JSON.stringify(entityReturn));
 						return resolve(entityReturn);
 					}
@@ -180,7 +179,7 @@ class MongoCrud {
 	remove(entityId) {
 		return new Promise((resolve, reject) => {
 			try {
-				this.mongoModel.remove(entityId, (err, entityReturn) => {
+				this.mongoModel.deleteOne(entityId, (err, entityReturn) => {
 					if (err) {
 						this.handleError(reject, err, `REMOVE error: ${err}`);
 					}
@@ -199,7 +198,7 @@ class MongoCrud {
 	removeAll() {
 		return new Promise((resolve, reject) => {
 			try {
-				this.mongoModel.remove({}, (err) => {
+				this.mongoModel.deleteMany({}, (err) => {
 					if (err) {
 						this.handleError(reject, err, `REMOVE-ALL error: ${err}`);
 					}
