@@ -44,7 +44,7 @@ class DbUtils{
 			.then(response => response);
 	}
 
-	static updateEntityField(entityId, fieldName, fieldValue, model){
+	static updateEntityField(entityId, fieldName, fieldValue, model, operation = 'update'){
 		console.log('updateLayerField start...');
 		console.log(`params: 
 			entityId = ${entityId}, 
@@ -54,8 +54,7 @@ class DbUtils{
 
 		let updatedField = {};
 		updatedField[fieldName] = fieldValue;
-		let operation = 'update';
-		if (Array.isArray(updatedField)) {
+		if (operation === 'update' && Array.isArray(updatedField)) {
 			operation = 'updateArray';
 		}
 

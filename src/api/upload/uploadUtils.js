@@ -211,9 +211,9 @@ function setBeforeUpload(file, fileType, uploadPath) {
 
 function returnFiles(files, path) {
 	console.log('upload files returnFiles path: ', path);
-	// remove the zip file from the temporary uploads directory
+	// remove the file/zip file from the temporary uploads directory
 	fs.removeSync(path);
-	// if ZIP files: remove the zip directory
+	// if ZIP files: remove only the zip directory
 	const zipPath = path.split('.');
 	if (zipPath[1] === 'zip') {
 		files.map(file => {
@@ -228,6 +228,7 @@ function returnFiles(files, path) {
 		});
 	} else {
 		console.log('this file is not a ZIP!');
+		files = files.length ? files : [files];
 		files[0].zipPath = null;
 		console.log('zipPath: ', files[0].zipPath);
 	}

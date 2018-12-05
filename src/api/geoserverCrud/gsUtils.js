@@ -29,13 +29,11 @@ const getLayerDetailsFromGeoserver = (worldLayer, resourceUrl) => {
 			let data;
 			if (worldLayer.fileType === 'raster') {
 				data = parseLayerDetails(worldLayer, layerDetails.coverage);
-				// worldLayer.geoserver.data = parseLayerDetails(worldLayer, layerDetails.coverage);
 				console.log('getLayerDetailsFromGeoserver data: ', JSON.stringify(worldLayer.data));
 				data.metadata = { dirName: layerDetails.coverage.metadata.entry.$ };
 			}
 			else if (worldLayer.fileType === 'vector') {
 				data = parseLayerDetails(worldLayer, layerDetails.featureType);
-				// worldLayer.geoserver.data = parseLayerDetails(worldLayer, layerDetails.featureType);
 				data.metadata = { recalculateBounds: layerDetails.featureType.metadata.entry.$ };
 			} else {
 				throw new Error('ERROR: unknown layer TYPE!');
@@ -142,8 +140,6 @@ const parseLayerDetails = (worldLayer, data) => {
 		data.nativeBoundingBox.crs.$
 			? data.nativeBoundingBox.crs.$
 			: data.nativeBoundingBox.crs;
-	// set the store's ID
-	// worldLayer.geoserver.store.storeId = data.store.name;
 
 	return worldLayer.geoserver.data;
 };

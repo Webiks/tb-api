@@ -146,7 +146,7 @@ router.delete('/delete/:worldId/:layerId', (req, res) => {
 	const worldId = req.params.worldId;
 	const removedLayer = req.body;
 	// 1. remove the layer's Id from the world's layersId array
-	dbUtils.updateEntityField({ _id: worldId }, 'layersId', req.params.layerId, 'worldModel')
+	dbUtils.updateEntityField({ _id: worldId }, 'layersId', req.params.layerId, 'worldModel', 'removeFromArray')
 		.then(() => {
 			// 2. remove the layer if it doesn't exist in another worlds
 			let removeFromGeoserver = false;
