@@ -2,7 +2,6 @@ const axios = require('axios');
 const { upload } = require('../../../config/config');
 const configUrl = require('../../../config/serverConfig');
 
-// const headers = upload.headers;
 const authorization = upload.headers.authorization;
 
 class GsLayers {
@@ -16,8 +15,7 @@ class GsLayers {
 		return axios.get(urlGetLayers, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {
-				console.error(`gs LAYER: GET-ALL world's layers from Geoserver ERROR!: ${error}`);
-				return error;
+				return handleError(error,`GET-ALL world's layers from Geoserver ERROR!: ${error}`);
 			});
 	}
 
@@ -28,8 +26,7 @@ class GsLayers {
 		return axios.get(urlGetLayer, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {
-				console.error(`gs LAYER: Get Layer Info From Geoserver ERROR! layer ${layerName} can't be found!: ${error}`);
-				return error;
+				return handleError(error,`Get Layer Info From Geoserver ERROR! layer ${layerName} can't be found!: ${error}`);
 			});
 	}
 
@@ -40,8 +37,7 @@ class GsLayers {
 		return axios.get(resourceUrl, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {
-				console.error(`gs LAYER: Get Layer Details From Geoserver ERROR!: ${error}`);
-				return error;
+				return handleError(error,`Get Layer Details From Geoserver ERROR!: ${error}`);
 			});
 	}
 
@@ -52,8 +48,7 @@ class GsLayers {
 		return axios.get(storeUrl, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {
-				console.error(`gs LAYER: Get Store Data From Geoserver ERROR!: ${error}`);
-				return error;
+				return handleError(error,`Get Store Data From Geoserver ERROR!: ${error}`);
 			});
 	}
 
@@ -63,8 +58,7 @@ class GsLayers {
 		return axios.get(capabilitiesUrl, { headers: { authorization } })
 			.then(response => response.data)
 			.catch(error => {
-				console.error(`gs LAYER: Get Capabilities From Geoserver ERROR!: ${error}`);
-				return error;
+				return handleError(error,`Get Capabilities From Geoserver ERROR!: ${error}`);
 			});
 	}
 
@@ -80,31 +74,15 @@ class GsLayers {
 				return response.data;
 			})
 			.catch(error => {
-				console.error(`gs LAYER: DELETE layer From Geoserver ERROR!, url: ${url}, error: ${error}`);
-				return error;
+				return handleError(error, `DELETE layer From Geoserver ERROR!, url: ${url}, error: ${error}`);
 			});
 	}
+}
 
-	// ========================================= private  F U N C T I O N S ============================================
-	getTypeData(fileType) {
-		const typeData = {};
-		switch (fileType) {
-			case ('RASTER'):
-				typeData.storeType = 'coveragestores';
-				typeData.layerDetailsType = 'coverages';
-				break;
-			case ('VECTOR'):
-				typeData.storeType = 'datastores';
-				typeData.layerDetailsType = 'featuretypes';
-				break;
-		}
-		return typeData;
-	}
-
-	handleError(error, message) {
-		console.error('gs LAYER: ' + message);
-		return error;
-	}
+// ========================================= private  F U N C T I O N S ============================================
+function handleError(error, message){
+	console.error('gs LAYER: ' + message);
+	return error;
 }
 
 module.exports = GsLayers;
