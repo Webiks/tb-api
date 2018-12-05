@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const dbUtils = require('./DbUtils');
-const gsUtils = require('../geoserverCrud/gsUtils');
-const GsLayers = require('../geoserverCrud/GsLayers');
+const gsUtils = require('../geoserverCrud/GsUtils');
+const gsLayers = require('../geoserverCrud/GsLayers');
 const { geoserver } = require('../../../config/config');
 const configUrl = require('../../../config/serverConfig');
 
@@ -58,7 +58,7 @@ router.get('/:layerId', (req, res) => {
 // get all the World's Layers list from GeoServer
 router.get('/geoserver/:worldId', (req, res) => {
 	console.log(`geo LAYER SERVER: start GET ALL ${req.params.worldId} World's Layers...`);
-	GsLayers.getWorldLayerListFromGeoserver(req.params.worldId)
+	gsLayers.getWorldLayerListFromGeoserver(req.params.worldId)
 		.then(response => res.send(response.layers.layer))
 		.catch(error => {
 			const consoleMessage = `db LAYER: GET-ALL from GeoServer ERROR!: ${error}`;
@@ -98,7 +98,7 @@ router.get('/geoserver/:worldId/:layerName', (req, res) => {
 router.get('/geoserver/wmts/:worldId/:layerName', (req, res) => {
 	const capabilitiesUrl = `${configUrl.baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
 	console.log('geo LAYER SERVER: start GetCapabilities url = ', capabilitiesUrl);
-	GsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
+	gsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
 		.then(response => res.send(response))
 		.catch(error => {
 			const consoleMessage = `db LAYER: GetCapabilities ERROR!: ${error}`;

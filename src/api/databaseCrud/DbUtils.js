@@ -1,4 +1,4 @@
-const gsUtils = require('../geoserverCrud/gsUtils');
+const gsUtils = require('../geoserverCrud/GsUtils');
 const worldModel = require('../../database/schemas/WorldSchema');
 const layerModel = require('../../database/schemas/LayerSchema');
 const MongoCrud = require('../../database/MongoCrud');
