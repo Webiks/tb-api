@@ -1,0 +1,32 @@
+{
+	"x-swagger-router-controller": "ansyn",
+
+	"get": {
+		"tags": ["Ansyn"],
+		"description": "Get layer by sensor Type",
+		"operationId": "layersBysensorType",
+		"parameters": [
+			{
+				"name": "sensorType",
+				"description": "sensor Type",
+				"in": "path",
+				"type": "string",
+				"required": true
+			}
+		],
+		"responses": {
+			"200": {
+				"description": "Get layer By sensor Type",
+				"schema": {
+					"$ref": "./definition.json#/definitions/FetchSuccess"
+				}
+			},
+			"default": {
+				"description": "Error",
+				"schema": {
+					"$ref": "./definition.json#/definitions/ErrorResponse"
+				}
+			}
+		}
+	}
+}

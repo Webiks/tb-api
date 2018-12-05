@@ -24,8 +24,11 @@
 		"/ansyn/layers/{id}": {
 			"$ref": "./ansyn/layerById.json"
 		},
-		"/ansyn/layers/{id}/thumbnail": {
-			"$ref": "./ansyn/thumbnail.json"
+		"/ansyn/layers/sensorName/{sensorName}": {
+			"$ref": "./ansyn/layersBySensorName.json"
+		},
+		"/ansyn/layers/sensorType/{sensorType}": {
+			"$ref": "./ansyn/LayersBySensorType.json"
 		}
 	}
 }

@@ -191,7 +191,7 @@ class ImageHandler {
 				inputData: {
 					name: layer.fileData.name,
 					sensor: {
-						type: fields.sensorType,
+						type: fields.sensorType || 'UAV',
 						name: fields.sensorName || layer.imageData.Model,
 						maker: layer.imageData.Make,
 						bands: []
