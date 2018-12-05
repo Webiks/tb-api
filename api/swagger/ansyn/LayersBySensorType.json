@@ -4,7 +4,7 @@
 	"get": {
 		"tags": ["Ansyn"],
 		"description": "Get layer by sensor Type",
-		"operationId": "layersBysensorType",
+		"operationId": "layersBySensorType",
 		"parameters": [
 			{
 				"name": "sensorType",
