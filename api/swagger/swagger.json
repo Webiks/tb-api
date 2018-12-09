@@ -23,9 +23,6 @@
 		},
 		"/ansyn/layers/{id}": {
 			"$ref": "./ansyn/layerById.json"
-		},
-		"/ansyn/layers/{id}/thumbnail": {
-			"$ref": "./ansyn/thumbnail.json"
 		}
 	}
 }
