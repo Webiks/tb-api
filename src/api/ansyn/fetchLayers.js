@@ -12,45 +12,27 @@ const fetchLayers = ({ worldName, geometry, dates, queries = [] }) => {
 			const start = Date.parse(dates.start);
 			const end = Date.parse(dates.end);
 			// set the additional queries
-			if (queries.length !== 0){
-				queries = queries.map(query => {
-					const field = query.field;
-					console.log(`fetchLayers field: ${field}`);
-					const	values = query.values;
-					let operator;
-					if (query.isMatch){
-						operator = { $in: values }
-					} else {
-						operator = { $nin: values }
-					}
-					const newQuery = {};
-					newQuery[field] = operator ;
-					return newQuery;
-				});
-				console.log(`fetchLayers queries: ${JSON.stringify(queries)}`);
-			}
-			return _findLayers(world.layersId, geometry, start, end, queries)
+			const parsedQueries = queries.reduce((initQuery, { field, values, isMatch }) => ({
+				...initQuery,
+				[field]: isMatch ? { $in: values } : { $nin: values }
+			}), {});
+			console.log(`fetchLayers queries: ${JSON.stringify(parsedQueries)}`);
+
+			return _findLayers(world.layersId, geometry, start, end, parsedQueries)
 				.then((layers = []) => layers);
 		});
 };
 
-const _findLayers = (layersId, $geometry, $gt, $lt, queries) => {
+const _findLayers = (layersId, $geometry, $gt, $lt, parsedQueries) => {
 	if (!layersId.length) {
 		return Promise.resolve([]);
 	}
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
 		'createdDate': { $gt, $lt },
-		'geoData.footprint.geometry': { $geoIntersects: { $geometry } }})
-		.then(layers => {
-			console.log(`fetchLayers:  1.find ${layers.length} layers`);
-			if (queries.length !== 0){
-				return layerModel.find({
-					$or: layers.map((_id) => ({ _id })), $and: queries });
-			} else {
-				return layers;
-			}
-		})
+		'geoData.footprint.geometry': { $geoIntersects: { $geometry } },
+		...parsedQueries
+	});
 };
 
 module.exports = fetchLayers;
