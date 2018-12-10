@@ -75,8 +75,7 @@
 						"type": "object",
 						"required": [
 							"field",
-							"values",
-							"isMatch"
+							"values"
 						],
 						"properties": {
 							"field": {

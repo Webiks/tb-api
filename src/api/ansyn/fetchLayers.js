@@ -12,7 +12,7 @@ const fetchLayers = ({ worldName, geometry, dates, queries = [] }) => {
 			const start = Date.parse(dates.start);
 			const end = Date.parse(dates.end);
 			// set the additional queries
-			const parsedQueries = queries.reduce((initQuery, { field, values, isMatch }) => ({
+			const parsedQueries = queries.reduce((initQuery, { field, values, isMatch = true }) => ({
 				...initQuery,
 				[field]: isMatch ? { $in: values } : { $nin: values }
 			}), {});
