@@ -73,7 +73,7 @@ const uploadFiles = (req, res) => {
 		// creating a ZIP file
 		console.log('upload multi files...');
 		// set the ZIP name according to the first file name
-		const splitName = (file.name).split('.');
+		const splitName = (encodeURIComponent(file.name)).split('.');
 		name = `${splitName[0]}.zip`;
 		path = uploadPath + name;
 		console.log('zip path: ', path);
@@ -105,7 +105,7 @@ const uploadFiles = (req, res) => {
 				// upload the files to S3 amazon storage
 				const files = zipFiles.map(file => {
 					console.log(`zipFile file: ${file.name}`);
-					buffer = fs.readFileSync(file.filePath);
+					buffer = fs.readFileSync(file.encodePathName);
 					// remove the file from the temporary uploads directory
 					fs.removeSync(file.encodePathName);
 					return uploadFilesToS3(file, buffer, vectorId);
