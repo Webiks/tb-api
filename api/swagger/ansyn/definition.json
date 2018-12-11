@@ -67,6 +67,35 @@
 							"example": "2018-11-15T13:01:15.537Z"
 						}
 					}
+				},
+				"queries": {
+					"description": "additional optional selection query",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": [
+							"field",
+							"values"
+						],
+						"properties": {
+							"field": {
+								"description": "the field name",
+								"type": "string",
+								"example": "inputData.sensor.type"
+							},
+							"values": {
+								"description": "the field's values",
+								"type": "array",
+								"items": { "type": "string" },
+								"example": ["UAV"]
+							},
+							"isMatch": {
+								"description": "is to match the query or not?",
+								"type": "boolean",
+								"example": true
+							}
+						}
+					}
 				}
 			}
 		},

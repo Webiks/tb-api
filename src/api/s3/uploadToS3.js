@@ -5,7 +5,7 @@ const uploadToS3 = (file, buffer, vectorId) => {
 	console.log(`start upload file To S3...${file.name}`);
 
 	const fileKey = getFileKey(file, vectorId);
-	console.log(`public file Key: ${fileKey}`);
+	console.log(`file Key: ${fileKey}`);
 	return upload(file.fileType, fileKey, buffer);
 };
 
