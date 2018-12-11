@@ -56,7 +56,7 @@ const uploadFiles = (req, res) => {
 		file = setBeforeUpload(file, fileType, uploadPath);
 		name = file.name;
 		path = file.filePath;
-		buffer = fs.readFileSync(path);
+		buffer = fs.readFileSync(file.encodePathName);
 		console.log('UploadFiles SINGLE req file(after): ', JSON.stringify(file));
 
 		// upload the file to S3 amazon storage
@@ -190,6 +190,8 @@ function setBeforeUpload(file, fileType, uploadPath) {
 	const encodeFileName = encodeURIComponent(name);
 	const encodePathName = uploadPath + encodeFileName;
 	const fileExtension = name.substring(name.lastIndexOf('.'));
+
+	console.log(`setBeforeUpload encodePathName: ${encodePathName}`);
 
 	const newFile = {
 		_id: uuid.v4(),
