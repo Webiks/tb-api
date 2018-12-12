@@ -257,6 +257,7 @@ const imageData = {
 	camReverse: Number,
 	gimbalReverse: Number,
 	fieldOfView: Number,
+	tilesUrl: [String],
 	thumbnailUrl: String
 };
 

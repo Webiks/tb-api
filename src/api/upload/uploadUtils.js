@@ -166,10 +166,12 @@ function uploadFilesToS3(file, buffer, vectorId) {
 			file = {
 				...file,
 				imageData: {
+					tilesUrl: uploadUrl.tilesUrl,
 					thumbnailUrl: uploadUrl.thumbnailUrl
 				}
 			};
-			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.imageData.thumbnailUrl)}`);
+			console.log(`succeed to upload thumbnail To S3: ${file.imageData.thumbnailUrl}`);
+			console.log(`succeed to upload image's tiles To S3: ${JSON.stringify(file.imageData.tilesUrl)}`);
 			return file;
 		})
 		.catch(err => {
