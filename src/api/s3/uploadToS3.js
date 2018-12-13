@@ -36,25 +36,27 @@ function upload(fileKey, buffer, file) {
 				// 	})
 
 				const initTileSize = 256;
-				const zoomLevel = 5;
-				return getImageTiles(file.encodePathName, file.fileExtension, initTileSize, zoomLevel)
-					.then(() => {
-						// save the image thumbnail
-						const parser = exif.create(buffer);
-						const result = parser.parse();
-						// upload the thumbnail of the image to s3
-						if (result.hasThumbnail('image/jpeg')) {
-							const splitKey = fileKey.split('.');
-							const thumbnailBuffer = result.getThumbnailBuffer();
-							const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
-							console.log(`upload thumbnail key: ${thumbnailKey}`);
-							return s3Upload(thumbnailKey, thumbnailBuffer)
-								.then(thumbnailUrl => {
-									uploadUrl.thumbnailUrl = thumbnailUrl;
-									console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
-									return uploadUrl;
-								});
-						}
+				return getImageSize(file.encodePathName)
+					.then(imageSize => {
+						return getImageTiles(file.encodePathName, file.fileExtension, initTileSize, imageSize.width)
+							.then(() => {
+								// save the image thumbnail
+								const parser = exif.create(buffer);
+								const result = parser.parse();
+								// upload the thumbnail of the image to s3
+								if (result.hasThumbnail('image/jpeg')) {
+									const splitKey = fileKey.split('.');
+									const thumbnailBuffer = result.getThumbnailBuffer();
+									const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
+									console.log(`upload thumbnail key: ${thumbnailKey}`);
+									return s3Upload(thumbnailKey, thumbnailBuffer)
+										.then(thumbnailUrl => {
+											uploadUrl.thumbnailUrl = thumbnailUrl;
+											console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
+											return uploadUrl;
+										});
+								}
+							});
 					});
 			} else {
 				return uploadUrl;
@@ -66,9 +68,11 @@ function upload(fileKey, buffer, file) {
 		});
 }
 
-async function getImageTiles (filePath, fileExtension, initTileSize, zoomLevel){
+async function getImageTiles (filePath, fileExtension, initTileSize, fileWidth){
 	const targetDir = filePath.split('.')[0];
 	createDirSync(targetDir);
+	const zoomLevel = Math.floor(Math.log2(fileWidth/initTileSize));
+	console.log(`zoom level: ${zoomLevel}`);
 
 	for (let index = 0; index < zoomLevel; index++) {
 		const tileSize = initTileSize * Math.pow(2,index);
@@ -102,6 +106,25 @@ function getFileKey(file, vectorId) {
 		fileKey = `${typeDir}/${file._id}/${fileName}`;
 	}
 	return fileKey;
+}
+
+function getImageSize(path){
+	return new Promise((resolve, reject) => {
+		console.log('start getImageSize...');
+		im.identify(['-format', '%wx%h', path], function (err, dimension) {
+			if (err) {
+				console.log(`getImageTiles ERROR: ${err}`);
+				return reject(err);
+			}
+			const dimSplit = dimension.split('x');
+			const imageSize = {
+				width: dimSplit[0],
+				height: dimSplit[1]
+			};
+			console.log('getImageSize imageSize:', JSON.stringify(imageSize));
+			return resolve(imageSize);
+		})
+	});
 }
 
 module.exports = uploadToS3;
