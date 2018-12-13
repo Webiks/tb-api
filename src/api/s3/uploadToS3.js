@@ -1,26 +1,29 @@
 const exif = require('exif-parser');
-// const gm = require('gm');
-const im = require('imagemagick');
-// const gm = require('gm').subClass({imageMagick: true});
+const gm = require('gm').subClass({ imageMagick: true });
 const { s3Upload } = require('./s3Utils');
-const { createDirSync } = require('../fs/fileMethods');
 
 const uploadToS3 = (file, buffer, vectorId) => {
 	console.log(`start upload file To S3...${file.name}`);
 
-	const fileKey = getFileKey(file, vectorId);
-	console.log(`file Key: ${fileKey}`);
-	return upload(fileKey, buffer, file);
+	const s3FileUrls = getFileKey(file, vectorId);
+	console.log(`s3FileUrls: ${JSON.stringify(s3FileUrls)}`);
+	return upload(s3FileUrls, buffer, file);
 };
 
 // ================================================== Private F U N C T I O N S ========================================
 // upload the file to S3 including the thumbnail (if it's an image file)
-function upload(fileKey, buffer, file) {
+function upload(s3FileUrls, buffer, file) {
 	const uploadUrl = {
 		fileUrl: '',
+		tilesUrl: [],
 		thumbnailUrl: ''
 	};
-	console.log('start s3Upload image...');
+	const filePath = file.encodePathName;
+	const s3Dir = s3FileUrls.s3Dir;
+	const fileKey = s3FileUrls.fileKey;
+	const fileExtension = file.fileExtension;
+	console.log(`start s3Upload image...${fileKey}`);
+	console.log(`file extension: ${fileExtension}`);
 
 	return s3Upload(fileKey, buffer)
 		.then(fileUrl => {
@@ -28,26 +31,19 @@ function upload(fileKey, buffer, file) {
 			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
 			// tiles the image
 			if (file.fileType === 'image') {
-				// gm(buffer, fileName)
-				// 	.resize(256,256)
-				// 	.toBuffer('JPG', function (err, tileBuffer) {
-				// 		if (err) return handle(err);
-				// 		console.log('done!');
-				// 	})
-
 				const initTileSize = 256;
-				return getImageSize(file.encodePathName)
+				return getImageSize(filePath)
 					.then(imageSize => {
-						return getImageTiles(file.encodePathName, file.fileExtension, initTileSize, imageSize.width)
-							.then(() => {
+						return getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTileSize, imageSize.width)
+							.then(tilesUrl => {
+								uploadUrl.tilesUrl = tilesUrl;
 								// save the image thumbnail
 								const parser = exif.create(buffer);
 								const result = parser.parse();
 								// upload the thumbnail of the image to s3
 								if (result.hasThumbnail('image/jpeg')) {
-									const splitKey = fileKey.split('.');
 									const thumbnailBuffer = result.getThumbnailBuffer();
-									const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
+									const thumbnailKey = `${s3Dir}_Thumbnail${fileExtension}`;
 									console.log(`upload thumbnail key: ${thumbnailKey}`);
 									return s3Upload(thumbnailKey, thumbnailBuffer)
 										.then(thumbnailUrl => {
@@ -68,62 +64,83 @@ function upload(fileKey, buffer, file) {
 		});
 }
 
-async function getImageTiles (filePath, fileExtension, initTileSize, fileWidth){
-	const targetDir = filePath.split('.')[0];
-	createDirSync(targetDir);
-	const zoomLevel = Math.floor(Math.log2(fileWidth/initTileSize));
+async function getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTileSize, fileWidth) {
+	const tilesUrl = [];
+	const zoomLevel = Math.floor(Math.log2(fileWidth / initTileSize));
 	console.log(`zoom level: ${zoomLevel}`);
 
+	// save the tiles according to the zoom levels (the smallest zoom - the biggest tile size)
 	for (let index = 0; index < zoomLevel; index++) {
-		const tileSize = initTileSize * Math.pow(2,index);
+		const tileSize = initTileSize * Math.pow(2, index);
 		console.log(`getImageTiles tileSize: ${tileSize}`);
-		const tile = await new Promise((resolve, reject) => {
-			im.convert([filePath, '-resize', `x${tileSize}`, `${targetDir}/${index}${fileExtension}`],
-				function (err, stdout) {
+		await new Promise((resolve, reject) => {
+			gm(buffer, filePath)
+				.resize(`x${tileSize}`)
+				.toBuffer('JPG', function (err, tileBuffer) {
 					if (err) {
 						console.log(`getImageTiles ERROR: ${err}`);
 						return reject(err);
 					}
-					console.log('stdout:', stdout);
-					return resolve(stdout);
-				})
+					console.log('tileBuffer:', tileBuffer);
+					const body = (Buffer.isBuffer(tileBuffer) ? tileBuffer : new Buffer(tileBuffer, 'binary'));
+					const key = `${s3FileUrls.s3Dir}_Tiles/${zoomLevel - index}${fileExtension}`;
+					return resolve(uploadTileToS3(key, body)
+						.then(tileUrl => {
+							tilesUrl.push(tileUrl);
+							return tilesUrl;
+						}));
+				});
 		});
 	}
-	return 'done';
+	return tilesUrl;
+}
+
+function uploadTileToS3(key, body) {
+	return s3Upload(key, body)
+		.then(tileUrl => {
+			console.log('tileUrl:', tileUrl);
+			return tileUrl;
+		});
 }
 
 function getFileKey(file, vectorId) {
 	const fileType = file.fileType;
 	const typeDir = `${fileType}s`;											// define the 'images','rasters','vectors' folders
 	const fileName = file.encodeFileName;
-	let fileKey;
+	let s3FileUrls = {
+		s3Dir: '',
+		fileKey: ''
+	};
 
 	// if vector - save under the id of the SHX's file inside a directory with the vector's name
 	if (vectorId) {
 		const dirName = fileName.split('.')[0];
-		fileKey = `${typeDir}/${vectorId}/${dirName}/${fileName}`;
+		s3FileUrls.s3Dir = `${typeDir}/${vectorId}/${dirName}/`;
+		s3FileUrls.fileKey = `${s3FileUrls.s3Dir}${fileName}`;
 	} else {
-		fileKey = `${typeDir}/${file._id}/${fileName}`;
+		s3FileUrls.s3Dir = `${typeDir}/${file._id}/`;
+		s3FileUrls.fileKey = `${s3FileUrls.s3Dir}${fileName}`;
+		// if image - save the original image as zoom 0 under the 'Tiles' directory
+		if (fileType === 'image') {
+			const key = s3FileUrls.fileKey;
+			s3FileUrls.s3Dir = key.substring(0, key.lastIndexOf('.'));
+			s3FileUrls.fileKey = `${s3FileUrls.s3Dir}_Tiles/0${file.fileExtension}`;
+		}
 	}
-	return fileKey;
+	return s3FileUrls;
 }
 
-function getImageSize(path){
+function getImageSize(path) {
 	return new Promise((resolve, reject) => {
 		console.log('start getImageSize...');
-		im.identify(['-format', '%wx%h', path], function (err, dimension) {
+		gm(path).size(function (err, value) {
 			if (err) {
 				console.log(`getImageTiles ERROR: ${err}`);
 				return reject(err);
 			}
-			const dimSplit = dimension.split('x');
-			const imageSize = {
-				width: dimSplit[0],
-				height: dimSplit[1]
-			};
-			console.log('getImageSize imageSize:', JSON.stringify(imageSize));
-			return resolve(imageSize);
-		})
+			console.log('getImageSize value:', value);
+			return resolve(value);
+		});
 	});
 }
 
