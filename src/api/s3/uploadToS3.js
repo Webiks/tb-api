@@ -34,7 +34,7 @@ function upload(s3FileUrls, buffer, file) {
 				const initTileSize = 256;
 				return getImageSize(filePath)
 					.then(imageSize => {
-						return getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTileSize, imageSize.width)
+						return getImageTiles(buffer, s3FileUrls, fileExtension, initTileSize, imageSize.width)
 							.then(tilesUrl => {
 								uploadUrl.tilesUrl = tilesUrl;
 								// save the image thumbnail
@@ -64,18 +64,24 @@ function upload(s3FileUrls, buffer, file) {
 		});
 }
 
-async function getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTileSize, fileWidth) {
+async function getImageTiles(buffer, s3FileUrls,fileExtension, initTileSize, fileWidth) {
 	const tilesUrl = [];
-	const zoomLevel = Math.floor(Math.log2(fileWidth / initTileSize));
-	console.log(`zoom level: ${zoomLevel}`);
+	// const zoomLevel = Math.floor(Math.log2(fileWidth / initTileSize));
+	// console.log(`zoom level: ${zoomLevel}`);
+	let percent = 100;
 
 	// save the tiles according to the zoom levels (the smallest zoom - the biggest tile size)
-	for (let index = 0; index < zoomLevel; index++) {
-		const tileSize = initTileSize * Math.pow(2, index);
-		console.log(`getImageTiles tileSize: ${tileSize}`);
+	// for (let index = 0; index < zoomLevel; index++) {
+	for (let index = 0; index < 4; index++) {
+		// const tileSize = initTileSize * Math.pow(2, index);
+		// console.log(`getImageTiles tileSize: ${tileSize}`);
+		console.log(`getImageTiles percent: ${percent}%`);
 		await new Promise((resolve, reject) => {
-			gm(buffer, filePath)
-				.resize(`x${tileSize}`)
+			gm(buffer)
+				// .resize(`x${tileSize}`)
+				.resize(`${percent}%`)
+				.gravity('Center')
+				.crop(initTileSize, initTileSize)
 				.toBuffer('JPG', function (err, tileBuffer) {
 					if (err) {
 						console.log(`getImageTiles ERROR: ${err}`);
@@ -83,7 +89,8 @@ async function getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTi
 					}
 					console.log('tileBuffer:', tileBuffer);
 					const body = (Buffer.isBuffer(tileBuffer) ? tileBuffer : new Buffer(tileBuffer, 'binary'));
-					const key = `${s3FileUrls.s3Dir}_Tiles/${zoomLevel - index}${fileExtension}`;
+					// const key = `${s3FileUrls.s3Dir}_Tiles/${zoomLevel - index}${fileExtension}`;
+					const key = `${s3FileUrls.s3Dir}_Tiles/${index}${fileExtension}`;
 					return resolve(uploadTileToS3(key, body)
 						.then(tileUrl => {
 							tilesUrl.push(tileUrl);
@@ -91,6 +98,7 @@ async function getImageTiles(buffer, s3FileUrls, filePath, fileExtension, initTi
 						}));
 				});
 		});
+		percent = percent/2;
 	}
 	return tilesUrl;
 }
