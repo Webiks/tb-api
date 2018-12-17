@@ -8,8 +8,15 @@
 		"consumes": ["multipart/form-data"],
 		"parameters": [
 			{
-				"name": "title",
-				"description": "title",
+				"name": "description",
+				"description": "description",
+				"in": "formData",
+				"type": "string",
+				"required": false
+			},
+			{
+				"name": "creditName ",
+				"description": "name of credit",
 				"in": "formData",
 				"type": "string",
 				"required": false

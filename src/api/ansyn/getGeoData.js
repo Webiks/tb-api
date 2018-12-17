@@ -1,5 +1,17 @@
 const turf = require('@turf/turf');
 
+const getGeoDataFromPoint = (point, pixelSize) => {
+	console.log('setGeoData center point: ', JSON.stringify(point));
+	// get the Bbox
+	const bbox = getBboxFromPoint(point, pixelSize);
+	console.log('setGeoData polygon: ', JSON.stringify(bbox));
+	// get the footprint
+	const footprint = getFootprint(bbox);
+	console.log('setGeoData footprint: ', JSON.stringify(footprint));
+	// set the geoData
+	return { droneCenter: turf.point(point), footprint, bbox };
+};
+
 const getFootprint = (bbox) => {
 	return turf.bboxPolygon(bbox);
 };
@@ -13,7 +25,7 @@ const getBboxFromPoint = (center, radius) => {
 };
 
 module.exports = {
-	getFootprint,
-	getBboxFromPoint
+	getGeoDataFromPoint,
+	getFootprint
 };
 
