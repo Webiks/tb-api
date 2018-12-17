@@ -36,12 +36,12 @@ const getDroneGeoData = (file) => {
 				let footprint;
 				// if all succeed
 				if (response.data.features[0] !== {} && response.data.features[1] !== {}) {
-					console.log("cesium-referance SUCCEED!!!");
+					console.log('cesium-referance SUCCEED!!!');
 					footprint = response.data.features[0];
 				}
 				// update the footprint according to the fixed drone-center (if the fixed polygon was failed)
 				else if (response.data.features[0] === {} && response.data.features[1] !== {}) {
-					console.log("cesium-referance: GOT ONLY POINT!!!");
+					console.log('cesium-referance: GOT ONLY POINT!!!');
 					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.footPrintPixelSize);
 					footprint = newGeoData.footprint;
 				}
@@ -54,7 +54,7 @@ const getDroneGeoData = (file) => {
 					.then(newLayer => newLayer);
 			} else {
 				// if failed - return the original file
-				console.log("cesium-referance FAILED!!!");
+				console.log('cesium-referance FAILED!!!');
 				return file;
 			}
 		})
