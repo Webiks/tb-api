@@ -209,6 +209,7 @@ const inputData = {
 	sensor: {
 		name: String,
 		type: String ,
+		model: String,
 		maker: String,
 		bands: [String]
 	},
@@ -223,7 +224,8 @@ const inputData = {
 		opacity: { $type: Number, min: 0, max: 1 }
 	},
 	ansyn: {
-		title: String
+		description: String,
+		creditName: String
 	}
 };
 

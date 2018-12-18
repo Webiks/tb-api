@@ -45,5 +45,8 @@
 		},
 		"maxFileSize": 50000000000,
 		"defaultWorldId": "public"
+	},
+	"ansyn": {
+		"footPrintPixelSize": 200
 	}
 }

@@ -1,8 +1,9 @@
 const exif = require('exif-parser');
 const exiftool = require('exiftool');
 const moment = require('moment');
+const { ansyn } = require('../../../config/config');
 const { createNewLayer } = require('../databaseCrud/DbUtils');
-const { getFootprint, getBboxFromPoint } = require('../ansyn/getGeoData');
+const { getGeoDataFromPoint } = require('../ansyn/getGeoData');
 
 // upload files to the File System
 class ImageHandler {
@@ -21,7 +22,6 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 2. set the world-layer data
-				// let worldLayer = setLayerFields(file._id, fileData, displayUrl, filePath);
 				let worldLayer = setLayerFields(file._id, fileData, file.filePath);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
@@ -171,29 +171,50 @@ class ImageHandler {
 		function setGeoData(layer) {
 			// set the center point and the droneCenter (the same point, for now)
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
-			const droneCenter = centerPoint;
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
-			// get the Bbox
-			const bbox = getBboxFromPoint(centerPoint, 200);
-			console.log('setGeoData polygon: ', JSON.stringify(bbox));
-			// get the footprint
-			const footprint = getFootprint(bbox);
-			console.log('setGeoData footprint: ', JSON.stringify(footprint));
 			// set the geoData
-			const geoData = { droneCenter, footprint, centerPoint, bbox };
+			let geoData = getGeoDataFromPoint(centerPoint, ansyn.footPrintPixelSize);
+			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
 		}
 
 		function setInputData(layer) {
+			let type = '';
+			let name = '';
+			let model = '';
+			let maker = '';
+			let description = '';
+			let creditName = '';
+
+			if(fields.sensorType){
+				type = fields.sensorType.trim().toLowerCase();
+			}
+			if(fields.sensorName){
+				name = fields.sensorName.trim().toLowerCase();
+			}
+			if(layer.imageData.Model){
+				model = layer.imageData.Model.trim().toUpperCase();
+			}
+			if(layer.imageData.Make){
+				maker = layer.imageData.Make.trim().toUpperCase();
+			}
+			if(fields.description){
+				description = fields.description.trim();
+			}
+			if(fields.creditName){
+				creditName = fields.creditName.trim();
+			}
+
 			return {
 				...layer,
 				inputData: {
 					name: layer.fileData.name,
 					sensor: {
-						type: fields.sensorType,
-						name: fields.sensorName || layer.imageData.Model,
-						maker: layer.imageData.Make,
+						type,
+						name,
+						model,
+						maker,
 						bands: []
 					},
 					tb: {
@@ -203,7 +224,8 @@ class ImageHandler {
 						cloudCoveragePercentage: 0
 					},
 					ansyn: {
-						title: fields.title || ''
+						description,
+						creditName
 					}
 				}
 			};
