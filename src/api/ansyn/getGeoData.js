@@ -16,6 +16,10 @@ const getFootprint = (bbox) => {
 	return turf.bboxPolygon(bbox);
 };
 
+const getCenterFromPolygon = (polygon) => {
+	return turf.center(polygon);
+};
+
 // get the Boundry Box from a giving Center Point using turf
 const getBboxFromPoint = (center, radius) => {
 	const distance = radius / 1000; 					// the square size in kilometers
@@ -26,6 +30,7 @@ const getBboxFromPoint = (center, radius) => {
 
 module.exports = {
 	getGeoDataFromPoint,
+	getCenterFromPolygon,
 	getFootprint
 };
 

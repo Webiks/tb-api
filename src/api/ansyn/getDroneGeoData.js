@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { upload, remote, ansyn } = require('../../../config/config');
-const { getGeoDataFromPoint } = require('./getGeoData');
+const { getGeoDataFromPoint, getCenterFromPolygon } = require('./getGeoData');
 const { updateEntityField } = require('../databaseCrud/DbUtils');
 
 // get the real polygon of the drone's image
@@ -31,19 +31,22 @@ const getDroneGeoData = (file) => {
 	return axios.post(remote.droneDomain, body, { headers })
 		.then(response => {
 			console.log(`getDroneGeoData response: ${JSON.stringify(response.data)}`);
-			if (response.data.features) {
-				const droneCenter = response.data.features[1];
-				let footprint;
-				// if all succeed
-				if (response.data.features[0] !== {} && response.data.features[1] !== {}) {
-					console.log('cesium-referance SUCCEED!!!');
-					footprint = response.data.features[0];
-				}
-				// update the footprint according to the fixed drone-center (if the fixed polygon was failed)
-				else if (response.data.features[0] === {} && response.data.features[1] !== {}) {
+			if (response.data) {
+				let footprint = response.data.bboxPolygon;
+				let droneCenter = response.data.centerPoint;
+				// if got only the drone center point - find a fixed polygon around the given center point
+				if (footprint === null && droneCenter !== null) {
 					console.log('cesium-referance: GOT ONLY POINT!!!');
 					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.footPrintPixelSize);
 					footprint = newGeoData.footprint;
+				}
+				// if got only the polygon - find the center point from the given polygon
+				else if (footprint !== null && droneCenter === null) {
+					console.log('cesium-referance: GOT ONLY POLYGON!!!');
+					droneCenter = getCenterFromPolygon(footprint);
+				} else {
+					// if all succeed
+					console.log('cesium-referance SUCCEED!!!');
 				}
 
 				file.geoData.droneCenter = droneCenter;
