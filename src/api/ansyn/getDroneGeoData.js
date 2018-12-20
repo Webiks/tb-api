@@ -2,7 +2,6 @@ const axios = require('axios');
 const { center } = require('@turf/turf');
 const { upload, remote, ansyn } = require('../../../config/config');
 const { getGeoDataFromPoint } = require('./getGeoData');
-const { updateEntityField } = require('../databaseCrud/DbUtils');
 
 // get the real polygon of the drone's image
 const getDroneGeoData = (file) => {
@@ -31,7 +30,7 @@ const getDroneGeoData = (file) => {
 
 	return axios.post(remote.droneDomain, body, { headers })
 		.then(response => {
-			console.log(`getDroneGeoData response: ${JSON.stringify(response.data)}`);
+			console.log(`getDroneGeoData response Data: ${JSON.stringify(response.data)}`);
 			if (response.data) {
 				let footprint = response.data.bboxPolygon;
 				let droneCenter = response.data.centerPoint;
@@ -49,13 +48,11 @@ const getDroneGeoData = (file) => {
 					// if all succeed
 					console.log('cesium-referance SUCCEED!!!');
 				}
-
 				file.geoData.droneCenter = droneCenter;
 				file.geoData.footprint = footprint;
 
-				// save the changes in mongoDB
-				return updateEntityField(file._id, 'geoData', file.geoData, 'layerModel')
-					.then(newLayer => newLayer);
+				return file;
+
 			} else {
 				// if failed - return the original file
 				console.log('cesium-referance FAILED!!!');

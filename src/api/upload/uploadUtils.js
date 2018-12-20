@@ -6,7 +6,6 @@ const uploadToS3 = require('../s3/uploadToS3');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
 const { findFileType } = require('../fs/fileMethods');
-const getDroneGeoData = require('../ansyn/getDroneGeoData');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
@@ -132,27 +131,11 @@ function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, 
 		// save all the file's data in the database
 		console.log(`uploadUtils uploadHandler file imageData: ${JSON.stringify(reqFiles.imageData)}`);
 		imageHandler.getImageData(worldId, reqFiles, name, path, reqFields, buffer)
-			.then(files => {
-				files = returnFiles(files, path);
-				res.send(files);
-
-				files = files.length ? files : [files];
-
-				// get the real footprint of the Drone's images
-				const promises = files.map(file => {
-					return getDroneGeoData(file)
-						.then(newFile => newFile);
-				});
-
-				return Promise.all(promises);
-
-			});
+			.then(files => res.send(returnFiles(files, path)));
 	} else {
 		// upload the file to GeoServer
-		let files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
-		files = returnFiles(files, path);
-		res.send(files);
-		return files;
+		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
+		res.send(returnFiles(files, path));
 	}
 }
 

@@ -3,7 +3,8 @@ const exiftool = require('exiftool');
 const moment = require('moment');
 const { ansyn } = require('../../../config/config');
 const { createNewLayer } = require('../databaseCrud/DbUtils');
-const { getGeoDataFromPoint } = require('../ansyn/getGeoData');
+const getGeoDataFromPoint = require('../ansyn/getGeoData');
+const getDroneGeoData = require('../ansyn/getDroneGeoData');
 
 // upload files to the File System
 class ImageHandler {
@@ -40,15 +41,20 @@ class ImageHandler {
 						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-						// 6. save the file to mongo database and return the new file is succeed
-						return createNewLayer(newFile, worldId)
-							.then(newLayer => {
-								console.log('createNewLayer result: ' + newLayer);
-								return newLayer;
-							})
-							.catch(error => {
-								console.error('ERROR createNewLayer: ', error);
-								return null;
+						// 6. get the real footprint of the Drone's images from cesium
+						return getDroneGeoData(newFile)
+							.then(savedFile => {
+								console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
+								// 7. save the file to mongo database and return the new layer is succeed
+								return createNewLayer(savedFile, worldId)
+									.then(newLayer => {
+										console.log('createNewLayer OK!');
+										return newLayer;
+									})
+									.catch(error => {
+										console.error('ERROR createNewLayer: ', error);
+										return null;
+									});
 							});
 					})
 					.catch(error => {
@@ -187,22 +193,22 @@ class ImageHandler {
 			let description = '';
 			let creditName = '';
 
-			if(fields.sensorType){
+			if (fields.sensorType) {
 				type = fields.sensorType.trim().toLowerCase();
 			}
-			if(fields.sensorName){
+			if (fields.sensorName) {
 				name = fields.sensorName.trim().toLowerCase();
 			}
-			if(layer.imageData.Model){
+			if (layer.imageData.Model) {
 				model = layer.imageData.Model.trim().toUpperCase();
 			}
-			if(layer.imageData.Make){
+			if (layer.imageData.Make) {
 				maker = layer.imageData.Make.trim().toUpperCase();
 			}
-			if(fields.description){
+			if (fields.description) {
 				description = fields.description.trim();
 			}
-			if(fields.creditName){
+			if (fields.creditName) {
 				creditName = fields.creditName.trim();
 			}
 
