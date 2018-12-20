@@ -1,6 +1,7 @@
 const axios = require('axios');
+const { center } = require('@turf/turf');
 const { upload, remote, ansyn } = require('../../../config/config');
-const { getGeoDataFromPoint, getCenterFromPolygon } = require('./getGeoData');
+const { getGeoDataFromPoint } = require('./getGeoData');
 const { updateEntityField } = require('../databaseCrud/DbUtils');
 
 // get the real polygon of the drone's image
@@ -43,7 +44,7 @@ const getDroneGeoData = (file) => {
 				// if got only the polygon - find the center point from the given polygon
 				else if (footprint !== null && droneCenter === null) {
 					console.log('cesium-referance: GOT ONLY POLYGON!!!');
-					droneCenter = getCenterFromPolygon(footprint);
+					droneCenter = center(footprint);
 				} else {
 					// if all succeed
 					console.log('cesium-referance SUCCEED!!!');

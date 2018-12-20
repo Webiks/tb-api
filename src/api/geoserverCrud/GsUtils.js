@@ -1,5 +1,5 @@
+const { bboxPolygon } = require('@turf/turf');
 const gsLayers = require('./GsLayers');
-const { getFootprint } = require('../ansyn/getGeoData');
 
 class GsUtils {
 	// 1. get the layer's info (resource)
@@ -50,7 +50,7 @@ class GsUtils {
 				const polygon = worldLayer.geoserver.data.latLonBoundingBox;
 				console.log('getLayerDetailsFromGeoserver polygon: ', JSON.stringify(polygon));
 				const bbox = [polygon.minx, polygon.miny, polygon.maxx, polygon.maxy];
-				const footprint = getFootprint(bbox);
+				const footprint = bboxPolygon(bbox);
 				console.log('getLayerDetailsFromGeoserver footprint: ', JSON.stringify(footprint));
 				worldLayer.geoData = { droneCenter, footprint, centerPoint, bbox };
 				console.log('getLayerDetailsFromGeoserver geoData: ', JSON.stringify(worldLayer.geoData));
