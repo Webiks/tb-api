@@ -6,14 +6,10 @@ const getGeoDataFromPoint = (point, pixelSize) => {
 	const bbox = getBboxFromPoint(point, pixelSize);
 	console.log('setGeoData polygon: ', JSON.stringify(bbox));
 	// get the footprint
-	const footprint = getFootprint(bbox);
+	const footprint = turf.bboxPolygon(bbox);
 	console.log('setGeoData footprint: ', JSON.stringify(footprint));
 	// set the geoData
 	return { droneCenter: turf.point(point), footprint, bbox };
-};
-
-const getFootprint = (bbox) => {
-	return turf.bboxPolygon(bbox);
 };
 
 // get the Boundry Box from a giving Center Point using turf
@@ -24,8 +20,5 @@ const getBboxFromPoint = (center, radius) => {
 	return turf.bbox(buffered);
 };
 
-module.exports = {
-	getGeoDataFromPoint,
-	getFootprint
-};
+module.exports = getGeoDataFromPoint;
 
