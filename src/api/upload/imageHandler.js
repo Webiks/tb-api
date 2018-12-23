@@ -181,6 +181,7 @@ class ImageHandler {
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
 			let geoData = getGeoDataFromPoint(centerPoint, ansyn.footPrintPixelSize);
+			geoData.geoRegistered = false;
 			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
