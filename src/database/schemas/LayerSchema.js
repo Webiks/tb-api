@@ -33,6 +33,7 @@ const droneCenter = {
 };
 
 const geoData = {
+	geoRegistered: Boolean,
 	droneCenter,
 	footprint,
 	centerPoint: [Number, Number],

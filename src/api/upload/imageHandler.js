@@ -3,7 +3,8 @@ const exiftool = require('exiftool');
 const moment = require('moment');
 const { ansyn } = require('../../../config/config');
 const { createNewLayer } = require('../databaseCrud/DbUtils');
-const { getGeoDataFromPoint } = require('../ansyn/getGeoData');
+const getGeoDataFromPoint = require('../ansyn/getGeoData');
+const getDroneGeoData = require('../ansyn/getDroneGeoData');
 
 // upload files to the File System
 class ImageHandler {
@@ -22,12 +23,12 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 2. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, file.filePath);
+				let worldLayer = setLayerFields(file._id, fileData, file.filePath, file.imageData);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 3. get the metadata of the image file
 				console.log('3. metadata imageData thumbnailUrl: ' + file.imageData.thumbnailUrl);
-				return getMetadata(worldLayer, file.encodePathName, buffer, file.imageData.thumbnailUrl)
+				return getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
@@ -40,15 +41,20 @@ class ImageHandler {
 						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-						// 6. save the file to mongo database and return the new file is succeed
-						return createNewLayer(newFile, worldId)
-							.then(newLayer => {
-								console.log('createNewLayer result: ' + newLayer);
-								return newLayer;
-							})
-							.catch(error => {
-								console.error('ERROR createNewLayer: ', error);
-								return null;
+						// 6. get the real footprint of the Drone's image from cesium
+						return getDroneGeoData(newFile)
+							.then(savedFile => {
+								console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
+								// 7. save the file to mongo database and return the new layer is succeed
+								return createNewLayer(savedFile, worldId)
+									.then(newLayer => {
+										console.log('createNewLayer OK!');
+										return newLayer;
+									})
+									.catch(error => {
+										console.error('ERROR createNewLayer: ', error);
+										return null;
+									});
 							});
 					})
 					.catch(error => {
@@ -79,7 +85,7 @@ class ImageHandler {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, filePath) {
+		function setLayerFields(id, file, filePath, imageData) {
 			const name = (file.name).split('.')[0];
 
 			return {
@@ -90,12 +96,13 @@ class ImageHandler {
 				filePath,
 				fileType: 'image',
 				format: 'JPEG',
-				fileData: file
+				fileData: file,
+				imageData
 			};
 		}
 
 		// get the metadata of the image file
-		function getMetadata(file, filePath, buffer, thumbnailUrl) {
+		function getMetadata(file, filePath, buffer) {
 			let imageData = file.imageData;
 			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
 			const parser = exif.create(buffer);
@@ -143,6 +150,7 @@ class ImageHandler {
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
 
 					imageData = {
+						...imageData,
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
@@ -154,8 +162,7 @@ class ImageHandler {
 						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
-						createDate: moment(createDate, exifDateFormat).toString(),
-						thumbnailUrl
+						createDate: moment(createDate, exifDateFormat).toString()
 					};
 
 					// set the Date's fields in the layer's model
@@ -174,6 +181,7 @@ class ImageHandler {
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
 			let geoData = getGeoDataFromPoint(centerPoint, ansyn.footPrintPixelSize);
+			geoData.geoRegistered = false;
 			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
@@ -187,22 +195,22 @@ class ImageHandler {
 			let description = '';
 			let creditName = '';
 
-			if(fields.sensorType){
+			if (fields.sensorType) {
 				type = fields.sensorType.trim().toLowerCase();
 			}
-			if(fields.sensorName){
+			if (fields.sensorName) {
 				name = fields.sensorName.trim().toLowerCase();
 			}
-			if(layer.imageData.Model){
+			if (layer.imageData.Model) {
 				model = layer.imageData.Model.trim().toUpperCase();
 			}
-			if(layer.imageData.Make){
+			if (layer.imageData.Make) {
 				maker = layer.imageData.Make.trim().toUpperCase();
 			}
-			if(fields.description){
+			if (fields.description) {
 				description = fields.description.trim();
 			}
-			if(fields.creditName){
+			if (fields.creditName) {
 				creditName = fields.creditName.trim();
 			}
 
