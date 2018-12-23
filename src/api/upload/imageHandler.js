@@ -23,12 +23,12 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 2. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, file.filePath);
+				let worldLayer = setLayerFields(file._id, fileData, file.filePath, file.imageData);
 				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
 
 				// 3. get the metadata of the image file
 				console.log('3. metadata imageData thumbnailUrl: ' + file.imageData.thumbnailUrl);
-				return getMetadata(worldLayer, file.encodePathName, buffer, file.imageData.thumbnailUrl)
+				return getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
 
@@ -41,7 +41,7 @@ class ImageHandler {
 						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-						// 6. get the real footprint of the Drone's images from cesium
+						// 6. get the real footprint of the Drone's image from cesium
 						return getDroneGeoData(newFile)
 							.then(savedFile => {
 								console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
@@ -85,7 +85,7 @@ class ImageHandler {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, filePath) {
+		function setLayerFields(id, file, filePath, imageData) {
 			const name = (file.name).split('.')[0];
 
 			return {
@@ -96,12 +96,13 @@ class ImageHandler {
 				filePath,
 				fileType: 'image',
 				format: 'JPEG',
-				fileData: file
+				fileData: file,
+				imageData
 			};
 		}
 
 		// get the metadata of the image file
-		function getMetadata(file, filePath, buffer, thumbnailUrl) {
+		function getMetadata(file, filePath, buffer) {
 			let imageData = file.imageData;
 			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
 			const parser = exif.create(buffer);
@@ -149,6 +150,7 @@ class ImageHandler {
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
 
 					imageData = {
+						...imageData,
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
@@ -160,8 +162,7 @@ class ImageHandler {
 						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
-						createDate: moment(createDate, exifDateFormat).toString(),
-						thumbnailUrl
+						createDate: moment(createDate, exifDateFormat).toString()
 					};
 
 					// set the Date's fields in the layer's model
