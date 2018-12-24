@@ -12,8 +12,8 @@ class ImageHandler {
 	static getImageData(worldId, reqFiles, name, path, fields, buffer) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
-		console.log('uploadFile to FS files: ' + JSON.stringify(files));
-		console.log('uploadFile to FS fields: ' + JSON.stringify(fields));
+		console.log('uploadFile to FS files: ', JSON.stringify(files));
+		console.log('uploadFile to FS fields: ',JSON.stringify(fields));
 
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
@@ -23,11 +23,10 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 2. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, file.filePath, file.imageData);
-				console.log('2. worldLayer include Filedata: ' + JSON.stringify(worldLayer));
+				let worldLayer = setLayerFields(file._id, fileData, file.filePath, file.thumbnailUrl);
+				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer));
 
 				// 3. get the metadata of the image file
-				console.log('3. metadata imageData thumbnailUrl: ' + file.imageData.thumbnailUrl);
 				return getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
@@ -85,7 +84,7 @@ class ImageHandler {
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, filePath, imageData) {
+		function setLayerFields(id, file, filePath, thumbnailUrl) {
 			const name = (file.name).split('.')[0];
 
 			return {
@@ -97,7 +96,7 @@ class ImageHandler {
 				fileType: 'image',
 				format: 'JPEG',
 				fileData: file,
-				imageData
+				thumbnailUrl
 			};
 		}
 
@@ -181,7 +180,7 @@ class ImageHandler {
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
 			let geoData = getGeoDataFromPoint(centerPoint, ansyn.footPrintPixelSize);
-			geoData.geoRegistered = false;
+			geoData.isGeoRegistered = false;
 			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
 			return { ...layer, geoData };
