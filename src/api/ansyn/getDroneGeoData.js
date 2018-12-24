@@ -45,7 +45,7 @@ const getDroneGeoData = (file) => {
 					droneCenter = center(footprint);
 				} else {
 					// if all succeed
-					file.geoData.geoRegistered = true;
+					file.geoData.isGeoRegistered = true;
 					console.log(`${file.name}: cesium-referance SUCCEED!!!`);
 				}
 				file.geoData.droneCenter = droneCenter;

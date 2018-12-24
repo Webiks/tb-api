@@ -143,17 +143,11 @@ function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, 
 function uploadFilesToS3(file, buffer, vectorId) {
 	return uploadToS3(file, buffer, vectorId)
 		.then(uploadUrl => {
-			console.log(`uploadFilesToS3 uploadUrl: ${JSON.stringify(uploadUrl)}`);
 			file.filePath = uploadUrl.fileUrl;
+			file.thumbnailUrl = uploadUrl.thumbnailUrl;
 			console.log(`succeed to upload file To S3: ${JSON.stringify(file.filePath)}`);
-			file = {
-				...file,
-				imageData: {
-					thumbnailUrl: uploadUrl.thumbnailUrl
-				}
-			};
-			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.imageData.thumbnailUrl)}`);
-			return file;
+			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.thumbnailUrl)}`);
+			return { ...file };
 		})
 		.catch(err => {
 			console.error(`Error upload the file to S3: ${err}`);

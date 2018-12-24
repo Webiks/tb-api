@@ -52,7 +52,7 @@ class GsUtils {
 				const bbox = [polygon.minx, polygon.miny, polygon.maxx, polygon.maxy];
 				const footprint = bboxPolygon(bbox);
 				console.log('getLayerDetailsFromGeoserver footprint: ', JSON.stringify(footprint));
-				worldLayer.geoData = { droneCenter, footprint, centerPoint, bbox };
+				worldLayer.geoData = { droneCenter, footprint, centerPoint, bbox, isGeoRegistered: true };
 				console.log('getLayerDetailsFromGeoserver geoData: ', JSON.stringify(worldLayer.geoData));
 
 				console.log('2. return worldLayer: ', JSON.stringify(worldLayer));

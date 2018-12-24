@@ -33,7 +33,7 @@ const droneCenter = {
 };
 
 const geoData = {
-	geoRegistered: Boolean,
+	isGeoRegistered: Boolean,
 	droneCenter,
 	footprint,
 	centerPoint: [Number, Number],
@@ -259,8 +259,7 @@ const imageData = {
 	flightPitchDegree: Number,
 	camReverse: Number,
 	gimbalReverse: Number,
-	fieldOfView: Number,
-	thumbnailUrl: String
+	fieldOfView: Number
 };
 
 /* exif-parser fields:
@@ -376,7 +375,8 @@ const LayerSchema = new Schema({
 	fileName: String,
 	filePath: String,
 	createdDate: Number,													 // the file created date in number
-	displayUrl: String,														 // url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
+	displayUrl: String,														 // S3's url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
+	thumbnailUrl: String,
 	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
 	format: { $type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	fileData,
