@@ -34,7 +34,10 @@
 		"workspaces": "geoserver/rest/workspaces",
 		"imports": "geoserver/rest/imports",
 		"getLayerUrl": "api/gsLayers/layer",
-		"wmsThumbnailUrl":"?SERVICE=WMS&VERSION=1.1.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&&STYLES=WIDTH=256&HEIGHT=256&LAYERS=",
+		"wmsThumbnailParams": {
+			"start":"?service=WMS&version=1.1.0&request=GetMap&transparent=true&layers=",
+			"end":"&styles=&width=256&height=256&format=image/jpeg"
+		},
 		"wmtsServiceUrl": "gwc/service/wmts?SERVICE=wmts&REQUEST=getcapabilities&VERSION=1%2E0%2E0",
 		"baseCurl": "curl -u admin:geoserver"
 	},
