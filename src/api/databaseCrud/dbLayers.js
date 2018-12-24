@@ -75,7 +75,6 @@ router.get('/geoserver/:worldId/:layerName', (req, res) => {
 		name,
 		displayUrl: `${configUrl.baseUrlGeoserver}/${worldId}/wms`
 	};
-		// displayUrl: `${configUrl.baseUrlGeoserver}/${worldId}/${name}/${geoserver.wmtsServiceUrl}`
 	console.log(`geo LAYER SERVER: start GET ${name} layer DATA...`);
 	// 1. get the layer's info
 	gsUtils.getLayerInfoFromGeoserver(worldLayer, req.params.worldId, name)
@@ -84,8 +83,15 @@ router.get('/geoserver/:worldId/:layerName', (req, res) => {
 			return gsUtils.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);
 		})
 		.then(layerDetails => {
-			// worldLayer.displayUrl =
-			// 	`${configUrl.baseUrlGeoserver}/${worldId}/${geoserver.wmsServiceUrl}&LAYERS=${layerDetails.geoserver.layer.resource.name}&SRS=${layerDetails.geoserver.data.srs}`;
+			const baseThumbnailUrl = `${worldLayer.displayUrl}${geoserver.wmsThumbnailUrl}${layerDetails.geoserver.layer.resource.name}&SRS=${layerDetails.geoserver.data.srs}`;
+			const bbox = [
+				layerDetails.geoserver.data.nativeBoundingBox.minx,
+				layerDetails.geoserver.data.nativeBoundingBox.miny,
+				layerDetails.geoserver.data.nativeBoundingBox.maxx,
+				layerDetails.geoserver.data.nativeBoundingBox.maxy
+			];
+			worldLayer.thumbnailUrl = `${baseThumbnailUrl}&BBOX=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`;
+
 			// 3. get the store's data
 			return gsUtils.getStoreDataFromGeoserver(layerDetails, layerDetails.geoserver.data.store.href);
 		})
