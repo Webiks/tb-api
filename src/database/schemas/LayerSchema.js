@@ -198,7 +198,6 @@ const fileData = {
 	fileCreatedDate: Date | String,					// the file created date
 	fileUploadDate: Date | String,				  // the upload file date
 	fileExtension: String,
-	fileType: String,												// 'raster' or 'vector'
 	filePath: String,
 	encodeFileName: String,									// the encoded file name (differ when there is special charecters in the name)
 	zipPath: String									 				// the zip path of the upload vector (for removing it later)
@@ -377,7 +376,8 @@ const LayerSchema = new Schema({
 	createdDate: Number,													 // the file created date in number
 	displayUrl: String,														 // S3's url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
 	thumbnailUrl: String,
-	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
+	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image', 'drone', 'mobile'] },
+	sourceType: { $type: String, lowercase: true, enum: ['drone', 'mobile', 'satellite'] },
 	format: { $type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	fileData,
 	imageData,

@@ -51,6 +51,7 @@
 		"defaultWorldId": "public"
 	},
 	"ansyn": {
-		"footPrintPixelSize": 200
+		"droneFootPrintPixelSize": 200,
+		"mobileFootPrintPixelSize": 100
 	}
 }

@@ -1,4 +1,5 @@
 const exif = require('exif-parser');
+const exiftool = require('exiftool');
 const { s3Upload } = require('./s3Utils');
 
 const uploadToS3 = (file, buffer, vectorId) => {
@@ -13,8 +14,8 @@ const uploadToS3 = (file, buffer, vectorId) => {
 // upload the file to S3 including the thumbnail (if it's an image file)
 function upload(fileType, fileKey, buffer) {
 	const uploadUrl = {
-		fileUrl: '',
-		thumbnailUrl: ''
+		fileUrl: null,
+		thumbnailUrl: null
 	};
 	return s3Upload(fileKey, buffer)
 		.then(fileUrl => {
@@ -22,9 +23,26 @@ function upload(fileType, fileKey, buffer) {
 			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
 			// save the image thumbnail
 			if (fileType === 'image') {
-				console.log('start s3Upload image...');
+				// try for mobile info
+				// exiftool.metadata(buffer, function (err, results) {
+				// 	if (err) {
+				// 		console.log(`ERROR exiftool: ${err}`);
+				// 		reject(err);
+				// 	}
+				// 	// convert the results to an object
+				// 	let metadata = {};
+				// 	Object.entries(results).forEach((entry) => {
+				// 		const key = entry[0];
+				// 		const value = entry[1];
+				// 		metadata[key] = value;
+				// 	});
+				// 	console.log(`s3Upload exif-tool result: ${JSON.stringify(metadata)}`);
+				// });
+
 				const parser = exif.create(buffer);
 				const result = parser.parse();
+				console.log(`s3Upload hasThumbnail: ${result.hasThumbnail('image/jpeg')}`);
+
 				// upload the thumbnail of the image to s3
 				if (result.hasThumbnail('image/jpeg')) {
 					const splitKey = fileKey.split('.');
@@ -37,8 +55,12 @@ function upload(fileType, fileKey, buffer) {
 							console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
 							return uploadUrl;
 						});
+				} else {
+					console.log(`uploadUrl: ${JSON.stringify(uploadUrl)}`);
+					return uploadUrl;
 				}
 			} else {
+				console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
 				return uploadUrl;
 			}
 		})
@@ -50,16 +72,21 @@ function upload(fileType, fileKey, buffer) {
 
 function getFileKey(file, vectorId) {
 	const fileType = file.fileType;
-	const typeDir = `${fileType}s`;											// define the 'images','rasters','vectors' folders
+	const sourceType = file.sourceType;
+	const dirByType = `${fileType}s`;											// define the 'images','rasters','vectors' folders
 	const fileName = file.encodeFileName;
 	let fileKey;
 
 	// if vector - save under the id of the SHX's file inside a directory with the vector's name
 	if (vectorId) {
 		const dirName = fileName.split('.')[0];
-		fileKey = `${typeDir}/${vectorId}/${dirName}/${fileName}`;
+		fileKey = `${dirByType}/${vectorId}/${dirName}/${fileName}`;
 	} else {
-		fileKey = `${typeDir}/${file._id}/${fileName}`;
+		if (sourceType){
+			fileKey = `${dirByType}/${sourceType}/${file._id}/${fileName}`;
+		} else {
+			fileKey = `${dirByType}/${file._id}/${fileName}`;
+		}
 	}
 	return fileKey;
 }

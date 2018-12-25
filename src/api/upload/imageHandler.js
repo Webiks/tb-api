@@ -9,11 +9,10 @@ const getDroneGeoData = require('../ansyn/getDroneGeoData');
 // upload files to the File System
 class ImageHandler {
 
-	static getImageData(worldId, reqFiles, name, path, fields, buffer) {
+	static getImageData(worldId, reqFiles, name, path, buffer) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
 		console.log('uploadFile to FS files: ', JSON.stringify(files));
-		console.log('uploadFile to FS fields: ',JSON.stringify(fields));
 
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
@@ -23,14 +22,13 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData));
 
 				// 2. set the world-layer data
-				let worldLayer = setLayerFields(file._id, fileData, file.filePath, file.thumbnailUrl);
+				let worldLayer = setWorldLayer(file, file._id, fileData, file.filePath, file.thumbnailUrl);
 				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer));
 
 				// 3. get the metadata of the image file
 				return getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
-
 						// 4. set the geoData of the image file
 						const geoData = setGeoData({ ...metadata });
 						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
@@ -40,21 +38,18 @@ class ImageHandler {
 						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
-						// 6. get the real footprint of the Drone's image from cesium
-						return getDroneGeoData(newFile)
-							.then(savedFile => {
-								console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
-								// 7. save the file to mongo database and return the new layer is succeed
-								return createNewLayer(savedFile, worldId)
-									.then(newLayer => {
-										console.log('createNewLayer OK!');
-										return newLayer;
-									})
-									.catch(error => {
-										console.error('ERROR createNewLayer: ', error);
-										return null;
-									});
-							});
+						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
+						if (newFile.sourceType === 'drone') {
+							return getDroneGeoData(newFile)
+								.then(savedFile => {
+									console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
+									// 7. save the file to mongo database and return the new layer is succeed
+									return createNewLayer(savedFile, worldId)
+										.then(newLayer => saveDataToDB(savedFile));
+								});
+						} else {
+							return saveDataToDB(newFile);
+						}
 					})
 					.catch(error => {
 						console.log(error);
@@ -69,6 +64,19 @@ class ImageHandler {
 			return [];
 		}
 		// ============================================= Private Functions =================================================
+		// save all the image date in mongo Database and return the new layer is succeed
+		function saveDataToDB(savedFile) {
+			return createNewLayer(savedFile, worldId)
+				.then(newLayer => {
+					console.log('createNewLayer OK!');
+					return newLayer;
+				})
+				.catch(error => {
+					console.error('ERROR createNewLayer: ', error);
+					return null;
+				});
+		}
+
 		// set the File Data from the ReqFiles
 		function setFileData(file) {
 			return {
@@ -77,14 +85,13 @@ class ImageHandler {
 				fileUploadDate: file.fileUploadDate,
 				fileExtension: file.fileExtension,
 				filePath: file.filePath,
-				fileType: 'image',
 				encodeFileName: file.encodeFileName,
 				splitPath: null
 			};
 		}
 
 		// set the world-layer main fields
-		function setLayerFields(id, file, filePath, thumbnailUrl) {
+		function setWorldLayer(file, id, fileData, filePath, thumbnailUrl) {
 			const name = (file.name).split('.')[0];
 
 			return {
@@ -93,9 +100,11 @@ class ImageHandler {
 				fileName: file.name,
 				displayUrl: filePath,
 				filePath,
-				fileType: 'image',
+				fileType: file.fileType,
+				sourceType: file.sourceType,
 				format: 'JPEG',
-				fileData: file,
+				fileData,
+				inputData: file.inputData,
 				thumbnailUrl
 			};
 		}
@@ -106,7 +115,7 @@ class ImageHandler {
 			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
 			const parser = exif.create(buffer);
 
-			// 1. get the image's MetaData from the exif-parser
+			// get the image's MetaData from the exif-parser
 			const result = parser.parse();
 			const {
 				Make, Model,
@@ -131,38 +140,49 @@ class ImageHandler {
 					});
 					console.log('metadata object:', JSON.stringify(metadata));
 
-					// convert the 'fieldOfView' to a number
-					metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(' ')[0]);
-					console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
-
-					const {
-						relativeAltitude, fieldOfView,
-						pitch, yaw, roll,
-						cameraPitch, cameraYaw, cameraRoll,
-						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
-						flightRollDegree, flightYawDegree, flightPitchDegree,
-						camReverse, gimbalReverse,
-						modifyDate, ['date/timeOriginal']: dateTimeOriginal, createDate
-					} = metadata;
-
 					// format the dates
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
+					const {
+						modifyDate,
+						['date/timeOriginal']: dateTimeOriginal, createDate
+					} = metadata;
 
 					imageData = {
 						...imageData,
 						Make, Model,
 						GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, GPSAltitude,
 						ExifImageWidth, ExifImageHeight,
-						relativeAltitude, fieldOfView,
-						pitch, yaw, roll,
-						cameraPitch, cameraYaw, cameraRoll,
-						gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
-						flightRollDegree, flightYawDegree, flightPitchDegree,
-						camReverse, gimbalReverse,
 						modifyDate: moment(modifyDate, exifDateFormat).toString(),
 						dateTimeOriginal: moment(dateTimeOriginal, exifDateFormat).toString(),
 						createDate: moment(createDate, exifDateFormat).toString()
 					};
+
+					// convert the 'fieldOfView' to a number
+					if (metadata.fieldOfView) {
+						metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(' ')[0]);
+						console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
+					}
+
+					if (file.sourceType === 'drone') {
+						const {
+							relativeAltitude, fieldOfView,
+							pitch, yaw, roll,
+							cameraPitch, cameraYaw, cameraRoll,
+							gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
+							flightRollDegree, flightYawDegree, flightPitchDegree,
+							camReverse, gimbalReverse
+						} = metadata;
+
+						imageData = {
+							...imageData,
+							relativeAltitude, fieldOfView,
+							pitch, yaw, roll,
+							cameraPitch, cameraYaw, cameraRoll,
+							gimbalRollDegree, gimbalYawDegree, gimbalPitchDegree,
+							flightRollDegree, flightYawDegree, flightPitchDegree,
+							camReverse, gimbalReverse
+						};
+					}
 
 					// set the Date's fields in the layer's model
 					file.fileData.fileCreatedDate = imageData.createDate;
@@ -179,7 +199,13 @@ class ImageHandler {
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
-			let geoData = getGeoDataFromPoint(centerPoint, ansyn.footPrintPixelSize);
+			let footPrintPixelSize;
+			if (layer.sourceType === 'mobile') {
+				footPrintPixelSize = ansyn.mobileFootPrintPixelSize;
+			} else {
+				footPrintPixelSize = ansyn.droneFootPrintPixelSize;
+			}
+			let geoData = getGeoDataFromPoint(centerPoint, footPrintPixelSize);
 			geoData.isGeoRegistered = false;
 			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
@@ -187,55 +213,11 @@ class ImageHandler {
 		}
 
 		function setInputData(layer) {
-			let type = '';
-			let name = '';
-			let model = '';
-			let maker = '';
-			let description = '';
-			let creditName = '';
+			layer.inputData.sensor.model = layer.imageData.Model ? layer.imageData.Model.trim().toUpperCase() : null;
+			layer.inputData.sensor.maker = layer.imageData.maker ? layer.imageData.maker.trim().toUpperCase() : null;
+			layer.inputData.tb.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 
-			if (fields.sensorType) {
-				type = fields.sensorType.trim().toLowerCase();
-			}
-			if (fields.sensorName) {
-				name = fields.sensorName.trim().toLowerCase();
-			}
-			if (layer.imageData.Model) {
-				model = layer.imageData.Model.trim().toUpperCase();
-			}
-			if (layer.imageData.Make) {
-				maker = layer.imageData.Make.trim().toUpperCase();
-			}
-			if (fields.description) {
-				description = fields.description.trim();
-			}
-			if (fields.creditName) {
-				creditName = fields.creditName.trim();
-			}
-
-			return {
-				...layer,
-				inputData: {
-					name: layer.fileData.name,
-					sensor: {
-						type,
-						name,
-						model,
-						maker,
-						bands: []
-					},
-					tb: {
-						affiliation: 'UNKNOWN',
-						GSD: 0,
-						flightAltitude: layer.imageData.GPSAltitude,
-						cloudCoveragePercentage: 0
-					},
-					ansyn: {
-						description,
-						creditName
-					}
-				}
-			};
+			return { ...layer };
 		}
 	}
 }

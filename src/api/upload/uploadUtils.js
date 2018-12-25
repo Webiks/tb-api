@@ -5,27 +5,12 @@ const { upload } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
-const { findFileType } = require('../fs/fileMethods');
+const { findFileTypeAndSource } = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
 	console.log('start upload utils to: ', uploadPath);
-
-	// getting the user's input data from the request
-	const reqFields = req.fields ? req.fields : {};
-	let worldId;
-	if (req.params.worldId) {
-		worldId = req.params.worldId;
-	} else {
-		if (req.fields) {
-			worldId = reqFields.sharing ? reqFields.sharing.toLowerCase() : upload.defaultWorldId;
-		} else {
-			worldId = upload.defaultWorldId;
-		}
-	}
-	console.log(`req Fields: ${JSON.stringify(reqFields)}`);
-	console.log('worldId: ', worldId);
 
 	// Define the request Files
 	// 1. convert it to JSON and back to an Object
@@ -35,24 +20,42 @@ const uploadFiles = (req, res) => {
 	console.log(`req Files: ${jsonFiles}`);
 	console.log('req length: ', reqFiles.length);
 
-	// 2. find the file type
+	// 2. find the worldId and the file type and source
+	let worldId;
+	let sensorType;
 	let name;
 	let path;
 	let file;
+	let fields;
 	let buffer;
 	let vectorId = null;
 
 	if (!reqFiles.length) {
 		file = reqFiles;
+		fields = req.fields ? req.fields : null;
 	} else {
 		file = reqFiles[0];
+		fields = req.fields[0] ? req.fields[0] : null;
 	}
-	const fileType = findFileType(file.type);
+
+	if (req.params.worldId) {
+		worldId = req.params.worldId;
+	} else {
+		if (fields) {
+			worldId = fields.sharing ? fields.sharing.toLowerCase() : upload.defaultWorldId;
+			sensorType = fields.sensorType ? fields.sensorType : null;
+		} else {
+			worldId = upload.defaultWorldId;
+		}
+	}
+	console.log(`req Fields: ${JSON.stringify(fields)}`);
+	console.log('worldId: ', worldId);
+	const fileTypeAndSource = findFileTypeAndSource(file.type, sensorType);
 
 	// 3. check if need to make a ZIP file
 	if (!reqFiles.length) {
 		// set a single file before upload
-		file = setBeforeUpload(file, fileType, uploadPath);
+		file = setBeforeUpload(file, fileTypeAndSource, uploadPath, fields);
 		name = file.name;
 		path = file.filePath;
 		buffer = fs.readFileSync(file.encodePathName);
@@ -62,7 +65,7 @@ const uploadFiles = (req, res) => {
 		uploadFilesToS3(file, buffer, vectorId)
 			.then(file => {
 				// send to the right upload handler according to the type
-				uploadHandler(res, worldId, file, fileType, name, path, reqFields, buffer);
+				uploadHandler(res, worldId, file, name, path, buffer);
 			})
 			.catch(err => {
 				console.error(`Error upload the file to S3: ${err}`);
@@ -82,7 +85,7 @@ const uploadFiles = (req, res) => {
 
 		// define the names of the files to be zipped (in Sync operation)
 		const zipFiles = reqFiles.map(file => {
-			const newFile = setBeforeUpload(file, fileType, uploadPath);
+			const newFile = setBeforeUpload(file, fileTypeAndSource, uploadPath, fields);
 			// add the local file to the zip file
 			zip.addLocalFile(newFile.encodePathName);
 
@@ -113,7 +116,7 @@ const uploadFiles = (req, res) => {
 				// send to the right upload handler according to the type
 				Promise.all(files)
 					.then(files => {
-						uploadHandler(res, worldId, files, fileType, name, path, reqFields, buffer);
+						uploadHandler(res, worldId, files, name, path, buffer);
 					});
 			})
 			.catch(err => {
@@ -126,14 +129,13 @@ const uploadFiles = (req, res) => {
 
 // ========================================= private  F U N C T I O N S ============================================
 // send to the right upload handler according to the type
-function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, buffer) {
-	if (fileType === 'image') {
-		// save all the file's data in the database
-		console.log(`uploadUtils uploadHandler file imageData: ${JSON.stringify(reqFiles.imageData)}`);
-		imageHandler.getImageData(worldId, reqFiles, name, path, reqFields, buffer)
+function uploadHandler(res, worldId, reqFiles, name, path, buffer) {
+	if (reqFiles.fileType === 'image') {
+		// get all the image data and save it in mongo Database
+		imageHandler.getImageData(worldId, reqFiles, name, path, buffer)
 			.then(files => res.send(returnFiles(files, path)));
 	} else {
-		// upload the file to GeoServer
+		// upload the file to GeoServer and save all the data in mongo Database
 		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
 		res.send(returnFiles(files, path));
 	}
@@ -143,8 +145,9 @@ function uploadHandler(res, worldId, reqFiles, fileType, name, path, reqFields, 
 function uploadFilesToS3(file, buffer, vectorId) {
 	return uploadToS3(file, buffer, vectorId)
 		.then(uploadUrl => {
-			file.filePath = uploadUrl.fileUrl;
-			file.thumbnailUrl = uploadUrl.thumbnailUrl;
+			console.log(`uploadUrl: ${JSON.stringify(uploadUrl)}`);
+			file.filePath = uploadUrl.fileUrl ? uploadUrl.fileUrl : file.filePath;
+			file.thumbnailUrl = uploadUrl.thumbnailUrl ? uploadUrl.thumbnailUrl : null;
 			console.log(`succeed to upload file To S3: ${JSON.stringify(file.filePath)}`);
 			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.thumbnailUrl)}`);
 			return { ...file };
@@ -156,13 +159,37 @@ function uploadFilesToS3(file, buffer, vectorId) {
 }
 
 // prepare the file before uploading it
-function setBeforeUpload(file, fileType, uploadPath) {
+function setBeforeUpload(file, fileTypeAndSource, uploadPath, fields) {
 	console.log('setBeforeUpload File: ', JSON.stringify(file));
 	const name = file.name;
+	const fileType = fileTypeAndSource.fileType;
+	const sourceType = fileTypeAndSource.sourceType;
+	let inputData;
+	if (fields){
+		inputData = {
+			name,
+			sensor: {
+				type: fields.sensorType ? fields.sensorType : null,
+				name: fields.sensorName ? fields.sensorName : null
+			},
+			ansyn: {
+				description: fields.description ? fields.description : null,
+				creditName: fields.creditName ? fields.creditName : null
+			},
+			tb: {
+				affiliation: 'UNKNOWN',
+				GSD: 0,
+				flightAltitude: 0,
+				cloudCoveragePercentage: 0
+			}
+		};
+	}
+
 	// replace '/' to '_' in the file name
 	if (name.indexOf('/') !== -1) {
 		name.replace('/\//g', '_');
 	}
+
 	const filePath = uploadPath + name;
 	const encodeFileName = encodeURIComponent(name);
 	const encodePathName = uploadPath + encodeFileName;
@@ -176,10 +203,12 @@ function setBeforeUpload(file, fileType, uploadPath) {
 		size: file.size,
 		fileUploadDate: new Date(file.mtime).toISOString(),
 		fileType,
+		sourceType,
 		fileExtension,
 		filePath,
 		encodeFileName,
-		encodePathName
+		encodePathName,
+		inputData
 	};
 
 	// renaming the file full path (according to the encoded name)

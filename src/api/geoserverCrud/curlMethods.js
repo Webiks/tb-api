@@ -253,7 +253,8 @@ function executeFileToGeoserver(importId) {
 	// execute the import task
 	const curl_execute = `${baseCurl} -XPOST ${configUrl.reqImportCurl}/${importId}`;
 	const execute = execSync(curl_execute);
-	console.log('The execute is DONE...' + execute);
+	console.log('The execute is DONE...', execute);
+	console.log(`importId: ${configUrl.reqImportCurl}/${importId}`);
 	console.log('DONE!');
 }
 

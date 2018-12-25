@@ -159,7 +159,7 @@ router.delete('/delete/:worldId/:layerId', (req, res) => {
 		.then(() => {
 			// 2. remove the layer if it doesn't exist in another worlds
 			let removeFromGeoserver = false;
-			if (removedLayer.type !== 'image'){
+			if (!(removedLayer.type === 'image' || removedLayer.type === 'drone' || removedLayer.type === 'mobile')){
 				removeFromGeoserver = true;
 			}
 			return dbUtils.removeLayer(removedLayer, worldId, removeFromGeoserver)

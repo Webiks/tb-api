@@ -81,7 +81,7 @@ class DbUtils{
 		console.log(`start find and remove layer: ${layerId}`);
 		return dbLayerCrud.get({ _id: layerId })
 			.then(layer => {
-				if (layer.fileType === 'image') {
+				if (layer.fileType === 'image' || layer.fileType === 'drone' || layer.fileType === 'mobile') {
 					return {
 						worldId,
 						layerId: layer._id,
@@ -119,7 +119,7 @@ class DbUtils{
 					console.log('start to remove layer: ', removedLayer.layerId);
 					// a. remove the layer from the Layers list in the DataBase
 					let path = removedLayer.path;
-					if (removedLayer.type === 'image') {
+					if (removedLayer.type === 'image' || removedLayer.type === 'drone' || removedLayer.fileType === 'mobile') {
 						path = path.substring(0, removedLayer.path.lastIndexOf('/'));
 					}
 					console.log('dbUtils removeLayer path: ', path);

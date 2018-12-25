@@ -36,7 +36,7 @@ const getDroneGeoData = (file) => {
 				// if got only the drone center point - find a fixed polygon around the given center point
 				if (footprint === null && droneCenter !== null) {
 					console.log(`${file.name}: cesium-referance: GOT ONLY POINT!!!`);
-					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.footPrintPixelSize);
+					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.droneFootPrintPixelSize);
 					footprint = newGeoData.footprint;
 				}
 				// if got only the polygon - find the center point from the given polygon
