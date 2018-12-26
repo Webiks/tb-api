@@ -1,10 +1,11 @@
 const exif = require('exif-parser');
+const gm = require('gm').subClass({ imageMagick: true });
 const { s3Upload } = require('./s3Utils');
 
-const uploadToS3 = (file, buffer, vectorId) => {
+const uploadToS3 = (file, buffer, vectorId, sourceType) => {
 	console.log(`start upload file To S3...${file.name}`);
 
-	const fileKey = getFileKey(file, vectorId);
+	const fileKey = getFileKey(file, vectorId, sourceType);
 	console.log(`file Key: ${fileKey}`);
 	return upload(file.fileType, fileKey, buffer);
 };
@@ -24,25 +25,14 @@ function upload(fileType, fileKey, buffer) {
 			if (fileType === 'image') {
 				const parser = exif.create(buffer);
 				const result = parser.parse();
-				console.log(`s3Upload hasThumbnail: ${result.hasThumbnail('image/jpeg')}`);
-				// upload the thumbnail of the image to s3
+				// create and upload the thumbnail of the image to s3
 				if (result.hasThumbnail('image/jpeg')) {
-					const splitKey = fileKey.split('.');
-					const thumbnailBuffer = result.getThumbnailBuffer();
-					const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
-					console.log(`upload thumbnail key: ${thumbnailKey}`);
-					return s3Upload(thumbnailKey, thumbnailBuffer)
-						.then(thumbnailUrl => {
-							uploadUrl.thumbnailUrl = thumbnailUrl;
-							console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
-							return uploadUrl;
-						});
+					return saveThumbnailToS3(result.getThumbnailBuffer(), fileKey, uploadUrl);
 				} else {
-					console.log(`uploadUrl: ${JSON.stringify(uploadUrl)}`);
-					return uploadUrl;
+					return createThumbnail(buffer)
+						.then(thumbnailBuffer => saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl));
 				}
 			} else {
-				console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
 				return uploadUrl;
 			}
 		})
@@ -52,9 +42,35 @@ function upload(fileType, fileKey, buffer) {
 		});
 }
 
-function getFileKey(file, vectorId) {
+function createThumbnail(buffer){
+	return new Promise(resolve => {
+		return gm(buffer)
+			.resize(`x256`)
+			.toBuffer('JPG', function (err, thumbnailBuffer) {
+				if (err) {
+					console.log(`getImageTiles ERROR: ${err}`);
+					return reject(err);
+				}
+				const result = Buffer.isBuffer(thumbnailBuffer) ? thumbnailBuffer : new Buffer(thumbnailBuffer, 'binary');
+				return resolve(result);
+			});
+	});
+}
+
+function saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl){
+	const splitKey = fileKey.split('.');
+	const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
+	console.log(`upload thumbnail key: ${thumbnailKey}`);
+	return s3Upload(thumbnailKey, thumbnailBuffer)
+		.then(thumbnailUrl => {
+			uploadUrl.thumbnailUrl = thumbnailUrl;
+			console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
+			return uploadUrl;
+		});
+}
+
+function getFileKey(file, vectorId, sourceType) {
 	const fileType = file.fileType;
-	const sourceType = file.sourceType;
 	const dirByType = `${fileType}s`;											// define the 'images','rasters','vectors' folders
 	const fileName = file.encodeFileName;
 	let fileKey;

@@ -51,21 +51,24 @@ const uploadFiles = (req, res) => {
 	console.log(`req Fields: ${JSON.stringify(fields)}`);
 	console.log('worldId: ', worldId);
 	const fileTypeAndSource = findFileTypeAndSource(file.type, sensorType);
+	const fileType = fileTypeAndSource.fileType;
+	const sourceType = fileTypeAndSource.sourceType;
+	console.log(`uploadUtils sourceType = ${sourceType}`);
 
 	// 3. check if need to make a ZIP file
 	if (!reqFiles.length) {
 		// set a single file before upload
-		file = setBeforeUpload(file, fileTypeAndSource, uploadPath, fields);
+		file = setBeforeUpload(file, fileType, uploadPath, fields);
 		name = file.name;
 		path = file.filePath;
 		buffer = fs.readFileSync(file.encodePathName);
-		console.log('UploadFiles SINGLE req file(after): ', JSON.stringify(file));
+		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file));
 
 		// upload the file to S3 amazon storage
-		uploadFilesToS3(file, buffer, vectorId)
+		uploadFilesToS3(file, buffer, vectorId, sourceType)
 			.then(file => {
 				// send to the right upload handler according to the type
-				uploadHandler(res, worldId, file, name, path, buffer);
+				uploadHandler(res, worldId, file, name, path, buffer, sourceType);
 			})
 			.catch(err => {
 				console.error(`Error upload the file to S3: ${err}`);
@@ -85,7 +88,7 @@ const uploadFiles = (req, res) => {
 
 		// define the names of the files to be zipped (in Sync operation)
 		const zipFiles = reqFiles.map(file => {
-			const newFile = setBeforeUpload(file, fileTypeAndSource, uploadPath, fields);
+			const newFile = setBeforeUpload(file, fileType, uploadPath, fields);
 			// add the local file to the zip file
 			zip.addLocalFile(newFile.encodePathName);
 
@@ -110,13 +113,13 @@ const uploadFiles = (req, res) => {
 					buffer = fs.readFileSync(file.encodePathName);
 					// remove the file from the temporary uploads directory
 					fs.removeSync(file.encodePathName);
-					return uploadFilesToS3(file, buffer, vectorId);
+					return uploadFilesToS3(file, buffer, vectorId, sourceType);
 				});
 
 				// send to the right upload handler according to the type
 				Promise.all(files)
 					.then(files => {
-						uploadHandler(res, worldId, files, name, path, buffer);
+						uploadHandler(res, worldId, files, name, path, buffer, sourceType);
 					});
 			})
 			.catch(err => {
@@ -129,10 +132,10 @@ const uploadFiles = (req, res) => {
 
 // ========================================= private  F U N C T I O N S ============================================
 // send to the right upload handler according to the type
-function uploadHandler(res, worldId, reqFiles, name, path, buffer) {
+function uploadHandler(res, worldId, reqFiles, name, path, buffer, sourceType) {
 	if (reqFiles.fileType === 'image') {
 		// get all the image data and save it in mongo Database
-		imageHandler.getImageData(worldId, reqFiles, name, path, buffer)
+		imageHandler.getImageData(worldId, reqFiles, name, path, buffer, sourceType)
 			.then(files => res.send(returnFiles(files, path)));
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
@@ -142,8 +145,8 @@ function uploadHandler(res, worldId, reqFiles, name, path, buffer) {
 }
 
 // upload the file to S3 amazon storage and get its url (including the thumbnail's url)
-function uploadFilesToS3(file, buffer, vectorId) {
-	return uploadToS3(file, buffer, vectorId)
+function uploadFilesToS3(file, buffer, vectorId, sourceType) {
+	return uploadToS3(file, buffer, vectorId, sourceType)
 		.then(uploadUrl => {
 			console.log(`uploadUrl: ${JSON.stringify(uploadUrl)}`);
 			file.filePath = uploadUrl.fileUrl ? uploadUrl.fileUrl : file.filePath;
@@ -159,11 +162,9 @@ function uploadFilesToS3(file, buffer, vectorId) {
 }
 
 // prepare the file before uploading it
-function setBeforeUpload(file, fileTypeAndSource, uploadPath, fields) {
+function setBeforeUpload(file, fileType, uploadPath, fields) {
 	console.log('setBeforeUpload File: ', JSON.stringify(file));
 	const name = file.name;
-	const fileType = fileTypeAndSource.fileType;
-	const sourceType = fileTypeAndSource.sourceType;
 	let inputData;
 	if (fields){
 		inputData = {
@@ -203,7 +204,6 @@ function setBeforeUpload(file, fileTypeAndSource, uploadPath, fields) {
 		size: file.size,
 		fileUploadDate: new Date(file.mtime).toISOString(),
 		fileType,
-		sourceType,
 		fileExtension,
 		filePath,
 		encodeFileName,

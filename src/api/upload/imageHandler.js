@@ -9,10 +9,11 @@ const getDroneGeoData = require('../ansyn/getDroneGeoData');
 // upload files to the File System
 class ImageHandler {
 
-	static getImageData(worldId, reqFiles, name, path, buffer) {
+	static getImageData(worldId, reqFiles, name, path, buffer, sourceType) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
 		console.log('uploadFile to FS files: ', JSON.stringify(files));
+		console.log(`ImageHandler sourceType = ${sourceType}`);
 
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
@@ -39,7 +40,7 @@ class ImageHandler {
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
 
 						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
-						if (newFile.sourceType === 'drone') {
+						if (sourceType === 'drone') {
 							return getDroneGeoData(newFile)
 								.then(savedFile => {
 									console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
@@ -101,7 +102,6 @@ class ImageHandler {
 				displayUrl: filePath,
 				filePath,
 				fileType: file.fileType,
-				sourceType: file.sourceType,
 				format: 'JPEG',
 				fileData,
 				inputData: file.inputData,
@@ -111,8 +111,7 @@ class ImageHandler {
 
 		// get the metadata of the image file
 		function getMetadata(file, filePath, buffer) {
-			let imageData = file.imageData;
-			console.log(`start get Metadata...${JSON.stringify(imageData)}`);
+			let imageData;
 			const parser = exif.create(buffer);
 
 			// get the image's MetaData from the exif-parser
@@ -160,10 +159,9 @@ class ImageHandler {
 					// convert the 'fieldOfView' to a number
 					if (metadata.fieldOfView) {
 						metadata.fieldOfView = parseFloat(metadata.fieldOfView.split(' ')[0]);
-						console.log(`fieldOfView: ${metadata.fieldOfView}, type: ${typeof metadata.fieldOfView}`);
 					}
 
-					if (file.sourceType === 'drone') {
+					if (metadata.pitch && metadata.yaw && metadata.roll) {
 						const {
 							relativeAltitude, fieldOfView,
 							pitch, yaw, roll,
@@ -200,7 +198,8 @@ class ImageHandler {
 			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
 			let footPrintPixelSize;
-			if (layer.sourceType === 'mobile') {
+			console.log(`setGeoData sourceType = ${sourceType}`);
+			if (sourceType === 'mobile') {
 				footPrintPixelSize = ansyn.mobileFootPrintPixelSize;
 			} else {
 				footPrintPixelSize = ansyn.droneFootPrintPixelSize;

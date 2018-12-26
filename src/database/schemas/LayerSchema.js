@@ -377,7 +377,6 @@ const LayerSchema = new Schema({
 	displayUrl: String,														 // S3's url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
 	thumbnailUrl: String,
 	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image', 'drone', 'mobile'] },
-	sourceType: { $type: String, lowercase: true, enum: ['drone', 'mobile', 'satellite'] },
 	format: { $type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	fileData,
 	imageData,

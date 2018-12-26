@@ -18,7 +18,6 @@ const findFileTypeAndSource = (reqType, sensorType) => {
 	let fileType;
 
 	if (sensorType) {
-		console.log(`findFileTypeAndSource SensorType: ${sensorType}`);
 		const sensor = sensorType.toLowerCase();
 		// find the source type
 		if (sensor.includes('mobile')) {
@@ -38,7 +37,6 @@ const findFileTypeAndSource = (reqType, sensorType) => {
 			fileType = 'image';
 		}
 	} else {
-		console.log(`findFileTypeAndSource extension: ${extension}`);
 		// find the file type
 		if (extension.includes('tif')) {
 			fileType = 'raster';
