@@ -53,7 +53,6 @@ const uploadFiles = (req, res) => {
 	const fileTypeAndSource = findFileTypeAndSource(file.type, sensorType);
 	const fileType = fileTypeAndSource.fileType;
 	const sourceType = fileTypeAndSource.sourceType;
-	console.log(`uploadUtils sourceType = ${sourceType}`);
 
 	// 3. check if need to make a ZIP file
 	if (!reqFiles.length) {
@@ -225,7 +224,6 @@ function returnFiles(files, path) {
 	const zipPath = path.split('.');
 	if (zipPath[1] === 'zip') {
 		files.map(file => {
-			console.log('upload files returnFile file: ', JSON.stringify(file));
 			if (file.fileType === 'vector') {
 				file.zipPath = zipPath[0].trim();
 			} else {

@@ -43,9 +43,9 @@ function upload(fileType, fileKey, buffer) {
 }
 
 function createThumbnail(buffer){
-	return new Promise(resolve => {
+	return new Promise((resolve, reject) => {
 		return gm(buffer)
-			.resize(`x256`)
+			.resize('x256')
 			.toBuffer('JPG', function (err, thumbnailBuffer) {
 				if (err) {
 					console.log(`getImageTiles ERROR: ${err}`);

@@ -12,8 +12,6 @@ class ImageHandler {
 	static getImageData(worldId, reqFiles, name, path, buffer, sourceType) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
-		console.log('uploadFile to FS files: ', JSON.stringify(files));
-		console.log(`ImageHandler sourceType = ${sourceType}`);
 
 		if (files.length !== 0) {
 			// 1. move the image file into the directory in the name of its id
@@ -195,10 +193,8 @@ class ImageHandler {
 		function setGeoData(layer) {
 			// set the center point and the droneCenter (the same point, for now)
 			const centerPoint = [layer.imageData.GPSLongitude || 0, layer.imageData.GPSLatitude || 0];
-			console.log('setGeoData center point: ', JSON.stringify(centerPoint));
 			// set the geoData
 			let footPrintPixelSize;
-			console.log(`setGeoData sourceType = ${sourceType}`);
 			if (sourceType === 'mobile') {
 				footPrintPixelSize = ansyn.mobileFootPrintPixelSize;
 			} else {
