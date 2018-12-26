@@ -25,11 +25,11 @@ const getDroneGeoData = (file) => {
 		ExifImageHeight: file.imageData.ExifImageHeight
 	};
 
-	console.log(`${file.name}: getDroneGeoData body: ${JSON.stringify(body)}`);
+	console.log(`${file.name}: getDroneGeoData body: ${JSON.stringify(body,null,4)}`);
 
 	return axios.post(remote.droneDomain, body, { headers })
 		.then(response => {
-			console.log(`${file.name}: getDroneGeoData response: ${JSON.stringify(response.data)}`);
+			console.log(`${file.name}: getDroneGeoData response: ${JSON.stringify(response.data,null,4)}`);
 			if (response.data) {
 				let footprint = response.data.bboxPolygon;
 				let droneCenter = response.data.centerPoint;

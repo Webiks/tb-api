@@ -18,33 +18,45 @@ class ImageHandler {
 			const images = files.map(file => {
 				// 1. set the file Data from the upload file
 				const fileData = setFileData(file);
-				console.log('1. set FileData: ' + JSON.stringify(fileData));
+				console.log('1. set FileData: ' + JSON.stringify(fileData, null, 4));
 
 				// 2. set the world-layer data
 				let worldLayer = setWorldLayer(file, file._id, fileData, file.filePath, file.thumbnailUrl);
-				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer));
+				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer, null, 4));
 
 				// 3. get the metadata of the image file
 				return getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
-						console.log(`3. include Metadata: ${JSON.stringify(metadata)}`);
+						console.log(`3. include Metadata: ${JSON.stringify(metadata, null, 4)}`);
+						// update the sourceType if it's empty
+						if (!sourceType) {
+							const sensorType = file.inputData.sensor.type;
+							if (sensorType.toLowerCase().includes('drone')) {
+								sourceType = 'drone';
+							} else {
+								sourceType = 'mobile';
+							}
+						}
 						// 4. set the geoData of the image file
 						const geoData = setGeoData({ ...metadata });
-						console.log(`4. include Geodata: ${JSON.stringify(geoData)}`);
+						console.log(`4. include Geodata: ${JSON.stringify(geoData, null, 4)}`);
 
 						// 5. set the inputData of the image file
 						const inputData = setInputData({ ...geoData });
 						const newFile = { ...inputData };
-						console.log(`5. include Inputdata: ${JSON.stringify(newFile)}`);
+						console.log(`5. include Inputdata: ${JSON.stringify(newFile, null, 4)}`);
 
 						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
 						if (sourceType === 'drone') {
 							return getDroneGeoData(newFile)
 								.then(savedFile => {
-									console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
+									console.log(`6. include Drone-data: ${JSON.stringify(savedFile, null, 4)}`);
 									// 7. save the file to mongo database and return the new layer is succeed
-									return createNewLayer(savedFile, worldId)
-										.then(savedFile => saveDataToDB(savedFile));
+									return saveDataToDB(savedFile);
+								})
+								.catch(err => {
+									console.log(`getDroneGeoData ERROR: ${err}`);
+									return saveDataToDB(newFile);
 								});
 						} else {
 							return saveDataToDB(newFile);
@@ -135,7 +147,7 @@ class ImageHandler {
 						const value = entry[1];
 						metadata[key] = value;
 					});
-					console.log('metadata object:', JSON.stringify(metadata));
+					console.log('metadata object:', JSON.stringify(metadata, null, 4));
 
 					// format the dates
 					const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
@@ -178,8 +190,15 @@ class ImageHandler {
 							flightRollDegree, flightYawDegree, flightPitchDegree,
 							camReverse, gimbalReverse
 						};
+						// update the sensorType if it's empty
+						if (!file.inputData.sensor.type) {
+							file.inputData.sensor.type = 'Drone Imagery(JPG)';
+						}
+					} else {
+						if (!file.inputData.sensor.type) {
+							file.inputData.sensor.type = 'Mobile Imagery(JPG)';
+						}
 					}
-
 					// set the Date's fields in the layer's model
 					file.fileData.fileCreatedDate = imageData.createDate;
 					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
@@ -209,7 +228,7 @@ class ImageHandler {
 
 		function setInputData(layer) {
 			layer.inputData.sensor.model = layer.imageData.Model ? layer.imageData.Model.trim().toUpperCase() : null;
-			layer.inputData.sensor.maker = layer.imageData.maker ? layer.imageData.maker.trim().toUpperCase() : null;
+			layer.inputData.sensor.maker = layer.imageData.Make ? layer.imageData.Make.trim().toUpperCase() : null;
 			layer.inputData.tb.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 
 			return { ...layer };

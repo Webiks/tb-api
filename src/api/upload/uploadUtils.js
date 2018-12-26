@@ -48,7 +48,7 @@ const uploadFiles = (req, res) => {
 			worldId = upload.defaultWorldId;
 		}
 	}
-	console.log(`req Fields: ${JSON.stringify(fields)}`);
+	console.log(`req Fields: ${JSON.stringify(fields,null,4)}`);
 	console.log('worldId: ', worldId);
 	const fileTypeAndSource = findFileTypeAndSource(file.type, sensorType);
 	const fileType = fileTypeAndSource.fileType;
@@ -61,7 +61,7 @@ const uploadFiles = (req, res) => {
 		name = file.name;
 		path = file.filePath;
 		buffer = fs.readFileSync(file.encodePathName);
-		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file));
+		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file,null,4));
 
 		// upload the file to S3 amazon storage
 		uploadFilesToS3(file, buffer, vectorId, sourceType)
@@ -162,7 +162,7 @@ function uploadFilesToS3(file, buffer, vectorId, sourceType) {
 
 // prepare the file before uploading it
 function setBeforeUpload(file, fileType, uploadPath, fields) {
-	console.log('setBeforeUpload File: ', JSON.stringify(file));
+	console.log('setBeforeUpload File: ', JSON.stringify(file,null,4));
 	const name = file.name;
 	let inputData;
 	if (fields){
@@ -238,7 +238,7 @@ function returnFiles(files, path) {
 		files[0].zipPath = null;
 		console.log('zipPath: ', files[0].zipPath);
 	}
-	console.log('return files: ', JSON.stringify(files));
+	console.log('return files: ', JSON.stringify(files,null,4));
 	return files;
 }
 
