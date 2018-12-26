@@ -1,5 +1,4 @@
 const exif = require('exif-parser');
-const exiftool = require('exiftool');
 const { s3Upload } = require('./s3Utils');
 
 const uploadToS3 = (file, buffer, vectorId) => {
@@ -23,26 +22,9 @@ function upload(fileType, fileKey, buffer) {
 			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
 			// save the image thumbnail
 			if (fileType === 'image') {
-				// try for mobile info
-				// exiftool.metadata(buffer, function (err, results) {
-				// 	if (err) {
-				// 		console.log(`ERROR exiftool: ${err}`);
-				// 		reject(err);
-				// 	}
-				// 	// convert the results to an object
-				// 	let metadata = {};
-				// 	Object.entries(results).forEach((entry) => {
-				// 		const key = entry[0];
-				// 		const value = entry[1];
-				// 		metadata[key] = value;
-				// 	});
-				// 	console.log(`s3Upload exif-tool result: ${JSON.stringify(metadata)}`);
-				// });
-
 				const parser = exif.create(buffer);
 				const result = parser.parse();
 				console.log(`s3Upload hasThumbnail: ${result.hasThumbnail('image/jpeg')}`);
-
 				// upload the thumbnail of the image to s3
 				if (result.hasThumbnail('image/jpeg')) {
 					const splitKey = fileKey.split('.');

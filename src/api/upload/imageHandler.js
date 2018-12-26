@@ -45,7 +45,7 @@ class ImageHandler {
 									console.log(`5. include Drone-data: ${JSON.stringify(savedFile)}`);
 									// 7. save the file to mongo database and return the new layer is succeed
 									return createNewLayer(savedFile, worldId)
-										.then(newLayer => saveDataToDB(savedFile));
+										.then(savedFile => saveDataToDB(savedFile));
 								});
 						} else {
 							return saveDataToDB(newFile);
