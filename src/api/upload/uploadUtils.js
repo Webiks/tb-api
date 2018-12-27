@@ -168,6 +168,8 @@ function setBeforeUpload(file, fileType, uploadPath, fields) {
 	if (fields){
 		inputData = {
 			name,
+			flightAltitude: 0,
+			cloudCoveragePercentage: 0.1,
 			sensor: {
 				type: fields.sensorType ? fields.sensorType : null,
 				name: fields.sensorName ? fields.sensorName : null
@@ -178,9 +180,7 @@ function setBeforeUpload(file, fileType, uploadPath, fields) {
 			},
 			tb: {
 				affiliation: 'UNKNOWN',
-				GSD: 0,
-				flightAltitude: 0,
-				cloudCoveragePercentage: 0
+				GSD: 0
 			}
 		};
 	}
