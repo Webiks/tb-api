@@ -206,6 +206,8 @@ const fileData = {
 // INPUT DATA: data from the user
 const inputData = {
 	name: String,
+	flightAltitude: Number,
+	cloudCoveragePercentage: Number,
 	sensor: {
 		name: String,
 		type: String ,
@@ -215,9 +217,7 @@ const inputData = {
 	},
 	tb: {
 		affiliation: { $type: String, uppercase: true, enum: ['INPUT', 'OUTPUT', 'UNKNOWN'] },  // 'INPUT' or 'OUTPUT'
-		GSD: Number,
-		flightAltitude: Number,
-		cloudCoveragePercentage: Number
+		GSD: Number
 	},
 	ol: {
 		zoom: Number,

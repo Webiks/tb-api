@@ -229,7 +229,7 @@ class ImageHandler {
 		function setInputData(layer) {
 			layer.inputData.sensor.model = layer.imageData.Model ? layer.imageData.Model.trim().toUpperCase() : null;
 			layer.inputData.sensor.maker = layer.imageData.Make ? layer.imageData.Make.trim().toUpperCase() : null;
-			layer.inputData.tb.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
+			layer.inputData.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 
 			return { ...layer };
 		}
