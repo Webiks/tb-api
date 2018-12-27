@@ -25,18 +25,18 @@ const getDroneGeoData = (file) => {
 		ExifImageHeight: file.imageData.ExifImageHeight
 	};
 
-	console.log(`${file.name}: getDroneGeoData body: ${JSON.stringify(body)}`);
+	console.log(`${file.name}: getDroneGeoData body: ${JSON.stringify(body,null,4)}`);
 
 	return axios.post(remote.droneDomain, body, { headers })
 		.then(response => {
-			console.log(`${file.name}: getDroneGeoData response: ${JSON.stringify(response.data)}`);
+			console.log(`${file.name}: getDroneGeoData response: ${JSON.stringify(response.data,null,4)}`);
 			if (response.data) {
 				let footprint = response.data.bboxPolygon;
 				let droneCenter = response.data.centerPoint;
 				// if got only the drone center point - find a fixed polygon around the given center point
 				if (footprint === null && droneCenter !== null) {
 					console.log(`${file.name}: cesium-referance: GOT ONLY POINT!!!`);
-					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.footPrintPixelSize);
+					const newGeoData = getGeoDataFromPoint(droneCenter.geometry.coordinates, ansyn.droneFootPrintPixelSize);
 					footprint = newGeoData.footprint;
 				}
 				// if got only the polygon - find the center point from the given polygon

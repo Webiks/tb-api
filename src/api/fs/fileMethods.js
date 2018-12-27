@@ -12,17 +12,46 @@ const getOptions = (uploadPath) => {
 	};
 };
 
-const findFileType = (reqType) => {
+const findFileTypeAndSource = (reqType, sensorType) => {
 	const extension = (reqType).split('/')[1].toLowerCase();
-	if (extension.includes('tif')) {
-		return 'raster';
+	let sourceType = null;
+	let fileType;
+
+	if (sensorType) {
+		const sensor = sensorType.toLowerCase();
+		// find the source type
+		if (sensor.includes('mobile')) {
+			sourceType = 'mobile';
+		}
+		else if (sensor.includes('drone')) {
+			sourceType = 'drone';
+		}
+		else if (sensor.includes('satellite')) {
+			sourceType = 'satellite';
+		}
+		// find the file type
+		if (sensor.includes('geotiff')) {
+			fileType = 'raster';
+		}
+		else if (sensor.includes('imagery')) {
+			fileType = 'image';
+		}
+	} else {
+		// find the file type
+		if (extension.includes('tif')) {
+			fileType = 'raster';
+		}
+		else if (extension === 'jpg' || extension === 'jpeg') {
+			fileType = 'image';
+		}	else {
+			fileType = 'vector';
+		}
 	}
-	else if (extension === 'jpg' || extension === 'jpeg') {
-		return 'image';
-	}
-	else {
-		return 'vector';
-	}
+
+	return {
+		fileType,
+		sourceType
+	};
 };
 
 const createDirSync = (dirPath) => {
@@ -41,4 +70,4 @@ const createDirSync = (dirPath) => {
 	}
 };
 
-module.exports = { getOptions, findFileType, createDirSync };
+module.exports = { getOptions, findFileTypeAndSource, createDirSync };

@@ -198,7 +198,6 @@ const fileData = {
 	fileCreatedDate: Date | String,					// the file created date
 	fileUploadDate: Date | String,				  // the upload file date
 	fileExtension: String,
-	fileType: String,												// 'raster' or 'vector'
 	filePath: String,
 	encodeFileName: String,									// the encoded file name (differ when there is special charecters in the name)
 	zipPath: String									 				// the zip path of the upload vector (for removing it later)
