@@ -30,7 +30,11 @@ function upload(fileType, fileKey, buffer) {
 					return saveThumbnailToS3(result.getThumbnailBuffer(), fileKey, uploadUrl);
 				} else {
 					return createThumbnail(buffer)
-						.then(thumbnailBuffer => saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl));
+						.then(thumbnailBuffer => saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl))
+						.catch(err => {
+							console.error(`ERROR create Thumbnail: ${err}`);
+							return uploadUrl;
+						});
 				}
 			} else {
 				return uploadUrl;
@@ -42,7 +46,7 @@ function upload(fileType, fileKey, buffer) {
 		});
 }
 
-function createThumbnail(buffer){
+function createThumbnail(buffer) {
 	return new Promise((resolve, reject) => {
 		return gm(buffer)
 			.resize('x256')
@@ -57,7 +61,7 @@ function createThumbnail(buffer){
 	});
 }
 
-function saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl){
+function saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl) {
 	const splitKey = fileKey.split('.');
 	const thumbnailKey = `${splitKey[0]}_Thumbanil.${splitKey[1]}`;
 	console.log(`upload thumbnail key: ${thumbnailKey}`);
@@ -80,7 +84,7 @@ function getFileKey(file, vectorId, sourceType) {
 		const dirName = fileName.split('.')[0];
 		fileKey = `${dirByType}/${vectorId}/${dirName}/${fileName}`;
 	} else {
-		if (sourceType){
+		if (sourceType) {
 			fileKey = `${dirByType}/${sourceType}/${file._id}/${fileName}`;
 		} else {
 			fileKey = `${dirByType}/${file._id}/${fileName}`;

@@ -42,10 +42,10 @@ class UploadFilesToGS {
 					console.log('check the state of each task... ');
 					importObj.tasks.map(task => {
 						console.log(`task ${task.id} state = ${task.state}`);
+						// get the task object
+						task = getTaskObj(importObj.id, task.id);
+						console.log(`task ${task.id} (before change): ${JSON.stringify(task)}`);
 						if (task.state !== 'READY') {
-							// get the task object
-							task = getTaskObj(importObj.id, task.id);
-							console.log(`task ${task.id} (before change): ${JSON.stringify(task)}`);
 							// check the state's error and fix it
 							if (task && task.state === 'NO_CRS') {
 								const updateLayerJson = JSON.stringify(layerSrsUpdate());
@@ -65,7 +65,6 @@ class UploadFilesToGS {
 				// 3b. for RASTERS only: POST the files to the tasks list, in order to create an import task for it
 				else {
 					const rasterTasks = sendToTask(path, name, importObj.id);
-					console.log('raster tasks: ' + JSON.stringify(rasterTasks));
 					if (!rasterTasks) {
 						console.log('something is wrong with the file!');
 						files = [];
@@ -78,8 +77,15 @@ class UploadFilesToGS {
 				files = [];
 			}
 
-			// return the files
-			console.log('return files: ' + JSON.stringify(files));
+			const task = getTaskObj(importObj.id, 0);
+			console.log('after uploadToGeoserver task: ' + JSON.stringify(task, null, 4));
+			files = [{
+				...files[0],
+				layer: {
+					name: task.layer.name
+				}
+			}];
+			console.log('return files: ' + JSON.stringify(files, null, 4));
 			return files;
 		}
 

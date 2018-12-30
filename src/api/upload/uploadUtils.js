@@ -11,6 +11,14 @@ const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
 	console.log('start upload utils to: ', uploadPath);
+	console.log(`req xhr: ${JSON.stringify(req.xhr,null,4)}`);
+
+	// var xhr = new XMLHttpRequest();
+	// xhr.timeout = 2000; // time in milliseconds
+	// xhr.ontimeout = function (e) {
+	// 	// XMLHttpRequest timed out. Do something here.
+	// };
+
 
 	// Define the request Files
 	// 1. convert it to JSON and back to an Object
