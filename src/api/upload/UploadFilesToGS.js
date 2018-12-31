@@ -16,15 +16,16 @@ class UploadFilesToGS {
 	static uploadFile(workspaceName, reqFiles, name, path) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to GeoServer...');
-		console.log('uploadFile files: ' + JSON.stringify(files));
-		console.log('uploadFile PATH: ' + path);
+		console.log('uploadFile PATH: ', path);
+		const fileType = files[0].fileType.toLowerCase();
+		let taskMap = new Map();
 
 		if (files.length !== 0) {
 			// 1. create the JSON files with the desire workspace
 			let importJSON = {};
 
-			console.log('files Type: ' + files[0].fileType);
-			if (files[0].fileType.toLowerCase() === 'raster') {
+			console.log('files Type: ' + fileType);
+			if (fileType === 'raster') {
 				importJSON = createImportObject(workspaceName);
 			} else {
 				importJSON = createImportObjectWithData(workspaceName, path);
@@ -37,15 +38,15 @@ class UploadFilesToGS {
 
 			if (importObj) {
 				// 3a. for VECTORS only:
-				if (files[0].fileType.toLowerCase() === 'vector') {
+				if (fileType === 'vector') {
 					// check the STATE of each task in the Task List
 					console.log('check the state of each task... ');
 					importObj.tasks.map(task => {
 						console.log(`task ${task.id} state = ${task.state}`);
+						// get the task object and map it into the taskMap object
+						setTaskMap(importObj.id, task.id);
+
 						if (task.state !== 'READY') {
-							// get the task object
-							task = getTaskObj(importObj.id, task.id);
-							console.log(`task ${task.id} (before change): ${JSON.stringify(task)}`);
 							// check the state's error and fix it
 							if (task && task.state === 'NO_CRS') {
 								const updateLayerJson = JSON.stringify(layerSrsUpdate());
@@ -64,12 +65,15 @@ class UploadFilesToGS {
 				}
 				// 3b. for RASTERS only: POST the files to the tasks list, in order to create an import task for it
 				else {
-					const rasterTasks = sendToTask(path, name, importObj.id);
-					console.log('raster tasks: ' + JSON.stringify(rasterTasks));
+					let rasterTasks = sendToTask(path, name, importObj.id);
+
 					if (!rasterTasks) {
 						console.log('something is wrong with the file!');
 						files = [];
 					} else {
+						// get the task object and map it into the taskMap object
+						rasterTasks = rasterTasks.length ? rasterTasks : [rasterTasks];
+						rasterTasks.forEach(task => setTaskMap(importObj.id, task.id));
 						files = uploadToGeoserver(importObj.id);
 					}
 				}
@@ -78,8 +82,9 @@ class UploadFilesToGS {
 				files = [];
 			}
 
-			// return the files
-			console.log('return files: ' + JSON.stringify(files));
+			// get the layer name from the completed task object
+			files = files.map(file => getLayerNameFromTask(file, importObj.id));
+			console.log('return files: ' + JSON.stringify(files, null, 4));
 			return files;
 		}
 
@@ -94,6 +99,29 @@ class UploadFilesToGS {
 			deleteUncompleteImports();
 
 			return files;
+		}
+
+		// get the task object and map it into the taskMap object
+		function setTaskMap(importObjId, taskId) {
+			const task = getTaskObj(importObjId, taskId);
+			console.log(`setTaskMap file name: ${task.data.file}`);
+			console.log(`setTaskMap task ID: ${task.id}`);
+			taskMap.set(task.data.file, task.id);
+			console.log(`${task.data.file} task id = ${taskMap.get(task.data.file)}`);
+		}
+
+		// get the layer name from the completed task object
+		function getLayerNameFromTask(file, importObjId) {
+			const taskId = taskMap.get(file.encodeFileName);
+			console.log(`taskId = ${taskId}`);
+			const task = getTaskObj(importObjId, taskId);
+			console.log(`getLayerNameFromTask task: ${JSON.stringify(task)}`);
+			return {
+				...file,
+				layer: {
+					name: task.layer.name
+				}
+			};
 		}
 	}
 }
