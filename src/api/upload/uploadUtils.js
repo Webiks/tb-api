@@ -66,21 +66,25 @@ const uploadFiles = (req, res) => {
 	if (!reqFiles.length) {
 		// set a single file before upload
 		file = setBeforeUpload(file, fileType, uploadPath, fields);
-		name = file.name;
-		path = file.filePath;
+		name = file.encodeFileName;
+		path = file.encodePathName;
 		buffer = fs.readFileSync(file.encodePathName);
 		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file,null,4));
 
 		// upload the file to S3 amazon storage
-		uploadFilesToS3(file, buffer, vectorId, sourceType)
-			.then(file => {
-				// send to the right upload handler according to the type
-				uploadHandler(res, worldId, file, name, path, buffer, sourceType);
-			})
-			.catch(err => {
-				console.error(`Error upload the file to S3: ${err}`);
-				res.status(422).send({ errors: [{ title: 'Image Upload Error', detail: err.message }] });
-			});
+		if (fileType === 'image'){
+			uploadFilesToS3(file, buffer, vectorId, sourceType)
+				.then(file => {
+					// send to the right upload handler according to the type
+					uploadHandler(res, worldId, file, name, path, buffer, sourceType);
+				})
+				.catch(err => {
+					console.error(`Error upload the file to S3: ${err}`);
+					res.status(422).send({ errors: [{ title: 'Image Upload Error', detail: err.message }] });
+				});
+		}	else {
+			uploadHandler(res, worldId, file, name, path, buffer, sourceType);
+		}
 	} else {
 		// creating a ZIP file
 		console.log('upload multi files...');
@@ -116,16 +120,21 @@ const uploadFiles = (req, res) => {
 
 				// upload the files to S3 amazon storage
 				const files = zipFiles.map(file => {
-					console.log(`zipFile file: ${file.name}`);
+					console.log(`zipFile file: ${file.encodeFileName}`);
 					buffer = fs.readFileSync(file.encodePathName);
 					// remove the file from the temporary uploads directory
 					fs.removeSync(file.encodePathName);
-					return uploadFilesToS3(file, buffer, vectorId, sourceType);
+					if (fileType === 'image'){
+						return uploadFilesToS3(file, buffer, vectorId, sourceType);
+					} else {
+						return Promise.resolve(file);
+					}
 				});
 
 				// send to the right upload handler according to the type
 				Promise.all(files)
 					.then(files => {
+						console.log('uploadUtils Promise files: ', JSON.stringify(files));
 						uploadHandler(res, worldId, files, name, path, buffer, sourceType);
 					});
 			})

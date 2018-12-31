@@ -169,14 +169,14 @@ function getFileObj(importId, fileName) {
 function getTaskObj(importId, taskId) {
 	// get the task file
 	const curl_getTask = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}/tasks/${taskId}`;
-	console.log('Get the task object...' + curl_getTask);
+	console.log('Get the task object...', curl_getTask);
 	const taskJSON = execSync(curl_getTask);
 	const task = IsJsonOK(taskJSON);
 	if (!task) {
 		console.error('something is wrong with the JSON task file!');
 		return null;
 	} else {
-		console.log('get Task object...' + JSON.stringify(task));
+		console.log('the Task object: ', JSON.stringify(task, null, 4));
 		return task.task;
 	}
 }
