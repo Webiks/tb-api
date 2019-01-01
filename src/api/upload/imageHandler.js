@@ -215,6 +215,7 @@ class ImageHandler {
 						if (!file.inputData.sensor.type) {
 							file.inputData.sensor.type = 'Mobile Imagery(JPG)';
 						}
+						file.inputData.sensor.name = `${imageData.Make}_${imageData.Model}`;
 					}
 					// set the Date's fields in the layer's model
 					file.fileData.fileCreatedDate = imageData.createDate;
