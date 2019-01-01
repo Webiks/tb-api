@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
 const imageHandler = require('./imageHandler');
-const geoserverHandle = require('./geoserverHandler')
+const geoserverHandle = require('./geoserverHandler');
 const { findFileTypeAndSource } = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;

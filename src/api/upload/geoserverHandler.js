@@ -1,5 +1,4 @@
 const UploadFilesToGS = require('./UploadFilesToGS');
-const {bboxPolygon} = require('@turf/turf');
 const {createNewLayer} = require('../databaseCrud/DbUtils');
 const gsUtils = require('../geoserverCrud/GsUtils');
 const configUrl = require('../../../config/serverConfig');

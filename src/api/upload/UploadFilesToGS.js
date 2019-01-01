@@ -7,7 +7,6 @@ const {
 	sendToTask,
 	updateTaskField,
 	executeFileToGeoserver,
-	deleteUncompleteImports
 } = require('../geoserverCrud/curlMethods');
 
 // upload files to GeoServer
