@@ -2,9 +2,9 @@ const exif = require('exif-parser');
 const exiftool = require('exiftool');
 const moment = require('moment');
 const fs = require('fs-extra');
-const { ansyn } = require('../../../config/config');
+const {ansyn} = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
-const { createNewLayer } = require('../databaseCrud/DbUtils');
+const {createNewLayer} = require('../databaseCrud/DbUtils');
 const getGeoDataFromPoint = require('../ansyn/getGeoData');
 const getDroneGeoData = require('../ansyn/getDroneGeoData');
 
@@ -42,12 +42,12 @@ class ImageHandler {
 							}
 						}
 						// 4. set the geoData of the image file
-						const geoData = setGeoData({ ...metadata });
+						const geoData = setGeoData({...metadata});
 						console.log(`4. include Geodata: ${JSON.stringify(geoData, null, 4)}`);
 
 						// 5. set the inputData of the image file
-						const inputData = setInputData({ ...geoData });
-						const newFile = { ...inputData };
+						const inputData = setInputData({...geoData});
+						const newFile = {...inputData};
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile, null, 4)}`);
 
 						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
@@ -220,7 +220,7 @@ class ImageHandler {
 					file.fileData.fileCreatedDate = imageData.createDate;
 					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
 
-					resolve({ ...file, imageData });
+					resolve({...file, imageData});
 				});
 			});
 		}
@@ -238,9 +238,9 @@ class ImageHandler {
 			}
 			let geoData = getGeoDataFromPoint(centerPoint, footPrintPixelSize);
 			geoData.isGeoRegistered = false;
-			geoData = { ...geoData, centerPoint };
+			geoData = {...geoData, centerPoint};
 			console.log('setGeoData: ', JSON.stringify(geoData));
-			return { ...layer, geoData };
+			return {...layer, geoData};
 		}
 
 		function setInputData(layer) {
@@ -248,7 +248,7 @@ class ImageHandler {
 			layer.inputData.sensor.maker = layer.imageData.Make ? layer.imageData.Make.trim().toUpperCase() : null;
 			layer.inputData.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 
-			return { ...layer };
+			return {...layer};
 		}
 	}
 }
