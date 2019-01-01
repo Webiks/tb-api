@@ -82,7 +82,7 @@ class ImageHandler {
 						return saveDataToDB(file);
 					})
 					.catch(err => {
-						console.log(error);
+						console.log(err);
 						return null;
 					});
 			});
@@ -121,7 +121,7 @@ class ImageHandler {
 		}
 
 		// set the world-layer main fields
-		function setWorldLayer(file, id, fileData, filePath, thumbnailUrl) {
+		function setWorldLayer(file, id, fileData, filePath) {
 			const name = (file.name).split('.')[0];
 
 			return {
