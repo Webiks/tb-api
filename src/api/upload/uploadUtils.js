@@ -2,7 +2,7 @@ const AdmZip = require('adm-zip');
 const uuid = require('uuid');
 const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
-const uploadToS3 = require('../s3/uploadToS3');
+// const uploadToS3 = require('../s3/uploadToS3');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
 const { findFileTypeAndSource } = require('../fs/fileMethods');
@@ -11,14 +11,6 @@ const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
 	console.log('start upload utils to: ', uploadPath);
-	console.log(`req xhr: ${JSON.stringify(req.xhr,null,4)}`);
-
-	// var xhr = new XMLHttpRequest();
-	// xhr.timeout = 2000; // time in milliseconds
-	// xhr.ontimeout = function (e) {
-	// 	// XMLHttpRequest timed out. Do something here.
-	// };
-
 
 	// Define the request Files
 	// 1. convert it to JSON and back to an Object
@@ -35,8 +27,6 @@ const uploadFiles = (req, res) => {
 	let path;
 	let file;
 	let fields;
-	let buffer;
-	let vectorId = null;
 
 	if (!reqFiles.length) {
 		file = reqFiles;
@@ -68,23 +58,11 @@ const uploadFiles = (req, res) => {
 		file = setBeforeUpload(file, fileType, uploadPath, fields);
 		name = file.encodeFileName;
 		path = file.encodePathName;
-		buffer = fs.readFileSync(file.encodePathName);
 		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file,null,4));
 
-		// upload the file to S3 amazon storage
-		if (fileType === 'image'){
-			uploadFilesToS3(file, buffer, vectorId, sourceType)
-				.then(file => {
-					// send to the right upload handler according to the type
-					uploadHandler(res, worldId, file, name, path, buffer, sourceType);
-				})
-				.catch(err => {
-					console.error(`Error upload the file to S3: ${err}`);
-					res.status(422).send({ errors: [{ title: 'Image Upload Error', detail: err.message }] });
-				});
-		}	else {
-			uploadHandler(res, worldId, file, name, path, buffer, sourceType);
-		}
+		// send to the right upload handler according to the type
+		uploadHandler(res, worldId, file, name, path, sourceType);
+
 	} else {
 		// creating a ZIP file
 		console.log('upload multi files...');
@@ -107,36 +85,13 @@ const uploadFiles = (req, res) => {
 		});
 
 		Promise.all(zipFiles)
-			.then(zipFiles => {
+			.then(files => {
 				// write the zip to the disk
 				console.log(`write zip file: ${path}`);
 				zip.writeZip(path);
 
-				// get the vector's Id of the SHP file
-				if (zipFiles[0].fileType === 'vector') {
-					const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
-					vectorId = shpFile[0]._id;
-				}
-
-				// upload the files to S3 amazon storage
-				const files = zipFiles.map(file => {
-					console.log(`zipFile file: ${file.encodeFileName}`);
-					buffer = fs.readFileSync(file.encodePathName);
-					// remove the file from the temporary uploads directory
-					fs.removeSync(file.encodePathName);
-					if (fileType === 'image'){
-						return uploadFilesToS3(file, buffer, vectorId, sourceType);
-					} else {
-						return Promise.resolve(file);
-					}
-				});
-
 				// send to the right upload handler according to the type
-				Promise.all(files)
-					.then(files => {
-						console.log('uploadUtils Promise files: ', JSON.stringify(files));
-						uploadHandler(res, worldId, files, name, path, buffer, sourceType);
-					});
+				uploadHandler(res, worldId, files, name, path, sourceType);
 			})
 			.catch(err => {
 				console.log(err);
@@ -148,33 +103,16 @@ const uploadFiles = (req, res) => {
 
 // ========================================= private  F U N C T I O N S ============================================
 // send to the right upload handler according to the type
-function uploadHandler(res, worldId, reqFiles, name, path, buffer, sourceType) {
+function uploadHandler(res, worldId, reqFiles, name, path, sourceType) {
 	if (reqFiles.fileType === 'image') {
 		// get all the image data and save it in mongo Database
-		imageHandler.getImageData(worldId, reqFiles, name, path, buffer, sourceType)
+		imageHandler.getImageData(worldId, reqFiles, name, path, sourceType)
 			.then(files => res.send(returnFiles(files, path)));
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
 		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
 		res.send(returnFiles(files, path));
 	}
-}
-
-// upload the file to S3 amazon storage and get its url (including the thumbnail's url)
-function uploadFilesToS3(file, buffer, vectorId, sourceType) {
-	return uploadToS3(file, buffer, vectorId, sourceType)
-		.then(uploadUrl => {
-			console.log(`uploadUrl: ${JSON.stringify(uploadUrl)}`);
-			file.filePath = uploadUrl.fileUrl ? uploadUrl.fileUrl : file.filePath;
-			file.thumbnailUrl = uploadUrl.thumbnailUrl ? uploadUrl.thumbnailUrl : null;
-			console.log(`succeed to upload file To S3: ${JSON.stringify(file.filePath)}`);
-			console.log(`succeed to upload thumbnail To S3: ${JSON.stringify(file.thumbnailUrl)}`);
-			return { ...file };
-		})
-		.catch(err => {
-			console.error(`Error upload the file to S3: ${err}`);
-			throw new Error(err);
-		});
 }
 
 // prepare the file before uploading it
@@ -235,6 +173,7 @@ function setBeforeUpload(file, fileType, uploadPath, fields) {
 
 function returnFiles(files, path) {
 	console.log('upload files returnFiles path: ', path);
+	files = files.length ? files : [files];
 	// remove the file/zip file from the temporary uploads directory
 	fs.removeSync(path);
 	// if ZIP files: remove only the zip directory

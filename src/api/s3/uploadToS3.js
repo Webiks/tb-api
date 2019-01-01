@@ -2,10 +2,10 @@ const exif = require('exif-parser');
 const gm = require('gm').subClass({ imageMagick: true });
 const { s3Upload } = require('./s3Utils');
 
-const uploadToS3 = (file, buffer, vectorId, sourceType) => {
+// upload the file and its thumbnail to S3 amazon storage and update the urls in the file object
+const uploadToS3 = (file, buffer, sourceType, vectorId) => {
 	console.log(`start upload file To S3...${file.name}`);
-
-	const fileKey = getFileKey(file, vectorId, sourceType);
+	const fileKey = getFileKey(file, sourceType, vectorId);
 	console.log(`file Key: ${fileKey}`);
 	return upload(file.fileType, fileKey, buffer);
 };
@@ -14,13 +14,13 @@ const uploadToS3 = (file, buffer, vectorId, sourceType) => {
 // upload the file to S3 including the thumbnail (if it's an image file)
 function upload(fileType, fileKey, buffer) {
 	const uploadUrl = {
-		fileUrl: null,
+		filePath: null,
 		thumbnailUrl: null
 	};
 	return s3Upload(fileKey, buffer)
 		.then(fileUrl => {
-			uploadUrl.fileUrl = fileUrl;
-			console.log(`s3Upload fileUrl: ${uploadUrl.fileUrl}`);
+			uploadUrl.filePath = fileUrl;
+			console.log(`s3Upload fileUrl: ${uploadUrl.filePath}`);
 			// save the image thumbnail
 			if (fileType === 'image') {
 				const parser = exif.create(buffer);
@@ -41,7 +41,7 @@ function upload(fileType, fileKey, buffer) {
 			}
 		})
 		.catch(err => {
-			console.error(err, err.stack);
+			console.error(`Error upload the file to S3: ${err}`);
 			throw new Error(err);
 		});
 }
@@ -68,12 +68,11 @@ function saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl) {
 	return s3Upload(thumbnailKey, thumbnailBuffer)
 		.then(thumbnailUrl => {
 			uploadUrl.thumbnailUrl = thumbnailUrl;
-			console.log(`return uploadUrl: ${JSON.stringify(uploadUrl)}`);
 			return uploadUrl;
 		});
 }
 
-function getFileKey(file, vectorId, sourceType) {
+function getFileKey(file, sourceType, vectorId) {
 	const fileType = file.fileType;
 	const dirByType = `${fileType}s`;											// define the 'images','rasters','vectors' folders
 	const fileName = file.encodeFileName;
