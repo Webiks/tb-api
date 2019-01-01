@@ -93,10 +93,6 @@ class UploadFilesToGS {
 			// 1. execute the import task
 			console.log('start executeFileToGeoserver...');
 			executeFileToGeoserver(importObjId);
-
-			// 2. delete all the uncompleted tasks in the import queue
-			//deleteUncompleteImports();
-
 			return files;
 		}
 

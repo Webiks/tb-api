@@ -1,3 +1,4 @@
+const fs = require('fs-extra');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const {createNewLayer} = require('../databaseCrud/DbUtils');
 const gsUtils = require('../geoserverCrud/GsUtils');
@@ -18,7 +19,7 @@ class GeoserverHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData, null, 4));
 
 				// 2. set the world-layer data
-				let worldLayer = setWorldLayer(file, file._id, fileData,worldId);
+				let worldLayer = setWorldLayer(file, file._id, fileData, worldId);
 				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer, null, 4));
 				// 3. get the metadata of the image file
 				return getGeoserver(worldLayer, worldId, reqFiles, name, path).then(
@@ -53,11 +54,14 @@ class GeoserverHandler {
 
 		// set the File Data from the ReqFiles
 		function setFileData(file) {
+			const fileStat = fs.statSync(file.filePath);
+			const {birthtime} = fileStat;
 			return {
 				name: file.name,
 				size: file.size,
 				fileUploadDate: file.fileUploadDate,
 				fileExtension: file.fileExtension,
+				fileCreatedDate: birthtime,
 				filePath: file.filePath,
 				encodeFileName: file.encodeFileName,
 				splitPath: null
@@ -66,20 +70,19 @@ class GeoserverHandler {
 
 		// set the world-layer main fields
 		function setWorldLayer(file, id, fileData, worldId) {
-
 			return {
 				_id: id,
 				displayUrl: `${configUrl.baseUrlGeoserver}/${worldId}/wms`,
 				fileData,
+				createdDate: new Date(fileData.fileCreatedDate).getTime(),
 				inputData: file.inputData,
 			};
 		}
 
-		// get the metadata of the image file
+		// get the metadata of the geo server
 		function getGeoserver(worldLayer, worldId, reqFiles, name, path) {
 			const {geoserver: {layer: {name: layerName}}} = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path)[0];
 			worldLayer.name = layerName;
-			worldLayer.createdDate = new Date().getTime();
 			return gsUtils.getAllLayerData(worldLayer, worldId, layerName);
 		}
 	}

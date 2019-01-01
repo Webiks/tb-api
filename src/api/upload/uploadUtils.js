@@ -156,7 +156,7 @@ function uploadHandler(res, worldId, reqFiles, name, path, buffer, sourceType) {
 
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
-		geoserverHandle.getGeoserverData(worldId, reqFiles, name, path,buffer, sourceType).then(files => {
+		geoserverHandle.getGeoserverData(worldId, reqFiles, name, path).then(files => {
 			console.log('then geoserverHandler');
 			handler(files);
 		});

@@ -133,7 +133,6 @@ class GsUtils {
 			})
 			.catch(error => {
 				const consoleMessage = `db LAYER: ERROR Get Layer Data From Geoserver!: ${error}`;
-				//const sendMessage = `ERROR: can't get Layer's Data From Geoserver!: ${error}`;
 				console.log(consoleMessage);
 				return null;
 			});
