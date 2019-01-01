@@ -1,11 +1,11 @@
 const AdmZip = require('adm-zip');
 const uuid = require('uuid');
 const fs = require('fs-extra');
-const { upload } = require('../../../config/config');
+const {upload} = require('../../../config/config');
 // const uploadToS3 = require('../s3/uploadToS3');
-const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
-const { findFileTypeAndSource } = require('../fs/fileMethods');
+const geoserverHandle = require('./geoserverHandler');
+const {findFileTypeAndSource} = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
@@ -46,7 +46,7 @@ const uploadFiles = (req, res) => {
 			worldId = upload.defaultWorldId;
 		}
 	}
-	console.log(`req Fields: ${JSON.stringify(fields,null,4)}`);
+	console.log(`req Fields: ${JSON.stringify(fields, null, 4)}`);
 	console.log('worldId: ', worldId);
 	const fileTypeAndSource = findFileTypeAndSource(file.type, sensorType);
 	const fileType = fileTypeAndSource.fileType;
@@ -58,7 +58,7 @@ const uploadFiles = (req, res) => {
 		file = setBeforeUpload(file, fileType, uploadPath, fields);
 		name = file.encodeFileName;
 		path = file.encodePathName;
-		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file,null,4));
+		console.log('uploadUtils SINGLE req file(after): ', JSON.stringify(file, null, 4));
 
 		// send to the right upload handler according to the type
 		uploadHandler(res, worldId, file, name, path, sourceType);
@@ -95,7 +95,7 @@ const uploadFiles = (req, res) => {
 			})
 			.catch(err => {
 				console.log(err);
-				res.status(422).send({ errors: [{ title: 'Image Upload Error', detail: err.message }] });
+				res.status(422).send({errors: [{title: 'Image Upload Error', detail: err.message}]});
 			});
 	}
 
@@ -110,17 +110,17 @@ function uploadHandler(res, worldId, reqFiles, name, path, sourceType) {
 			.then(files => res.send(returnFiles(files, path)));
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
-		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
-		res.send(returnFiles(files, path));
+		geoserverHandle.getGeoserverData(worldId, reqFiles, name, path).then(
+			files => res.send(returnFiles(files, path)));
 	}
 }
 
 // prepare the file before uploading it
 function setBeforeUpload(file, fileType, uploadPath, fields) {
-	console.log('setBeforeUpload File: ', JSON.stringify(file,null,4));
+	console.log('setBeforeUpload File: ', JSON.stringify(file, null, 4));
 	const name = file.name;
 	let inputData;
-	if (fields){
+	if (fields) {
 		inputData = {
 			name,
 			flightAltitude: 0,
@@ -194,7 +194,7 @@ function returnFiles(files, path) {
 		files[0].zipPath = null;
 		console.log('zipPath: ', files[0].zipPath);
 	}
-	console.log('return files: ', JSON.stringify(files,null,4));
+	console.log('return files: ', JSON.stringify(files, null, 4));
 	return files;
 }
 

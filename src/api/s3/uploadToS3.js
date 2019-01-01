@@ -1,6 +1,6 @@
 const exif = require('exif-parser');
-const gm = require('gm').subClass({ imageMagick: true });
-const { s3Upload } = require('./s3Utils');
+const gm = require('gm').subClass({imageMagick: true});
+const {s3Upload} = require('./s3Utils');
 
 // upload the file and its thumbnail to S3 amazon storage and update the urls in the file object
 const uploadToS3 = (file, buffer, sourceType, vectorId) => {

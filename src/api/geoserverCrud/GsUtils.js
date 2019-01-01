@@ -111,6 +111,33 @@ class GsUtils {
 			});
 	}
 
+	static getAllLayerData(worldLayer, worldId, layerName){
+		const {geoserver} = require('../../../config/config');
+		return this.getLayerInfoFromGeoserver(worldLayer,worldId, layerName)
+			.then(layerInfo => {
+				// 2. get the layer's details
+				return this.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);
+			})
+			.then(layerDetails => {
+				const baseThumbnailUrl = `${worldLayer.displayUrl}${geoserver.wmsThumbnailParams.start}${layerDetails.geoserver.layer.resource.name}`;
+				const bbox = [
+					layerDetails.geoserver.data.nativeBoundingBox.minx,
+					layerDetails.geoserver.data.nativeBoundingBox.miny,
+					layerDetails.geoserver.data.nativeBoundingBox.maxx,
+					layerDetails.geoserver.data.nativeBoundingBox.maxy
+				];
+				layerDetails.thumbnailUrl = `${baseThumbnailUrl}&bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}&srs=${layerDetails.geoserver.data.srs}${geoserver.wmsThumbnailParams.end}`;
+
+				// 3. get the store's data
+				return this.getStoreDataFromGeoserver(layerDetails, layerDetails.geoserver.data.store.href);
+			})
+			.catch(error => {
+				const consoleMessage = `db LAYER: ERROR Get Layer Data From Geoserver!: ${error}`;
+				console.log(consoleMessage);
+				return null;
+			});
+	}
+
 	// delete the layer from GeoServer
 	static removeLayerFromGeoserver(resourceUrl, storeUrl) {
 		// 1. delete the layer according to the resource Url
