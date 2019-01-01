@@ -96,7 +96,7 @@ class UploadFilesToGS {
 			executeFileToGeoserver(importObjId);
 
 			// 2. delete all the uncompleted tasks in the import queue
-			deleteUncompleteImports();
+			//deleteUncompleteImports();
 
 			return files;
 		}
@@ -118,9 +118,10 @@ class UploadFilesToGS {
 			console.log(`getLayerNameFromTask task: ${JSON.stringify(task)}`);
 			return {
 				...file,
-				layer: {
-					name: task.layer.name
-				}
+				geoserver: {
+					layer: {
+						name: task.layer.name
+					}}
 			};
 		}
 	}

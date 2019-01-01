@@ -3,8 +3,8 @@ const uuid = require('uuid');
 const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
-const UploadFilesToGS = require('./UploadFilesToGS');
 const imageHandler = require('./imageHandler');
+const geoserverHandle = require('./geoserverHandler')
 const { findFileTypeAndSource } = require('../fs/fileMethods');
 
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
@@ -149,14 +149,17 @@ const uploadFiles = (req, res) => {
 // ========================================= private  F U N C T I O N S ============================================
 // send to the right upload handler according to the type
 function uploadHandler(res, worldId, reqFiles, name, path, buffer, sourceType) {
+	let handler = (files) => res.send(returnFiles(files,path));
 	if (reqFiles.fileType === 'image') {
 		// get all the image data and save it in mongo Database
-		imageHandler.getImageData(worldId, reqFiles, name, path, buffer, sourceType)
-			.then(files => res.send(returnFiles(files, path)));
+		imageHandler.getImageData(worldId, reqFiles, name, path, buffer, sourceType).then(handler);
+
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
-		const files = UploadFilesToGS.uploadFile(worldId, reqFiles, name, path);
-		res.send(returnFiles(files, path));
+		geoserverHandle.getGeoserverData(worldId, reqFiles, name, path,buffer, sourceType).then(files => {
+			console.log('then geoserverHandler');
+			handler(files);
+		});
 	}
 }
 
