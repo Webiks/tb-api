@@ -1,7 +1,9 @@
 const exif = require('exif-parser');
 const exiftool = require('exiftool');
 const moment = require('moment');
+const fs = require('fs-extra');
 const { ansyn } = require('../../../config/config');
+const uploadToS3 = require('../s3/uploadToS3');
 const { createNewLayer } = require('../databaseCrud/DbUtils');
 const getGeoDataFromPoint = require('../ansyn/getGeoData');
 const getDroneGeoData = require('../ansyn/getDroneGeoData');
@@ -9,23 +11,25 @@ const getDroneGeoData = require('../ansyn/getDroneGeoData');
 // upload files to the File System
 class ImageHandler {
 
-	static getImageData(worldId, reqFiles, name, path, buffer, sourceType) {
+	static getImageData(worldId, reqFiles, name, path, sourceType) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
 		console.log('starting to uploadFile to FS...');
 
 		if (files.length !== 0) {
-			// 1. move the image file into the directory in the name of its id
 			const images = files.map(file => {
 				// 1. set the file Data from the upload file
 				const fileData = setFileData(file);
 				console.log('1. set FileData: ' + JSON.stringify(fileData, null, 4));
 
 				// 2. set the world-layer data
-				let worldLayer = setWorldLayer(file, file._id, fileData, file.filePath, file.thumbnailUrl);
+				let worldLayer = setWorldLayer(file, file._id, fileData, file.filePath);
 				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer, null, 4));
 
-				// 3. get the metadata of the image file
-				return getMetadata(worldLayer, file.encodePathName, buffer)
+				// get 2 promised simultaneously:
+				// A. get the image data
+				const buffer = fs.readFileSync(file.encodePathName);
+				// 3. get ALL the metadata of the image file (including the drone-cesium service)
+				const imageData = getMetadata(worldLayer, file.encodePathName, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata, null, 4)}`);
 						// update the sourceType if it's empty
@@ -48,22 +52,37 @@ class ImageHandler {
 
 						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
 						if (sourceType === 'drone') {
-							return getDroneGeoData(newFile)
-								.then(savedFile => {
-									console.log(`6. include Drone-data: ${JSON.stringify(savedFile, null, 4)}`);
-									// 7. save the file to mongo database and return the new layer is succeed
-									return saveDataToDB(savedFile);
-								})
-								.catch(err => {
-									console.log(`getDroneGeoData ERROR: ${err}`);
-									return saveDataToDB(newFile);
-								});
+							return getDroneGeoData(newFile);
 						} else {
-							return saveDataToDB(newFile);
+							return Promise.resolve(newFile);
 						}
 					})
 					.catch(error => {
 						console.log(error);
+						return null;
+					});
+
+				// B. upload the file and its thumbnail to S3
+				const s3Upload = uploadToS3(file, buffer, sourceType, null);
+
+				// save ALL the image data to mongo DataBase
+				return Promise.all([imageData, s3Upload])
+					.then(file => {
+						file = [...file];
+						const filePath = file[1].filePath ? file[1].filePath : file[0].filePath;
+						const displayUrl = filePath;
+						const thumbnailUrl = file[1].thumbnailUrl ? file[1].thumbnailUrl : null;
+						file = {
+							...file[0],
+							filePath,
+							displayUrl,
+							thumbnailUrl
+						};
+						console.log(`save to mongoDB(file): ${JSON.stringify(file, null, 4)}`);
+						return saveDataToDB(file);
+					})
+					.catch(err => {
+						console.log(err);
 						return null;
 					});
 			});
@@ -102,20 +121,18 @@ class ImageHandler {
 		}
 
 		// set the world-layer main fields
-		function setWorldLayer(file, id, fileData, filePath, thumbnailUrl) {
+		function setWorldLayer(file, id, fileData, filePath) {
 			const name = (file.name).split('.')[0];
 
 			return {
 				_id: id,
 				name,
 				fileName: file.name,
-				displayUrl: filePath,
 				filePath,
 				fileType: file.fileType,
 				format: 'JPEG',
 				fileData,
-				inputData: file.inputData,
-				thumbnailUrl
+				inputData: file.inputData
 			};
 		}
 

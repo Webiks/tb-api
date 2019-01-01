@@ -1,3 +1,5 @@
+// const fs = require('fs-extra');
+// const uploadToS3 = require('../s3/uploadToS3');
 const {
 	createImportObject,
 	createImportObjectWithData,
@@ -116,9 +118,27 @@ class UploadFilesToGS {
 				geoserver: {
 					layer: {
 						name: task.layer.name
-					}}
+					}
+				}
 			};
 		}
+
+		// get the vector's Id of the SHP file
+		// function uploadGSToS3(zipFiles,sourceType){
+		// 	let vectorId = null;
+		// 	if (zipFiles[0].fileType === 'vector') {
+		// 		const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
+		// 		vectorId = shpFile[0]._id;
+		// 	}
+		// 	// upload the files to S3 amazon storage
+		// 	const files = zipFiles.map(file => {
+		// 		console.log(`zipFile file: ${file.encodeFileName}`);
+		// 		const buffer = fs.readFileSync(file.encodePathName);
+		// 		// remove the file from the temporary uploads directory
+		// 		fs.removeSync(file.encodePathName);
+		// 		return uploadToS3(file, buffer, sourceType, vectorId);
+		// 	});
+		// }
 	}
 }
 
