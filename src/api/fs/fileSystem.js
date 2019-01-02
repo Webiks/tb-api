@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 
 router.post('/', (req) => {
 	console.log('start the file System: remove file...' + JSON.stringify(req.body));
-	return fs.removeSync(req.body.filePath);
+	return fs.removeSync(req.body.fileData.filePath);
 });
 
 module.exports = router;

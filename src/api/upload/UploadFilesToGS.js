@@ -56,7 +56,7 @@ class UploadFilesToGS {
 								updateTaskField(updateLayerJson, importObj.id, task.id, 'layer');
 							} else {
 								console.log('something is wrong with the file!');
-								files = [];
+								files = null;
 							}
 						}
 					});
@@ -70,7 +70,7 @@ class UploadFilesToGS {
 
 					if (!rasterTasks) {
 						console.log('something is wrong with the file!');
-						files = [];
+						files = null;
 					} else {
 						// get the task object and map it into the taskMap object
 						rasterTasks = rasterTasks.length ? rasterTasks : [rasterTasks];
@@ -80,12 +80,12 @@ class UploadFilesToGS {
 				}
 			} else {
 				console.log('something is wrong with the JSON file!');
-				files = [];
+				files = null;
 			}
 
 			// get the layer name from the completed task object
 			files = files.map(file => getLayerNameFromTask(file, importObj.id));
-			console.log('return files: ' + JSON.stringify(files, null, 4));
+			console.log('UploadFilesToGS return files: ' + JSON.stringify(files, null, 4));
 			return files;
 		}
 
@@ -113,14 +113,8 @@ class UploadFilesToGS {
 			console.log(`taskId = ${taskId}`);
 			const task = getTaskObj(importObjId, taskId);
 			console.log(`getLayerNameFromTask task: ${JSON.stringify(task)}`);
-			return {
-				...file,
-				geoserver: {
-					layer: {
-						name: task.layer.name
-					}
-				}
-			};
+			file.layerName = task.layer.name;
+			return file;
 		}
 
 		// get the vector's Id of the SHP file
