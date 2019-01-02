@@ -215,7 +215,6 @@ class ImageHandler {
 						if (!file.inputData.sensor.type) {
 							file.inputData.sensor.type = 'Mobile Imagery(JPG)';
 						}
-						file.inputData.sensor.name = `${imageData.Make}_${imageData.Model}`;
 					}
 					// set the Date's fields in the layer's model
 					file.fileData.fileCreatedDate = imageData.createDate;
@@ -245,10 +244,14 @@ class ImageHandler {
 		}
 
 		function setInputData(layer) {
+			layer.inputData.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 			layer.inputData.sensor.model = layer.imageData.Model ? layer.imageData.Model.trim().toUpperCase() : null;
 			layer.inputData.sensor.maker = layer.imageData.Make ? layer.imageData.Make.trim().toUpperCase() : null;
-			layer.inputData.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
-
+			if (!layer.inputData.sensor.name){
+				if (layer.inputData.sensor.maker && layer.inputData.sensor.model){
+					layer.inputData.sensor.name = `${layer.inputData.sensor.maker}_${layer.inputData.sensor.model}`;
+				}
+			}
 			return {...layer};
 		}
 	}
