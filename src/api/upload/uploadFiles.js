@@ -162,7 +162,7 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 
 	const encodeFileName = encodeURIComponent(name);
 	const filePath = uploadPath + encodeFileName;
-	const fileExtension = name.substring(name.lastIndexOf('.'));
+	const fileExtension = name.substring(name.lastIndexOf('.')).toLowerCase();
 
 	console.log(`setBeforeUpload filePath: ${filePath}`);
 

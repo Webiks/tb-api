@@ -122,7 +122,7 @@ class UploadFilesToGS {
 		// function uploadGSToS3(zipFiles,sourceType){
 		// 	let vectorId = null;
 		// 	if (zipFiles[0].fileType === 'vector') {
-		// 		const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
+		// 		const shpFile = zipFiles.find(file => file.fileExtension === '.shp');
 		// 		vectorId = shpFile[0]._id;
 		// 	}
 		// 	// upload the files to S3 amazon storage

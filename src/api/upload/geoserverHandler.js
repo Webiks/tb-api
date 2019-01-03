@@ -18,6 +18,12 @@ class GeoserverHandler {
 			// get ALL layer data
 			if (files) {
 				files = files.length ? files : [files];
+
+				// for VECTORS - get data only for the .SHP file
+				if (files[0].fileType === 'vector'){
+					files = [files.find(file => file.fileExtension === '.shp')];
+				}
+
 				const images = files.map(file => {
 					// 1. set the file Data from the upload file
 					const fileData = setFileData(file);

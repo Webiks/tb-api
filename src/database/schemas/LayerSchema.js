@@ -197,7 +197,7 @@ const fileData = {
 	size: Number,                           // MB or KB
 	fileCreatedDate: Date | String,					// the file created date
 	fileUploadDate: Date | String,				  // the upload file date
-	fileExtension: String,
+	fileExtension: { $type: String, lowercase: true },
 	format: { $type: String, uppercase: true },
 	encodeFileName: String,									// the encoded file name (differ when there is special charecters in the name)
 	filePath: String,												// the encoded upload file path
