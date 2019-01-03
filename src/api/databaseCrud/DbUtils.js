@@ -27,7 +27,6 @@ class DbUtils{
 	}
 
 	static createNewLayer(layer, worldId){
-		// console.log('createNewLayer layer: ', JSON.stringify(layer, null, 4));
 		console.log('createNewLayer: start to CREATE new Layer in the DataBase...', layer.name);
 		// create the new layer in the Layers list and get the layer id (from mongoDB)
 		return dbLayerCrud.add(layer)
