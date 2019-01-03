@@ -35,7 +35,7 @@ class GeoserverHandler {
 					// 3. get the metadata of the image file
 					return gsUtils.getAllLayerData(worldLayer, worldId)
 						.then(newFile => {
-							console.log('3. worldLayer include geoserverData: ', JSON.stringify(worldLayer, null, 4));
+							console.log('3. worldLayer geoserverData: ', JSON.stringify(newFile.geoserver));
 							// 4. set the geoData of the image file
 							return saveDataToDB(newFile, worldId);
 						}).catch(error => {

@@ -108,9 +108,9 @@ router.delete('/delete/:worldId/:layerId', (req, res) => {
 		});
 });
 
-// ===============================
-//  GET WORLDS list from GEOSERVER
-// ===============================
+// ===================
+//  GET from GEOSERVER
+// ===================
 // get all the World's Layers list from GeoServer
 router.get('/geoserver/:worldId', (req, res) => {
 	console.log(`geo LAYER SERVER: start GET ALL ${req.params.worldId} World's Layers...`);
@@ -119,6 +119,19 @@ router.get('/geoserver/:worldId', (req, res) => {
 		.catch(error => {
 			const consoleMessage = `db LAYER: GET-ALL from GeoServer ERROR!: ${error}`;
 			const sendMessage = `ERROR: there are no layers!: ${error}`;
+			dbUtils.handleError(res, 404, consoleMessage, sendMessage);
+		});
+});
+
+// get Capabilities XML file - WMTS Request for display the selected layer
+router.get('/geoserver/wmts/:worldId/:layerName', (req, res) => {
+	const capabilitiesUrl = `${configUrl.baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
+	console.log('geo LAYER SERVER: start GetCapabilities url = ', capabilitiesUrl);
+	gsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
+		.then(response => res.send(response))
+		.catch(error => {
+			const consoleMessage = `db LAYER: GetCapabilities ERROR!: ${error}`;
+			const sendMessage = `ERROR: Capabilities XML file of ${req.params.layerName} can't be found!: ${error}`;
 			dbUtils.handleError(res, 404, consoleMessage, sendMessage);
 		});
 });

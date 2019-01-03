@@ -68,28 +68,35 @@ class GsUtils {
 							namespace: store.coverageStore.connectionParameters.entry.$
 						}
 					};
-					console.log(`worldLayer fileData: ${JSON.stringify(worldLayer.fileData, null, 4)}`);
-					worldLayer.fileData.filePath = store.coverageStore.url;                 // for the file path
+
+					worldLayer.fileData.filePath = store.coverageStore.url;                 // the url of the geoserver data_dir/upload
 
 				}
 				else if (worldLayer.fileType === 'vector') {
 					console.log('GsUtils get VECTOR data...');
 					worldLayer.geoserver.store = store.dataStore;
 					// translate map to an object
+					const url = store.dataStore.connectionParameters.entry.find(entry => entry['@key'] === 'url').$;
+					console.log(`vector url: ${url}`);
+
+					const namespace = store.dataStore.connectionParameters.entry.find(entry => entry['@key'] === 'namespace').$;
+					console.log(`vector namespace: ${namespace}`);
+
 					worldLayer.geoserver.store = {
 						connectionParameters: {
-							namespace: store.dataStore.connectionParameters.entry[0].$,
-							url: store.dataStore.connectionParameters.entry[1].$
+							namespace,
+							url
 						}
 					};
-					worldLayer.fileData.filePath = worldLayer.geoserver.store.connectionParameters.url;        // for the file path
+
+					worldLayer.fileData.filePath = worldLayer.geoserver.store.connectionParameters.url;        // the temp upload url (in tb-api/src/api/upload)
+					// comment: after uploading vectors to s3 - need to change this filePath
 				}
 				else {
 					return worldLayer;
 				}
 
 				// return the world-layer with all the data from GeoServer
-				console.log('3. return worldLayer: ', JSON.stringify(worldLayer));
 				return worldLayer;
 			});
 	}
@@ -98,12 +105,10 @@ class GsUtils {
 		const { geoserver } = require('../../../config/config');
 		return this.getLayerInfoFromGeoserver(worldLayer, worldId)
 			.then(layerInfo => {
-				console.log('1. got Layer Info...', JSON.stringify(layerInfo.geoserver, null, 4));
 				// 2. get the layer's details
 				return this.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);
 			})
 			.then(layerDetails => {
-				console.log('2. got Layer layerDetails...', JSON.stringify(layerDetails.geoserver, null, 4));
 				const baseThumbnailUrl = `${worldLayer.displayUrl}${geoserver.wmsThumbnailParams.start}${layerDetails.geoserver.layer.resource.name}`;
 				const bbox = [
 					layerDetails.geoserver.data.nativeBoundingBox.minx,
