@@ -9,7 +9,7 @@ const { getFileTypeData } = require('../fs/fileMethods');
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
 const uploadFiles = (req, res) => {
-	console.log('start upload utils to: ', uploadPath);
+	console.log('start upload files to temp dir: ', uploadPath);
 
 	// Define the request Files
 	// 1. convert it to JSON and back to an Object
@@ -58,7 +58,6 @@ const uploadFiles = (req, res) => {
 		name = file.encodeFileName;
 		path = uploadPath + name;
 		tempPaths[0] = path;
-		console.log(`single file tempPath: ${tempPaths[0]}`);
 
 		// send to the right upload handler according to the type
 		uploadHandler(res, worldId, file, name, path, tempPaths, typeData.sourceType);
@@ -108,7 +107,7 @@ const uploadFiles = (req, res) => {
 function uploadHandler(res, worldId, reqFiles, name, path, tempPaths, sourceType) {
 	if (reqFiles.fileType === 'image') {
 		// get all the image data and save it in mongo Database
-		imageHandler.getImageData(worldId, reqFiles, name, path, tempPaths, sourceType)
+		imageHandler.getImageData(worldId, reqFiles, name, path, sourceType)
 			.then(files => res.send(returnFiles(files, path, tempPaths)));
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
@@ -119,7 +118,7 @@ function uploadHandler(res, worldId, reqFiles, name, path, tempPaths, sourceType
 
 // prepare the file before uploading it
 function setBeforeUpload(file, typeData, uploadPath, fields) {
-	console.log('start setBeforeUpload ...', JSON.stringify(file, null, 4));
+	console.log('start setBeforeUpload ...');
 	const name = file.name;
 	// set the user's input fields
 	let sensorType = null;
@@ -164,8 +163,6 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 	const filePath = uploadPath + encodeFileName;
 	const fileExtension = name.substring(name.lastIndexOf('.')).toLowerCase();
 
-	console.log(`setBeforeUpload filePath: ${filePath}`);
-
 	const newFile = {
 		_id: uuid.v4(),
 		name,													// file name (include the extension)
@@ -182,13 +179,10 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 	// renaming the file full path (according to the encoded name)
 	fs.renameSync(file.path, newFile.filePath);
 
-	console.log('end setBeforeUpload ...', JSON.stringify(newFile, null, 4));
-
 	return newFile;
 }
 
 function returnFiles(files, path, tempPaths) {
-	console.log('upload files returnFiles path: ', path);
 	files = files.length ? files : [files];
 	// remove the file/zip file from the temporary uploads directory
 	fs.removeSync(path);
@@ -210,11 +204,9 @@ function returnFiles(files, path, tempPaths) {
 			}
 		});
 	} else {
-		console.log('this file is not a ZIP!');
 		files[0].fileData.zipPath = null;
-		console.log('zipPath: ', files[0].zipPath);
 	}
-	console.log('function returnFiles: ', JSON.stringify(files, null, 4));
+	console.log('returnFiles: ', JSON.stringify(files, null, 4));
 	return files;
 }
 

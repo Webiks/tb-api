@@ -52,7 +52,7 @@ function createThumbnail(buffer) {
 			.resize('x256')
 			.toBuffer('JPG', function (err, thumbnailBuffer) {
 				if (err) {
-					console.log(`getImageTiles ERROR: ${err}`);
+					console.error(`getImageTiles ERROR: ${err}`);
 					return reject(err);
 				}
 				const result = Buffer.isBuffer(thumbnailBuffer) ? thumbnailBuffer : new Buffer(thumbnailBuffer, 'binary');

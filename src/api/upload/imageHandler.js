@@ -13,7 +13,6 @@ class ImageHandler {
 
 	static getImageData(worldId, reqFiles, name, path, sourceType) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
-		console.log('starting get Image File data...');
 
 		if (files.length !== 0) {
 			const images = files.map(file => {

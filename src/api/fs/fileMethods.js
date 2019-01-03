@@ -46,6 +46,8 @@ const getFileTypeData = (reqType, sensorType) => {
 		format = 'SHAPEFILE';
 	}
 
+	console.log(`find sourceType: ${sourceType}`);
+
 	return {
 		fileType,
 		sourceType,
