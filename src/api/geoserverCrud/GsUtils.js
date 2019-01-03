@@ -57,7 +57,6 @@ class GsUtils {
 		return gsLayers.getStoreDataFromGeoserver(storeUrl)
 			.then(store => {
 				console.log('3. got Store Data...');
-				const storeName = worldLayer.geoserver.store.name;
 				// get the store data according to the layer's type
 				if (worldLayer.fileType === 'raster') {
 					console.log('GsUtils get RASTER data...');

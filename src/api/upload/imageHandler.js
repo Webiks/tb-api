@@ -4,7 +4,6 @@ const moment = require('moment');
 const fs = require('fs-extra');
 const { ansyn } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
-const { createNewLayer } = require('../databaseCrud/DbUtils');
 const { saveDataToDB, setFileData, setWorldLayer } = require('./uploadUtils');
 const getGeoDataFromPoint = require('../ansyn/getGeoData');
 const getDroneGeoData = require('../ansyn/getDroneGeoData');

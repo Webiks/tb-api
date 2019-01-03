@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const dbUtils = require('./DbUtils');
-const gsUtils = require('../geoserverCrud/GsUtils');
 const gsLayers = require('../geoserverCrud/GsLayers');
 const { geoserver } = require('../../../config/config');
 const configUrl = require('../../../config/serverConfig');

@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const { saveDataToDB, setFileData, setWorldLayer } = require('./uploadUtils');
-const { createNewLayer } = require('../databaseCrud/DbUtils');
 const gsUtils = require('../geoserverCrud/GsUtils');
 const configUrl = require('../../../config/serverConfig');
 
