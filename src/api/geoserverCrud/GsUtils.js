@@ -3,19 +3,15 @@ const gsLayers = require('./GsLayers');
 
 class GsUtils {
 	// 1. get the layer's info (resource)
-	static getLayerInfoFromGeoserver(worldLayer, worldId, layerName) {
-		return gsLayers.getLayerInfoFromGeoserver(worldId, layerName)
+	static getLayerInfoFromGeoserver(worldLayer, worldId) {
+		return gsLayers.getLayerInfoFromGeoserver(worldId, worldLayer.name)
 			.then(layerInfo => {
-				console.log('1. got Layer Info...' + JSON.stringify(layerInfo));
-				worldLayer = {
+				return {
 					...worldLayer,
 					geoserver: {
 						layer: layerInfo.layer
 					}
 				};
-				worldLayer.fileType = layerInfo.layer.type.toLowerCase();         // set the layer type
-				console.log('1. return worldLayer: ', JSON.stringify(worldLayer));
-				return worldLayer;
 			});
 	}
 
@@ -25,11 +21,9 @@ class GsUtils {
 			.then(layerDetails => {
 				// get the layer details data according to the layer's type
 				console.log('2. got Layer Details...');
-				console.log('2. worldLayer: ', JSON.stringify(worldLayer));
 				let data;
 				if (worldLayer.fileType === 'raster') {
 					data = parseLayerDetails(worldLayer, layerDetails.coverage);
-					console.log('getLayerDetailsFromGeoserver data: ', JSON.stringify(worldLayer.data));
 					data.metadata = { dirName: layerDetails.coverage.metadata.entry.$ };
 				}
 				else if (worldLayer.fileType === 'vector') {
@@ -53,9 +47,6 @@ class GsUtils {
 				const footprint = bboxPolygon(bbox);
 				console.log('getLayerDetailsFromGeoserver footprint: ', JSON.stringify(footprint));
 				worldLayer.geoData = { droneCenter, footprint, centerPoint, bbox, isGeoRegistered: true };
-				console.log('getLayerDetailsFromGeoserver geoData: ', JSON.stringify(worldLayer.geoData));
-
-				console.log('2. return worldLayer: ', JSON.stringify(worldLayer));
 
 				return worldLayer;
 			});
@@ -66,7 +57,6 @@ class GsUtils {
 		return gsLayers.getStoreDataFromGeoserver(storeUrl)
 			.then(store => {
 				console.log('3. got Store Data...');
-				const storeName = worldLayer.geoserver.store.name;
 				// get the store data according to the layer's type
 				if (worldLayer.fileType === 'raster') {
 					console.log('GsUtils get RASTER data...');
@@ -77,43 +67,42 @@ class GsUtils {
 							namespace: store.coverageStore.connectionParameters.entry.$
 						}
 					};
-					worldLayer.filePath = store.coverageStore.url;                          // for the file path
-					console.log('GsUtils RASTER url = ', worldLayer.filePath);
-					worldLayer.format = store.coverageStore.type.toUpperCase();       			// set the format
+
+					worldLayer.fileData.filePath = store.coverageStore.url;                 // the url of the geoserver data_dir/upload
+
 				}
 				else if (worldLayer.fileType === 'vector') {
 					console.log('GsUtils get VECTOR data...');
 					worldLayer.geoserver.store = store.dataStore;
 					// translate map to an object
+					const url = store.dataStore.connectionParameters.entry.find(entry => entry['@key'] === 'url').$;
+					console.log(`vector url: ${url}`);
+
+					const namespace = store.dataStore.connectionParameters.entry.find(entry => entry['@key'] === 'namespace').$;
+					console.log(`vector namespace: ${namespace}`);
+
 					worldLayer.geoserver.store = {
 						connectionParameters: {
-							namespace: store.dataStore.connectionParameters.entry[0].$,
-							url: store.dataStore.connectionParameters.entry[1].$
+							namespace,
+							url
 						}
 					};
-					worldLayer.filePath = worldLayer.geoserver.store.connectionParameters.url;        // for the file path
-					console.log('GsUtils VECTOR url = ', worldLayer.filePath);
-					worldLayer.format = store.dataStore.type.toUpperCase();           			// set the format
+
+					worldLayer.fileData.filePath = worldLayer.geoserver.store.connectionParameters.url;        // the temp upload url (in tb-api/src/api/upload)
+					// comment: after uploading vectors to s3 - need to change this filePath
 				}
 				else {
 					return worldLayer;
 				}
 
-				// set the file name
-				const path = worldLayer.filePath;
-				console.log('GsUtils store name: ', storeName);
-				const extension = path.substring(path.lastIndexOf('.'));
-				worldLayer.fileName = `${storeName}${extension}`;
-				console.log('GsUtils fileName: ', worldLayer.fileName);
 				// return the world-layer with all the data from GeoServer
-				console.log('3. return worldLayer: ', JSON.stringify(worldLayer));
 				return worldLayer;
 			});
 	}
 
-	static getAllLayerData(worldLayer, worldId, layerName){
-		const {geoserver} = require('../../../config/config');
-		return this.getLayerInfoFromGeoserver(worldLayer,worldId, layerName)
+	static getAllLayerData(worldLayer, worldId) {
+		const { geoserver } = require('../../../config/config');
+		return this.getLayerInfoFromGeoserver(worldLayer, worldId)
 			.then(layerInfo => {
 				// 2. get the layer's details
 				return this.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);

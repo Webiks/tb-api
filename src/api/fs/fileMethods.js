@@ -12,14 +12,14 @@ const getOptions = (uploadPath) => {
 	};
 };
 
-const findFileTypeAndSource = (reqType, sensorType) => {
-	const extension = (reqType).split('/')[1].toLowerCase();
+const getFileTypeData = (reqType, sensorType) => {
 	let sourceType = null;
 	let fileType;
+	let format = (reqType).split('/')[1].toUpperCase();
 
+	// find the source type
 	if (sensorType) {
 		const sensor = sensorType.toLowerCase();
-		// find the source type
 		if (sensor.includes('mobile')) {
 			sourceType = 'mobile';
 		}
@@ -29,28 +29,29 @@ const findFileTypeAndSource = (reqType, sensorType) => {
 		else if (sensor.includes('satellite')) {
 			sourceType = 'satellite';
 		}
-		// find the file type
-		if (sensor.includes('geotiff')) {
+	}
+
+	// find the file type and format
+	if (reqType.includes('image/')) {
+		if (reqType.includes('tiff')) {
 			fileType = 'raster';
+			format = 'GEOTIFF';
 		}
-		else if (sensor.includes('imagery')) {
+		else {
 			fileType = 'image';
-		}
-	} else {
-		// find the file type
-		if (extension.includes('tif')) {
-			fileType = 'raster';
-		}
-		else if (extension === 'jpg' || extension === 'jpeg') {
-			fileType = 'image';
-		}	else {
-			fileType = 'vector';
 		}
 	}
+	else {
+		fileType = 'vector';
+		format = 'SHAPEFILE';
+	}
+
+	console.log(`find sourceType: ${sourceType}`);
 
 	return {
 		fileType,
-		sourceType
+		sourceType,
+		format
 	};
 };
 
@@ -70,4 +71,4 @@ const createDirSync = (dirPath) => {
 	}
 };
 
-module.exports = { getOptions, findFileTypeAndSource, createDirSync };
+module.exports = { getOptions, getFileTypeData, createDirSync };

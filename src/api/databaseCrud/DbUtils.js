@@ -87,7 +87,7 @@ class DbUtils{
 						layerId: layer._id,
 						layerName: layer.name,
 						type: layer.fileType,
-						path: layer.filePath
+						path: layer.fileData.filePath
 					};
 				} else {
 					return {

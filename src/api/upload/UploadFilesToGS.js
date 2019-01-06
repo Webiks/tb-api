@@ -8,7 +8,7 @@ const {
 	layerSrsUpdate,
 	sendToTask,
 	updateTaskField,
-	executeFileToGeoserver,
+	executeFileToGeoserver
 } = require('../geoserverCrud/curlMethods');
 
 // upload files to GeoServer
@@ -16,7 +16,7 @@ class UploadFilesToGS {
 
 	static uploadFile(workspaceName, reqFiles, name, path) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
-		console.log('starting to uploadFile to GeoServer...');
+		console.log('starting to uploadFile to GeoServer...', files.length);
 		console.log('uploadFile PATH: ', path);
 		const fileType = files[0].fileType.toLowerCase();
 		let taskMap = new Map();
@@ -25,7 +25,7 @@ class UploadFilesToGS {
 			// 1. create the JSON files with the desire workspace
 			let importJSON = {};
 
-			console.log('files Type: ' + fileType);
+			console.log('files Type: ', fileType);
 			if (fileType === 'raster') {
 				importJSON = createImportObject(workspaceName);
 			} else {
@@ -44,9 +44,6 @@ class UploadFilesToGS {
 					console.log('check the state of each task... ');
 					importObj.tasks.map(task => {
 						console.log(`task ${task.id} state = ${task.state}`);
-						// get the task object and map it into the taskMap object
-						setTaskMap(importObj.id, task.id);
-
 						if (task.state !== 'READY') {
 							// check the state's error and fix it
 							if (task && task.state === 'NO_CRS') {
@@ -56,12 +53,18 @@ class UploadFilesToGS {
 								updateTaskField(updateLayerJson, importObj.id, task.id, 'layer');
 							} else {
 								console.log('something is wrong with the file!');
-								files = [];
+								files = null;
 							}
 						}
 					});
 					if (files.length !== 0) {
+						// 1. upload the files to GeoServer
 						files = uploadToGeoserver(importObj.id);
+
+						// 2. get the layer name from the task object
+						const task = getTaskObj(importObj.id, 0);
+						const layerName = task.layer.name;
+						files.forEach(file => file.layerName = layerName);
 					}
 				}
 				// 3b. for RASTERS only: POST the files to the tasks list, in order to create an import task for it
@@ -70,22 +73,24 @@ class UploadFilesToGS {
 
 					if (!rasterTasks) {
 						console.log('something is wrong with the file!');
-						files = [];
+						files = null;
 					} else {
-						// get the task object and map it into the taskMap object
+						// 1. get the task object and map it into the taskMap object
 						rasterTasks = rasterTasks.length ? rasterTasks : [rasterTasks];
 						rasterTasks.forEach(task => setTaskMap(importObj.id, task.id));
+
+						// 2. upload the files to GeoServer
 						files = uploadToGeoserver(importObj.id);
+
+						// 3. get the layer name from the completed task object
+						files.forEach(file => file.layerName = getLayerNameFromTask(file, importObj.id));
 					}
 				}
 			} else {
 				console.log('something is wrong with the JSON file!');
-				files = [];
+				files = null;
 			}
 
-			// get the layer name from the completed task object
-			files = files.map(file => getLayerNameFromTask(file, importObj.id));
-			console.log('return files: ' + JSON.stringify(files, null, 4));
 			return files;
 		}
 
@@ -101,8 +106,6 @@ class UploadFilesToGS {
 		// get the task object and map it into the taskMap object
 		function setTaskMap(importObjId, taskId) {
 			const task = getTaskObj(importObjId, taskId);
-			console.log(`setTaskMap file name: ${task.data.file}`);
-			console.log(`setTaskMap task ID: ${task.id}`);
 			taskMap.set(task.data.file, task.id);
 			console.log(`${task.data.file} task id = ${taskMap.get(task.data.file)}`);
 		}
@@ -110,24 +113,16 @@ class UploadFilesToGS {
 		// get the layer name from the completed task object
 		function getLayerNameFromTask(file, importObjId) {
 			const taskId = taskMap.get(file.encodeFileName);
-			console.log(`taskId = ${taskId}`);
 			const task = getTaskObj(importObjId, taskId);
 			console.log(`getLayerNameFromTask task: ${JSON.stringify(task)}`);
-			return {
-				...file,
-				geoserver: {
-					layer: {
-						name: task.layer.name
-					}
-				}
-			};
+			return task.layer.name;
 		}
 
 		// get the vector's Id of the SHP file
 		// function uploadGSToS3(zipFiles,sourceType){
 		// 	let vectorId = null;
 		// 	if (zipFiles[0].fileType === 'vector') {
-		// 		const shpFile = zipFiles.filter(file => file.fileExtension.toLowerCase() === '.shp');
+		// 		const shpFile = zipFiles.find(file => file.fileExtension === '.shp');
 		// 		vectorId = shpFile[0]._id;
 		// 	}
 		// 	// upload the files to S3 amazon storage

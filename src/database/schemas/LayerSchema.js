@@ -197,9 +197,10 @@ const fileData = {
 	size: Number,                           // MB or KB
 	fileCreatedDate: Date | String,					// the file created date
 	fileUploadDate: Date | String,				  // the upload file date
-	fileExtension: String,
-	filePath: String,
+	fileExtension: { $type: String, lowercase: true },
+	format: { $type: String, uppercase: true },
 	encodeFileName: String,									// the encoded file name (differ when there is special charecters in the name)
+	filePath: String,												// the encoded upload file path
 	zipPath: String									 				// the zip path of the upload vector (for removing it later)
 };
 
@@ -370,14 +371,11 @@ const geoserver = {
 // create the World-Layer Schema
 const LayerSchema = new Schema({
 	_id: String ,         				  	 						 // get the id from uuid function
-	name: String,                                  // from GeoServer
-	fileName: String,
-	filePath: String,
-	createdDate: Number,													 // the file created date in number
+	name: String,                                  // image = the encoded name, GeoServer = the layer name
+	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
+	createdDate: Number,													 // the file created date as a number
 	displayUrl: String,														 // S3's url to display the layer: JPG = the image Url, Geotiff = the wmts request Url
 	thumbnailUrl: String,
-	fileType: { $type: String, lowercase: true, enum: ['raster', 'vector', 'image'] },
-	format: { $type: String, uppercase: true, enum: ['GEOTIFF', 'SHAPEFILE', 'JPEG'] },
 	fileData,
 	imageData,
 	geoData,

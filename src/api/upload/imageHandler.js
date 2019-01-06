@@ -2,9 +2,9 @@ const exif = require('exif-parser');
 const exiftool = require('exiftool');
 const moment = require('moment');
 const fs = require('fs-extra');
-const {ansyn} = require('../../../config/config');
+const { ansyn } = require('../../../config/config');
 const uploadToS3 = require('../s3/uploadToS3');
-const {createNewLayer} = require('../databaseCrud/DbUtils');
+const { saveDataToDB, setFileData, setWorldLayer } = require('./uploadUtils');
 const getGeoDataFromPoint = require('../ansyn/getGeoData');
 const getDroneGeoData = require('../ansyn/getDroneGeoData');
 
@@ -13,7 +13,6 @@ class ImageHandler {
 
 	static getImageData(worldId, reqFiles, name, path, sourceType) {
 		let files = reqFiles.length ? reqFiles : [reqFiles];
-		console.log('starting to uploadFile to FS...');
 
 		if (files.length !== 0) {
 			const images = files.map(file => {
@@ -22,14 +21,14 @@ class ImageHandler {
 				console.log('1. set FileData: ' + JSON.stringify(fileData, null, 4));
 
 				// 2. set the world-layer data
-				let worldLayer = setWorldLayer(file, file._id, fileData, file.filePath);
+				const worldLayer = setWorldLayer(file, fileData);
 				console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer, null, 4));
 
 				// get 2 promised simultaneously:
 				// A. get the image data
-				const buffer = fs.readFileSync(file.encodePathName);
+				const buffer = fs.readFileSync(file.filePath);
 				// 3. get ALL the metadata of the image file (including the drone-cesium service)
-				const imageData = getMetadata(worldLayer, file.encodePathName, buffer)
+				const imageData = getMetadata(worldLayer, file.filePath, buffer)
 					.then(metadata => {
 						console.log(`3. include Metadata: ${JSON.stringify(metadata, null, 4)}`);
 						// update the sourceType if it's empty
@@ -42,12 +41,12 @@ class ImageHandler {
 							}
 						}
 						// 4. set the geoData of the image file
-						const geoData = setGeoData({...metadata});
+						const geoData = setGeoData({ ...metadata });
 						console.log(`4. include Geodata: ${JSON.stringify(geoData, null, 4)}`);
 
 						// 5. set the inputData of the image file
-						const inputData = setInputData({...geoData});
-						const newFile = {...inputData};
+						const inputData = setInputData({ ...geoData });
+						const newFile = { ...inputData };
 						console.log(`5. include Inputdata: ${JSON.stringify(newFile, null, 4)}`);
 
 						// 6. get the real footprint of the Drone's image from cesium (for Drone's images only)
@@ -68,18 +67,17 @@ class ImageHandler {
 				// save ALL the image data to mongo DataBase
 				return Promise.all([imageData, s3Upload])
 					.then(file => {
-						file = [...file];
-						const filePath = file[1].filePath ? file[1].filePath : file[0].filePath;
-						const displayUrl = filePath;
+						const filePath = file[1].filePath ? file[1].filePath : null;
 						const thumbnailUrl = file[1].thumbnailUrl ? file[1].thumbnailUrl : null;
+						file[0].fileData.filePath = filePath ? filePath : file[0].fileData.filePath;
+
 						file = {
 							...file[0],
-							filePath,
-							displayUrl,
+							displayUrl: filePath,
 							thumbnailUrl
 						};
 						console.log(`save to mongoDB(file): ${JSON.stringify(file, null, 4)}`);
-						return saveDataToDB(file);
+						return saveDataToDB(file, worldId);
 					})
 					.catch(err => {
 						console.log(err);
@@ -94,48 +92,6 @@ class ImageHandler {
 			return [];
 		}
 		// ============================================= Private Functions =================================================
-		// save all the image date in mongo Database and return the new layer is succeed
-		function saveDataToDB(savedFile) {
-			return createNewLayer(savedFile, worldId)
-				.then(newLayer => {
-					console.log('createNewLayer OK!');
-					return newLayer;
-				})
-				.catch(error => {
-					console.error('ERROR createNewLayer: ', error);
-					return null;
-				});
-		}
-
-		// set the File Data from the ReqFiles
-		function setFileData(file) {
-			return {
-				name: file.name,
-				size: file.size,
-				fileUploadDate: file.fileUploadDate,
-				fileExtension: file.fileExtension,
-				filePath: file.filePath,
-				encodeFileName: file.encodeFileName,
-				splitPath: null
-			};
-		}
-
-		// set the world-layer main fields
-		function setWorldLayer(file, id, fileData, filePath) {
-			const name = (file.name).split('.')[0];
-
-			return {
-				_id: id,
-				name,
-				fileName: file.name,
-				filePath,
-				fileType: file.fileType,
-				format: 'JPEG',
-				fileData,
-				inputData: file.inputData
-			};
-		}
-
 		// get the metadata of the image file
 		function getMetadata(file, filePath, buffer) {
 			let imageData;
@@ -220,7 +176,7 @@ class ImageHandler {
 					file.fileData.fileCreatedDate = imageData.createDate;
 					file.createdDate = Date.parse((file.fileData.fileCreatedDate));
 
-					resolve({...file, imageData});
+					resolve({ ...file, imageData });
 				});
 			});
 		}
@@ -238,21 +194,21 @@ class ImageHandler {
 			}
 			let geoData = getGeoDataFromPoint(centerPoint, footPrintPixelSize);
 			geoData.isGeoRegistered = false;
-			geoData = {...geoData, centerPoint};
+			geoData = { ...geoData, centerPoint };
 			console.log('setGeoData: ', JSON.stringify(geoData));
-			return {...layer, geoData};
+			return { ...layer, geoData };
 		}
 
 		function setInputData(layer) {
 			layer.inputData.flightAltitude = layer.imageData.GPSAltitude ? layer.imageData.GPSAltitude : 0;
 			layer.inputData.sensor.model = layer.imageData.Model ? layer.imageData.Model.trim().toUpperCase() : null;
 			layer.inputData.sensor.maker = layer.imageData.Make ? layer.imageData.Make.trim().toUpperCase() : null;
-			if (!layer.inputData.sensor.name){
-				if (layer.inputData.sensor.maker && layer.inputData.sensor.model){
+			if (!layer.inputData.sensor.name) {
+				if (layer.inputData.sensor.maker && layer.inputData.sensor.model) {
 					layer.inputData.sensor.name = `${layer.inputData.sensor.maker}_${layer.inputData.sensor.model}`;
 				}
 			}
-			return {...layer};
+			return { ...layer };
 		}
 	}
 }
