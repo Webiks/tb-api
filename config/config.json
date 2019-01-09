@@ -6,7 +6,7 @@
 	"remote": {
 		"localDomain": "http://127.0.0.1",
 		"domain": "http://tb-server.webiks.com",
-		"droneDomain": "http://drone-geo-referencer.webiks.com//v1/api/",
+		"droneDomain": "http://drone-geo-referencer.webiks.com/v1/api/",
 		"gsDatadir": "D:/GeoServer/data_dir"
 	},
 	"s3config": {
