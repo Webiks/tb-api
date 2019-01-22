@@ -1,6 +1,5 @@
+FROM exiftool
 FROM node
-
-RUN apt install libimage-exiftool-perl
 
 COPY . .
 
