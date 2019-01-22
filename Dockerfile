@@ -1,4 +1,4 @@
-FROM exiftool
+FROM dylansm/exiftool
 FROM node
 
 COPY . .
