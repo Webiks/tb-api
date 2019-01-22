@@ -1,7 +1,6 @@
 language: node_js
 
 node_js:
-- '9'
 - 'node'
 
 install:
@@ -13,6 +12,19 @@ cache:
 
 script:
 - npm run lint
+- sh -x scripts/build.sh $REPO $TRAVIS_COMMIT
+
+before_deploy:
+- docker --version
+- pip install --user awscli # install aws cli w/o sudo
+- export PATH=$PATH:$HOME/.local/bin # put aws in the path
+
+deploy:
+- provider: script
+  script: sh -x scripts/deploy.sh $REPO $TRAVIS_COMMIT $CLUSTER $SERVICE $AWS_REGION
+  skip_cleanup: true
+  on:
+    branch: master
 
 notifications:
   email: false

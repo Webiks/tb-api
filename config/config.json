@@ -20,9 +20,9 @@
 		"bucketName": "tb-webiks"
 	},
 	"mongodb": {
-		"port": 27017,
-		"name": "tb_database",
-		"url": "mongodb://127.0.0.1:27017"
+		"port": 85,
+		"name": "tb",
+		"url": "mongodb://ansyn.webiks.com:85"
 	},
 	"login":	{
 		"usernameKey": "TB_USERNAME",
