@@ -1,4 +1,6 @@
-FROM buildkite/puppeteer
+FROM node
+
+RUN apt install libimage-exiftool-perl
 
 COPY . .
 
