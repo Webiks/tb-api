@@ -3,7 +3,7 @@ const { getFileTypeData } = require('../../src/api/fs/fileMethods');
 const getImageData = require('../../src/api/upload/getImageData');
 const uploadPath = `${__dirname.replace(/\\/g, '/')}/public/uploads/`;
 
-function uploadImage(req, res) {
+function uploadImageNew(req, res) {
 	let file = JSON.parse(JSON.stringify(req.files.uploads));
 	let { fields } = req;
 	let worldId = (fields.sharing || upload.defaultWorldId).toLowerCase();
@@ -94,6 +94,12 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 	fs.renameSync(file.path, newFile.filePath);
 
 	return newFile;
+}
+
+function uploadImage(req, res) {
+	console.log('uploadImage controller req BODY: ', req.body);
+	console.log('uploadImage controller req FILES uploads: ', req.files.uploads);
+	res.json({ message: 'Not implemented yet' });
 }
 
 module.exports = {
