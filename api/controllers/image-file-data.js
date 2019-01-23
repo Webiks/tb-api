@@ -37,7 +37,7 @@ const imageFileData = (req, res) => {
 	const { buffer } = req.files.file[0];
 	exiftoolParsing(buffer)
 		.then((result) => res.json(result))
-		.catch((err) => res.status(500).json({ error: 'err' }));
+		.catch((err) => res.status(500).json({ error: err.message }));
 };
 
 module.exports = { imageFileData };

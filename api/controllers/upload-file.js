@@ -1,3 +1,4 @@
+/*
 const { upload } = require('../../config/config');
 const { getFileTypeData } = require('../../src/api/fs/fileMethods');
 const getImageData = require('../../src/api/upload/getImageData');
@@ -95,6 +96,7 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 
 	return newFile;
 }
+*/
 
 function uploadImage(req, res) {
 	console.log('uploadImage controller req BODY: ', req.body);
