@@ -1,5 +1,5 @@
 {
-	"x-swagger-router-controller": "ansyn",
+	"x-swagger-router-controller": "upload-file",
 
 	"post": {
 		"tags": ["Ansyn"],
@@ -33,6 +33,7 @@
 				"description": "the sensor's name",
 				"in": "formData",
 				"type": "string",
+				"enum": ["Phantom 3", "Phantom 4", "Phantom 4 Advanced", "Phantom 4 Pro", "Mavic", "Mavic Pro", "Mavic 2", "Spark", "Inspire"],
 				"required": false
 			},
 			{

@@ -3,16 +3,9 @@ const fetch = require('../../src/api/ansyn/fetchLayers');
 const layerModel = require('../../src/database/schemas/LayerSchema');
 
 module.exports = {
-	uploadImage,
 	fetchLayers,
 	layerById
 };
-
-function uploadImage(req, res) {
-	console.log('uploadImage controller req BODY: ', req.body);
-	console.log('uploadImage controller req FILES uploads: ', req.files.uploads);
-	res.json({ message: 'Not implemented yet' });
-}
 
 function fetchLayers(req, res) {
 	console.log('fetchLayers...');

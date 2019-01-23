@@ -1,0 +1,84 @@
+{
+  "x-swagger-router-controller": "image-file-data",
+  "post": {
+    "tags": [
+      "Image"
+    ],
+    "description": "Image data.",
+    "operationId": "imageFileData",
+    "consumes": [
+      "multipart/form-data"
+    ],
+    "parameters": [
+      {
+        "name": "file",
+        "description": "image file",
+        "in": "formData",
+        "type": "file",
+        "required": true
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Upload Success",
+        "schema": {
+          "type": "object",
+          "required": [
+            "GPSLatitude",
+            "GPSLongitude",
+            "ExifImageWidth",
+            "ExifImageHeight",
+            "relativeAltitude",
+            "gimbalRollDegree",
+            "gimbalYawDegree",
+            "gimbalPitchDegree",
+            "fieldOfView"
+          ],
+          "properties": {
+            "GPSLatitude": {
+              "type": ["number", "null"]
+            },
+            "GPSLongitude": {
+              "type": ["number", "null"]
+            },
+            "ExifImageWidth": {
+              "type": ["number", "null"]
+            },
+            "ExifImageHeight": {
+              "type": ["number", "null"]
+            },
+            "relativeAltitude": {
+              "type": ["number", "null"]
+            },
+            "gimbalRollDegree": {
+              "type": ["number", "null"]
+            },
+            "gimbalYawDegree": {
+              "type": ["number", "null"]
+            },
+            "gimbalPitchDegree": {
+              "type": ["number", "null"]
+            },
+            "fieldOfView": {
+              "type": ["number", "null"]
+            }
+          }
+        }
+      },
+      "default": {
+        "description": "Error",
+        "schema": {
+          "type": "object",
+          "required": [
+            "error"
+          ],
+          "properties": {
+            "error": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
