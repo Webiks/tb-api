@@ -2,7 +2,7 @@ const AdmZip = require('adm-zip');
 const uuid = require('uuid');
 const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
-const imageHandler = require('./imageHandler');
+const getImageData = require('./getImageData');
 const geoserverHandle = require('./geoserverHandler');
 const { getFileTypeData } = require('../fs/fileMethods');
 
@@ -107,7 +107,7 @@ const uploadFiles = (req, res) => {
 function uploadHandler(res, worldId, reqFiles, name, path, tempPaths, sourceType) {
 	if (reqFiles.fileType === 'image') {
 		// get all the image data and save it in mongo Database
-		imageHandler.getImageData(worldId, reqFiles, name, path, sourceType)
+		getImageData(worldId, reqFiles, name, path, sourceType)
 			.then(files => res.send(returnFiles(files, path, tempPaths)));
 	} else {
 		// upload the file to GeoServer and save all the data in mongo Database
