@@ -1,5 +1,5 @@
 {
-	"x-swagger-router-controller": "ansyn",
+	"x-swagger-router-controller": "upload-file",
 
 	"post": {
 		"tags": ["Ansyn"],
