@@ -23,6 +23,9 @@
 		},
 		"/ansyn/layers/{id}": {
 			"$ref": "./ansyn/layerById.json"
+		},
+		"/image-data": {
+			"$ref": "./image-file-data/image-file-data.json"
 		}
 	}
 }

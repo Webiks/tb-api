@@ -98,4 +98,4 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 
 module.exports = {
 	uploadImage
-}
+};

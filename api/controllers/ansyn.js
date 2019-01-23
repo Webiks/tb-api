@@ -7,9 +7,6 @@ module.exports = {
 	layerById
 };
 
-
-
-
 function fetchLayers(req, res) {
 	console.log('fetchLayers...');
 	fetch(req.body)
