@@ -6,9 +6,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const $RefParser = require('json-schema-ref-parser');
-const { mongodb, appPort, paths } = require('./config/config');
-const { domain } = require('./config/serverConfig');
-
+const { mongodb, appPort, paths, remote: { baseUrl } } = require('./config/config');
+const domain = `${baseUrl}:${appPort}`;
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');

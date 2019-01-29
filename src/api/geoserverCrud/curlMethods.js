@@ -1,7 +1,7 @@
 const { execSync } = require('child_process');          // for using the cURL command line
-const { geoserver } = require('../../../config/config');
-const configUrl = require('../../../config/serverConfig');
-
+const { geoserver, remote } = require('../../../config/config');
+const reqImportCurl = `${remote.baseUrl}:${geoserver.port}/${geoserver.imports}`;
+const baseWorkspacesUrlGeoserver = `${remote.baseUrl}:${geoserver.port}/${geoserver.workspaces}`;
 // // setting the cURL commands line (name and password, headers, request url)
 const baseCurl = geoserver.baseCurl;
 const curlContentTypeHeader = '-H "Content-type:application/json"';
@@ -78,7 +78,7 @@ function layerSrsUpdate() {
 // CREATE a new workspace in geoserver
 function createNewWorkspaceInGeoserver(workspaceJsonFile) {
 	console.log('Creating a new Workspace using the cURL...');
-	const curl_createWorkspace = `${baseCurl} -XPOST ${curlContentTypeHeader} -d "${workspaceJsonFile}" ${configUrl.baseWorkspacesUrlGeoserver}`;
+	const curl_createWorkspace = `${baseCurl} -XPOST ${curlContentTypeHeader} -d "${workspaceJsonFile}" ${baseWorkspacesUrlGeoserver}`;
 	console.log('succeed to create a new workspace in geoserver...' + curl_createWorkspace);
 	return execSync(curl_createWorkspace);
 }
@@ -86,7 +86,7 @@ function createNewWorkspaceInGeoserver(workspaceJsonFile) {
 // UPDATE the workspace's name in geoserver
 function updateWorkspaceInGeoserver(workspaceName, newName) {
 	console.log('Updateing Workspace\'s name using the cURL...');
-	const curl_updateWorkspace = `${baseCurl} -XPUT ${configUrl.baseWorkspacesUrlGeoserver}/${workspaceName} ${curlAcceptHeader} ${curlContentTypeHeader} -d "{ \"name\": \"${newName}\" }"`;
+	const curl_updateWorkspace = `${baseCurl} -XPUT ${baseWorkspacesUrlGeoserver}/${workspaceName} ${curlAcceptHeader} ${curlContentTypeHeader} -d "{ \"name\": \"${newName}\" }"`;
 	console.log(`succeed to update ${workspaceName} workspace to ${newName} ... ${curl_updateWorkspace}`);
 	return execSync(curl_updateWorkspace);
 }
@@ -94,7 +94,7 @@ function updateWorkspaceInGeoserver(workspaceName, newName) {
 // DELETE a workspace from geoserver
 function deleteWorkspaceFromGeoserver(workspaceName) {
 	console.log(`Deleting ${workspaceName} Workspace using the cURL...`);
-	const curl_deleteWorkspace = `${baseCurl} -XDELETE ${configUrl.baseWorkspacesUrlGeoserver}/${workspaceName}?recurse=true ${curlAcceptHeader} ${curlContentTypeHeader}`;
+	const curl_deleteWorkspace = `${baseCurl} -XDELETE ${baseWorkspacesUrlGeoserver}/${workspaceName}?recurse=true ${curlAcceptHeader} ${curlContentTypeHeader}`;
 	console.log('succeed to delete workspace ' + curl_deleteWorkspace + ' from geoserver');
 	return execSync(curl_deleteWorkspace);
 }
@@ -108,7 +108,7 @@ function deleteWorkspaceFromGeoserver(workspaceName) {
 function postImportObj(importJson) {
 	// the importer will return an import object (in Vectors - also will prepare the tasks automatically)
 	console.log('Upload File using the cURL...');
-	const curl_createEmptyImport = `${baseCurl} -XPOST ${curlContentTypeHeader} -d "${importJson}" ${configUrl.reqImportCurl}`;
+	const curl_createEmptyImport = `${baseCurl} -XPOST ${curlContentTypeHeader} -d "${importJson}" ${reqImportCurl}`;
 	console.log('step 1 is DONE...' + curl_createEmptyImport);
 	const importJSON = execSync(curl_createEmptyImport);
 	console.log('importJSON: ' + importJSON);
@@ -123,7 +123,7 @@ function postImportObj(importJson) {
 
 function getImportObj(importId) {
 	// get the import file
-	const curl_getImport = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}`;
+	const curl_getImport = `${baseCurl} -XGET ${reqImportCurl}/${importId}`;
 	console.log('Get the import object...' + curl_getImport);
 	const importJSON = execSync(curl_getImport);
 	const importObj = IsJsonOK(importJSON);
@@ -138,7 +138,7 @@ function getImportObj(importId) {
 
 function getDataObj(importId) {
 	// get the Data file
-	const curl_getTask = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}/data`;
+	const curl_getTask = `${baseCurl} -XGET ${reqImportCurl}/${importId}/data`;
 	console.log('Get the task object...' + curl_getTask);
 	const taskJSON = execSync(curl_getTask);
 	const task = IsJsonOK(taskJSON);
@@ -153,7 +153,7 @@ function getDataObj(importId) {
 
 function getFileObj(importId, fileName) {
 	// get the File data
-	const curl_getTask = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}/data/files/${fileName}`;
+	const curl_getTask = `${baseCurl} -XGET ${reqImportCurl}/${importId}/data/files/${fileName}`;
 	console.log('Get the task object...' + curl_getTask);
 	const taskJSON = execSync(curl_getTask);
 	const task = IsJsonOK(taskJSON);
@@ -168,7 +168,7 @@ function getFileObj(importId, fileName) {
 
 function getTaskObj(importId, taskId) {
 	// get the task file
-	const curl_getTask = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}/tasks/${taskId}`;
+	const curl_getTask = `${baseCurl} -XGET ${reqImportCurl}/${importId}/tasks/${taskId}`;
 	console.log('Get the task object...', curl_getTask);
 	const taskJSON = execSync(curl_getTask);
 	const task = IsJsonOK(taskJSON);
@@ -183,7 +183,7 @@ function getTaskObj(importId, taskId) {
 
 function getLayerObj(importId, taskId) {
 	// get the layer file
-	const curl_getLayer = `${baseCurl} -XGET ${configUrl.reqImportCurl}/${importId}/tasks/${taskId}/layer`;
+	const curl_getLayer = `${baseCurl} -XGET ${reqImportCurl}/${importId}/tasks/${taskId}/layer`;
 	console.log('Get the layer object...' + curl_getLayer);
 	const layerJSON = execSync(curl_getLayer);
 	const layerObj = IsJsonOK(layerJSON);
@@ -197,28 +197,28 @@ function getLayerObj(importId, taskId) {
 
 function updateImportById(updateImportJson, importId) {
 	// update the import Json file by ID
-	const curl_updateImport = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateImportJson}" ${configUrl.reqImportCurl}/${importId}`;
+	const curl_updateImport = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateImportJson}" ${reqImportCurl}/${importId}`;
 	console.log('updateFormat: ' + curl_updateImport);
 	return execSync(curl_updateImport);
 }
 
 function updateImportField(updateImportJson, importId, fieldName) {
 	// update the import Field
-	const curl_updateImport = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateImportJson}" ${configUrl.reqImportCurl}/${importId}/${fieldName}`;
+	const curl_updateImport = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateImportJson}" ${reqImportCurl}/${importId}/${fieldName}`;
 	console.log('updateFormat: ' + curl_updateImport);
 	return execSync(curl_updateImport);
 }
 
 function updateTaskById(updateTaskJson, importId, taskId) {
 	// update the task in the import Json file by ID
-	const curl_updateTask = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateTaskJson}" ${configUrl.reqImportCurl}/${importId}/tasks/${taskId}`;
+	const curl_updateTask = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateTaskJson}" ${reqImportCurl}/${importId}/tasks/${taskId}`;
 	console.log('updateTask: ' + curl_updateTask);
 	return execSync(curl_updateTask);
 }
 
 function updateTaskField(updateTaskJson, importId, taskId, fieldName) {
 	// update the task field in the import Json file
-	const curl_updateTask = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateTaskJson}" ${configUrl.reqImportCurl}/${importId}/tasks/${taskId}/${fieldName}`;
+	const curl_updateTask = `${baseCurl} -XPUT ${curlContentTypeHeader} -d "${updateTaskJson}" ${reqImportCurl}/${importId}/tasks/${taskId}/${fieldName}`;
 	console.log('updateTask: ' + curl_updateTask);
 	return execSync(curl_updateTask);
 }
@@ -229,7 +229,7 @@ function sendToTask(filepath, filename, importId) {
 	const curlFileData = `-F name=${filename} -F filedata=@${filepath}`;
 	console.log('sendToTask: curlFileData: ' + curlFileData);
 
-	const curl_postToTaskList = `${baseCurl} ${curlFileData} ${configUrl.reqImportCurl}/${importId}/tasks`;
+	const curl_postToTaskList = `${baseCurl} ${curlFileData} ${reqImportCurl}/${importId}/tasks`;
 	console.log('sendToTask: curl_postToTaskList: ' + curl_postToTaskList);
 	const taskJson = execSync(curl_postToTaskList);
 	console.log('taskJSON: ' + taskJson);
@@ -251,7 +251,7 @@ function sendToTask(filepath, filename, importId) {
 
 function executeFileToGeoserver(importId) {
 	// execute the import task
-	const curl_execute = `${baseCurl} -XPOST ${configUrl.reqImportCurl}/${importId}`;
+	const curl_execute = `${baseCurl} -XPOST ${reqImportCurl}/${importId}`;
 	const execute = execSync(curl_execute);
 	console.log('The execute is DONE...', execute);
 	console.log('DONE!');
@@ -259,7 +259,7 @@ function executeFileToGeoserver(importId) {
 
 function deleteUncompleteImports() {
 	// delete the task from the importer queue
-	const curl_deletsTasks = `${baseCurl} -XDELETE ${curlAcceptHeader} ${curlContentTypeHeader} ${configUrl.reqImportCurl}`;
+	const curl_deletsTasks = `${baseCurl} -XDELETE ${curlAcceptHeader} ${curlContentTypeHeader} ${reqImportCurl}`;
 	const deleteTasks = execSync(curl_deletsTasks);
 	console.log('Delete task from the Importer...' + deleteTasks);
 	console.log('DONE!');
