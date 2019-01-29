@@ -3,8 +3,8 @@ const router = express.Router();
 
 const dbUtils = require('./DbUtils');
 const gsLayers = require('../geoserverCrud/GsLayers');
-const { geoserver } = require('../../../config/config');
-const configUrl = require('../../../config/serverConfig');
+const { geoserver, remote } = require('../../../config/config');
+const baseUrlGeoserver = `${remote.baseUrl}:${geoserver.port}/${geoserver.path}`;
 
 const model = 'layerModel';
 
@@ -124,7 +124,7 @@ router.get('/geoserver/:worldId', (req, res) => {
 
 // get Capabilities XML file - WMTS Request for display the selected layer
 router.get('/geoserver/wmts/:worldId/:layerName', (req, res) => {
-	const capabilitiesUrl = `${configUrl.baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
+	const capabilitiesUrl = `${baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
 	console.log('geo LAYER SERVER: start GetCapabilities url = ', capabilitiesUrl);
 	gsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
 		.then(response => res.send(response))

@@ -2,7 +2,8 @@ const fs = require('fs-extra');
 const UploadFilesToGS = require('./UploadFilesToGS');
 const { saveDataToDB, setFileData, setWorldLayer } = require('./uploadUtils');
 const gsUtils = require('../geoserverCrud/GsUtils');
-const configUrl = require('../../../config/serverConfig');
+const { geoserver, remote } = require('../../../config/config');
+const baseUrlGeoserver = `${remote.baseUrl}:${geoserver.port}/${geoserver.path}`;
 
 // upload files to the File System
 class GeoserverHandler {
@@ -33,7 +34,7 @@ class GeoserverHandler {
 
 					// 2. set the world-layer data
 					const worldLayer = setWorldLayer(file, fileData);
-					worldLayer.displayUrl = `${configUrl.baseUrlGeoserver}/${worldId}/wms`;
+					worldLayer.displayUrl = `${baseUrlGeoserver}/${worldId}/wms`;
 					worldLayer.createdDate = new Date(fileData.fileCreatedDate).getTime();
 					console.log('2. worldLayer include Filedata: ', JSON.stringify(worldLayer, null, 4));
 
