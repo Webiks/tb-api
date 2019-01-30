@@ -98,12 +98,12 @@ function setBeforeUpload(file, typeData, uploadPath, fields) {
 }
 */
 
-function uploadImage(req, res) {
+function addLayer(req, res) {
 	console.log('uploadImage controller req BODY: ', req.body);
 	console.log('uploadImage controller req FILES uploads: ', req.files.uploads);
 	res.json({ message: 'Not implemented yet' });
 }
 
 module.exports = {
-	uploadImage
+	addLayer
 };

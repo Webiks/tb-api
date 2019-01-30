@@ -1,9 +1,9 @@
 module.exports = {
-  'x-swagger-router-controller': 'layerId',
+  'x-swagger-router-controller': 'addLayer',
   post: {
     tags: ['Layers'],
     description: 'Upload image file.',
-    operationId: 'uploadImage',
+    operationId: 'addLayer',
     consumes: ['multipart/form-data'],
     parameters: [
       {

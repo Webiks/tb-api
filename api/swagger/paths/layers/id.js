@@ -1,9 +1,9 @@
 module.exports = {
-  'x-swagger-router-controller': 'layerId',
+  'x-swagger-router-controller': 'layers',
   get: {
     tags: ['Layers'],
     description: 'Get layer by id',
-    operationId: 'layerById',
+    operationId: 'fetchLayer',
     parameters: [
       {
         name: 'id',

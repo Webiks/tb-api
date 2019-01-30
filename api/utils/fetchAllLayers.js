@@ -1,8 +1,8 @@
-const layerModel = require('../../database/schemas/LayerSchema');
-const worldModel = require('../../database/schemas/WorldSchema');
-const DBManger = require('../../database/DBManager');
+const layerModel = require('../../src/database/schemas/LayerSchema');
+const worldModel = require('../../src/database/schemas/WorldSchema');
+const DBManger = require('../../src/database/DBManager');
 
-const fetchLayers = ({ worldName, geometry, dates, queries = [] }) => {
+const fetchAllLayers = ({ worldName, geometry, dates, queries = [] }) => {
 	if (!DBManger.isConnected()) {
 		return Promise.reject(new Error('No connection for mongodb!'));
 	}
@@ -35,4 +35,4 @@ const _findLayers = (layersId, $geometry, $gt, $lt, parsedQueries) => {
 	});
 };
 
-module.exports = fetchLayers;
+module.exports = fetchAllLayers;
