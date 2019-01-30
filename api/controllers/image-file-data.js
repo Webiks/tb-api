@@ -34,6 +34,7 @@ const exiftoolParsing = (buffer) => {
 };
 
 const imageFileData = (req, res) => {
+	console.log('what?')
 	const { buffer } = req.files.file[0];
 	exiftoolParsing(buffer)
 		.then((result) => res.json(result))
