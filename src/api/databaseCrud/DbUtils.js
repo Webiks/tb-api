@@ -69,7 +69,7 @@ class DbUtils{
 		console.log(`start remove world... ${worldId}, layersId: ${layersId}`);
 		return dbWorldCrud.remove({ _id: worldId })
 			.then(() => {
-				// remove the world's layers if non of them exist in another worlds
+				// remove the world's layer if non of them exist in another worlds
 				layersId.forEach(layerId => this.findAndRemoveLayer(layerId, worldId));
 			})
 			.then(() => `succeed to delete ${worldId} world!`);

@@ -361,7 +361,7 @@ const imageData = {
 	lightValue: Number
 */
 
-// field for GeoServer layers
+// field for GeoServer layer
 const geoserver = {
 	layer,
 	store,

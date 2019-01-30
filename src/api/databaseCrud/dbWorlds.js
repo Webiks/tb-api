@@ -72,7 +72,7 @@ router.put('/:worldName', (req, res) => {
 		});
 });
 
-// update a single field in the World (passing the world's id + layers the new value of the field in the req.body)
+// update a single field in the World (passing the world's id + layer the new value of the field in the req.body)
 router.put('/:worldName/:fieldName', (req, res) => {
 	console.log(`db WORLD SERVER: start to UPDATE-FIELD world ${req.params.worldName}`);
 	const entityId = { _id: req.body['_id'] };

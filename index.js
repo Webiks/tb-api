@@ -5,58 +5,54 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const $RefParser = require('json-schema-ref-parser');
 const { mongodb, appPort, paths, remote: { baseUrl } } = require('./config/config');
 const domain = `${baseUrl}:${appPort}`;
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
+const swagger = require('./api/swagger/index.js');
 
-$RefParser.dereference('./api/swagger/swagger.json')
-	.then(results => {
-		const app = express();
-		const config = {
-			appRoot: __dirname,
-			swagger: results
-		};
+const app = express();
+const config = {
+	appRoot: __dirname,
+	swagger
+};
 
-		SwaggerExpress.create(config, function (err, swaggerExpress) {
-			if (err) {
-				throw err;
-			}
+SwaggerExpress.create(config, function (err, swaggerExpress) {
+	if (err) {
+		throw err;
+	}
 
-			/* swaggerUi */
-			app.use(SwaggerUi(swaggerExpress.runner.swagger, { swaggerUi: paths.swaggerUi }));
-			swaggerExpress.register(app);
+	/* swaggerUi */
+	app.use(SwaggerUi(swaggerExpress.runner.swagger, { swaggerUi: paths.swaggerUi }));
+	swaggerExpress.register(app);
 
-			app.listen(appPort, () => {
-				console.log(`Swagger-ui available on ${appPort}, on: ${domain}${paths.swaggerUi}`);
-			});
+	app.listen(appPort, () => {
+		console.log(`Swagger-ui available on ${appPort}, on: ${domain}${paths.swaggerUi}`);
+	});
 
-			/* v1 api - no swagger */
+	/* v1 api - no swagger */
 
-			// DB Connection URL
-			const url = `${mongodb.url}/${mongodb.name}`;
+	// DB Connection URL
+	const url = `${mongodb.url}/${mongodb.name}`;
 
-			// start the connection to the mongo Database
-			DBManager.connect(url).catch(() => {
-				console.log('No connection for mongo!');
-			});
-			app.use(cors({ credentials: true, origin: true }));
-			app.use(bodyParser.json());
+	// start the connection to the mongo Database
+	DBManager.connect(url).catch(() => {
+		console.log('No connection for mongo!');
+	});
+	app.use(cors({ credentials: true, origin: true }));
+	app.use(bodyParser.json());
 
-			app.use(session({
-				secret: 'keyboard cat',
-				resave: false,
-				saveUninitialized: true,
-				cookie: {
-					secure: false
-				}
-			}));
+	app.use(session({
+		secret: 'keyboard cat',
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			secure: false
+		}
+	}));
 
-			app.use('/login', login);
-			app.use('/v1/api', api);
-		});
-	})
-	.catch(err =>  console.log(err));
+	app.use('/login', login);
+	app.use('/v1/api', api);
+});
 
