@@ -1,6 +1,6 @@
 const axios = require('axios');
-const { upload } = require('../../../config/config');
-const configUrl = require('../../../config/serverConfig');
+const { upload, geoserver, remote } = require('../../../config/config');
+const baseWorkspacesUrlGeoserver = `${remote.baseUrl}:${geoserver.port}/${geoserver.workspaces}`;
 
 const authorization = upload.headers.authorization;
 
@@ -10,7 +10,7 @@ class GsLayers {
 	// ==============
 	// get a list of all the layers of the world from geoserver by REST api
 	static getWorldLayerListFromGeoserver(worldName) {
-		const urlGetLayers = `${configUrl.baseWorkspacesUrlGeoserver}/${worldName}/layers.json`;
+		const urlGetLayers = `${baseWorkspacesUrlGeoserver}/${worldName}/layers.json`;
 		console.log(`GsLayers: start GET-ALL world's layers from Geoserver...${urlGetLayers}`);
 		return axios.get(urlGetLayers, { headers: { authorization } })
 			.then(response => response.data)
@@ -21,7 +21,7 @@ class GsLayers {
 
 	// get the layer type & resource info ("layer" field - type ILayerDetails) from geoserver by REST api
 	static getLayerInfoFromGeoserver(worldName, layerName) {
-		const urlGetLayer = `${configUrl.baseWorkspacesUrlGeoserver}/${worldName}/layers/${layerName}.json`;
+		const urlGetLayer = `${baseWorkspacesUrlGeoserver}/${worldName}/layers/${layerName}.json`;
 		console.log('GsLayers: start GET LAYER INFO url = ', urlGetLayer);
 		return axios.get(urlGetLayer, { headers: { authorization } })
 			.then(response => response.data)
