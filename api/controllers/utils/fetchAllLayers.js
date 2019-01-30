@@ -1,6 +1,6 @@
-const layerModel = require('../../src/database/schemas/LayerSchema');
-const worldModel = require('../../src/database/schemas/WorldSchema');
-const DBManger = require('../../src/database/DBManager');
+const layerModel = require('../../../src/database/schemas/LayerSchema');
+const worldModel = require('../../../src/database/schemas/WorldSchema');
+const DBManger = require('../../../src/database/DBManager');
 
 const fetchAllLayers = ({ worldName, geometry, dates, queries = [] }) => {
 	if (!DBManger.isConnected()) {

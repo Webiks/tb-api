@@ -26,7 +26,6 @@
     "mongod": "^2.0.0",
     "mongodb": "^3.1.1",
     "mongoose": "^5.2.4",
-    "swagger-express-mw": "^0.7.0",
     "swagger-tools": "^0.10.4",
     "uuid": "^3.3.2"
   },

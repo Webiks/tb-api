@@ -1,6 +1,4 @@
 'use strict';
-const SwaggerExpress = require('swagger-express-mw');
-const SwaggerUi = require('swagger-tools/middleware/swagger-ui');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -10,23 +8,11 @@ const domain = `${baseUrl}:${appPort}`;
 const api = require('./src/api/index');
 const login = require('./src/login/index');
 const DBManager = require('./src/database/DBManager');
-const swagger = require('./api/swagger/index.js');
+const initSwagger = require('./api/swagger/init');
 
 const app = express();
-const config = {
-	appRoot: __dirname,
-	swagger
-};
 
-SwaggerExpress.create(config, function (err, swaggerExpress) {
-	if (err) {
-		throw err;
-	}
-
-	/* swaggerUi */
-	app.use(SwaggerUi(swaggerExpress.runner.swagger, { swaggerUi: paths.swaggerUi }));
-	swaggerExpress.register(app);
-
+initSwagger(app).then(() => {
 	app.listen(appPort, () => {
 		console.log(`Swagger-ui available on ${appPort}, on: ${domain}${paths.swaggerUi}`);
 	});

@@ -1,4 +1,4 @@
-const fetchAllLayers = require('../utils/fetchAllLayers');
+const fetchAllLayers = require('./utils/fetchAllLayers');
 const layerModel = require('../../src/database/schemas/LayerSchema');
 
 const fetchLayers = (req, res) => {
