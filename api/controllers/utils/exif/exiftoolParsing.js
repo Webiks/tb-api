@@ -1,4 +1,6 @@
 const exiftool = require('exiftool');
+const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
+const moment = require('moment');
 
 const deg2dec = (str) => {
 	if (!str) {
@@ -17,15 +19,18 @@ const exiftoolParsing = (buffer) => {
 				reject(err);
 			} else {
 				resolve({
-					GPSLatitude: +deg2dec(metadata.gpsLatitude),
-					GPSLongitude: +deg2dec(metadata.gpsLongitude),
-					ExifImageWidth: +metadata.imageWidth,
-					ExifImageHeight: +metadata.imageHeight,
-					relativeAltitude: +metadata.relativeAltitude,
-					gimbalRollDegree: +metadata.gimbalRollDegree,
-					gimbalYawDegree: +metadata.gimbalYawDegree,
-					gimbalPitchDegree: +metadata.gimbalPitchDegree,
-					fieldOfView: parseFloat(metadata.fieldOfView)
+					request: {
+						GPSLatitude: +deg2dec(metadata.gpsLatitude),
+						GPSLongitude: +deg2dec(metadata.gpsLongitude),
+						ExifImageWidth: +metadata.imageWidth,
+						ExifImageHeight: +metadata.imageHeight,
+						relativeAltitude: +metadata.relativeAltitude,
+						gimbalRollDegree: +metadata.gimbalRollDegree,
+						gimbalYawDegree: +metadata.gimbalYawDegree,
+						gimbalPitchDegree: +metadata.gimbalPitchDegree,
+						fieldOfView: parseFloat(metadata.fieldOfView)
+					},
+					date:  moment(metadata.createDate, exifDateFormat)
 				});
 			}
 		});

@@ -50,7 +50,7 @@ function createThumbnail(buffer) {
 	return new Promise((resolve, reject) => {
 		return gm(buffer)
 			.resize('x256')
-			.toBuffer('JPG', function (err, thumbnailBuffer) {
+			.toBuffer('JPEG', function (err, thumbnailBuffer) {
 				if (err) {
 					console.error(`getImageTiles ERROR: ${err}`);
 					return reject(err);

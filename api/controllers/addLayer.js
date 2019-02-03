@@ -160,7 +160,7 @@ const addLayer = async (req, res) => {
 
 	let result;
 	try {
-		switch(fields.sensorType){
+		switch (fields.sensorType) {
 			case sensorTypes.DroneImagery:
 				result = await droneImagery(fields);
 				break;
@@ -175,7 +175,7 @@ const addLayer = async (req, res) => {
 		}
 		res.json(result)
 	} catch (err) {
-		res.status(500).json({ error: err.message })
+		res.status(500).json({ error: err.message, _error: err })
 	}
 };
 
