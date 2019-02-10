@@ -26,6 +26,9 @@
 		},
 		"/image-data": {
 			"$ref": "./image-file-data/image-file-data.json"
+		},
+		"/geoserver/wmts/getCapabilities/{workspace}/{layer}": {
+			"$ref": "./geoserver/geoserver.json"
 		}
 	}
 }

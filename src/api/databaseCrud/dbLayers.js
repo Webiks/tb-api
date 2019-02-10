@@ -3,8 +3,7 @@ const router = express.Router();
 
 const dbUtils = require('./DbUtils');
 const gsLayers = require('../geoserverCrud/GsLayers');
-const { geoserver, remote } = require('../../../config/config');
-const baseUrlGeoserver = `${remote.baseUrl}:${geoserver.port}/${geoserver.path}`;
+const { geoserver } = require('../../../config/config');
 
 const model = 'layerModel';
 
@@ -118,19 +117,6 @@ router.get('/geoserver/:worldId', (req, res) => {
 		.catch(error => {
 			const consoleMessage = `db LAYER: GET-ALL from GeoServer ERROR!: ${error}`;
 			const sendMessage = `ERROR: there are no layers!: ${error}`;
-			dbUtils.handleError(res, 404, consoleMessage, sendMessage);
-		});
-});
-
-// get Capabilities XML file - WMTS Request for display the selected layer
-router.get('/geoserver/wmts/:worldId/:layerName', (req, res) => {
-	const capabilitiesUrl = `${baseUrlGeoserver}/${req.params.worldId}/${req.params.layerName}/${geoserver.wmtsServiceUrl}`;
-	console.log('geo LAYER SERVER: start GetCapabilities url = ', capabilitiesUrl);
-	gsLayers.getCapabilitiesFromGeoserver(capabilitiesUrl)
-		.then(response => res.send(response))
-		.catch(error => {
-			const consoleMessage = `db LAYER: GetCapabilities ERROR!: ${error}`;
-			const sendMessage = `ERROR: Capabilities XML file of ${req.params.layerName} can't be found!: ${error}`;
 			dbUtils.handleError(res, 404, consoleMessage, sendMessage);
 		});
 });
