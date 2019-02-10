@@ -27,7 +27,7 @@
 		"/image-data": {
 			"$ref": "./image-file-data/image-file-data.json"
 		},
-		"/geoserver/getCapabilities/{workspace}/{layer}": {
+		"/geoserver/wmts/getCapabilities/{workspace}/{layer}": {
 			"$ref": "./geoserver/geoserver.json"
 		}
 	}
