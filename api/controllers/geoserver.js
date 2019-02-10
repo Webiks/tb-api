@@ -1,5 +1,4 @@
 const axios = require('axios');
-
 const { geoserver } = require('../../config/config');
 
 const getCapabilities = (req, res) => {
