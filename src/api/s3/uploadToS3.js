@@ -47,7 +47,6 @@ function upload(fileType, fileKey, buffer) {
 }
 
 function createThumbnail(buffer) {
-<<<<<<< HEAD
 	return new Promise((resolve, reject) => {
 		return gm(buffer)
 			.resize('x256')
@@ -60,18 +59,6 @@ function createThumbnail(buffer) {
 				return resolve(result);
 			});
 	});
-=======
-	return new Promise((resolve, reject) => gm(buffer)
-		.resize('x256')
-		.toBuffer('JPG', function (err, thumbnailBuffer) {
-			if (err) {
-				console.error(`getImageTiles ERROR: ${err}`);
-				return reject(err);
-			}
-			const result = Buffer.isBuffer(thumbnailBuffer) ? thumbnailBuffer : new Buffer(thumbnailBuffer, 'binary');
-			return resolve(result);
-		}));
->>>>>>> c45881cc4b8fcd3e128eded7e83da702fa0a6ae6
 }
 
 function saveThumbnailToS3(thumbnailBuffer, fileKey, uploadUrl) {
