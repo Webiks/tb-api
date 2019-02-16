@@ -11,7 +11,7 @@ const getCapabilities = (req, res) => {
 			VERSION: '1.1.1'
 		}
 	}).then((capabilities) => {
-		res.send(capabilities.data)
+		res.send(capabilities.data);
 	}).catch((err) => {
 		console.log(err.message);
 		res.status(500).send({ error: err.message });

@@ -14,9 +14,7 @@ class GsLayers {
 		console.log(`GsLayers: start GET-ALL world's layers from Geoserver...${urlGetLayers}`);
 		return axios.get(urlGetLayers, { headers: { authorization } })
 			.then(response => response.data)
-			.catch(error => {
-				return handleError(error,`GET-ALL world's layers from Geoserver ERROR!: ${error}`);
-			});
+			.catch(error => handleError(error,`GET-ALL world's layers from Geoserver ERROR!: ${error}`));
 	}
 
 	// get the layer type & resource info ("layer" field - type ILayerDetails) from geoserver by REST api
@@ -25,9 +23,7 @@ class GsLayers {
 		console.log('GsLayers: start GET LAYER INFO url = ', urlGetLayer);
 		return axios.get(urlGetLayer, { headers: { authorization } })
 			.then(response => response.data)
-			.catch(error => {
-				return handleError(error,`Get Layer Info From Geoserver ERROR! layer ${layerName} can't be found!: ${error}`);
-			});
+			.catch(error => handleError(error,`Get Layer Info From Geoserver ERROR! layer ${layerName} can't be found!: ${error}`));
 	}
 
 	// get layer's details ("data" field - type ILayerDetails) from geoserver by REST api
@@ -36,9 +32,7 @@ class GsLayers {
 		console.log('GsLayers: GET LAYER DETAILS url: ', resourceUrl);
 		return axios.get(resourceUrl, { headers: { authorization } })
 			.then(response => response.data)
-			.catch(error => {
-				return handleError(error,`Get Layer Details From Geoserver ERROR!: ${error}`);
-			});
+			.catch(error => handleError(error,`Get Layer Details From Geoserver ERROR!: ${error}`));
 	}
 
 	// get the layer's store data ("store" field - type ILayerDetails) from geoserver by REST api
@@ -47,9 +41,7 @@ class GsLayers {
 		console.log('GsLayers: start GET STORE DATA url = ', storeUrl);
 		return axios.get(storeUrl, { headers: { authorization } })
 			.then(response => response.data)
-			.catch(error => {
-				return handleError(error,`Get Store Data From Geoserver ERROR!: ${error}`);
-			});
+			.catch(error => handleError(error,`Get Store Data From Geoserver ERROR!: ${error}`));
 	}
 
 	// get Capabilities XML file - WMTS Request for display the selected layer
@@ -57,9 +49,7 @@ class GsLayers {
 		console.log('GsLayers: start GET CAPABILITIES url = ', capabilitiesUrl);
 		return axios.get(capabilitiesUrl, { headers: { authorization } })
 			.then(response => response.data)
-			.catch(error => {
-				return handleError(error,`Get Capabilities From Geoserver ERROR!: ${error}`);
-			});
+			.catch(error => handleError(error,`Get Capabilities From Geoserver ERROR!: ${error}`));
 	}
 
 	// =================
@@ -73,9 +63,7 @@ class GsLayers {
 				console.log(`success to delete the layer! ${url}`);
 				return response.data;
 			})
-			.catch(error => {
-				return handleError(error, `DELETE layer From Geoserver ERROR!, url: ${url}, error: ${error}`);
-			});
+			.catch(error => handleError(error, `DELETE layer From Geoserver ERROR!, url: ${url}, error: ${error}`));
 	}
 }
 

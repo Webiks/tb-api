@@ -13,6 +13,7 @@
 		"semi": ["error", "always"],
 		"indent": ["error", "tab",  { "SwitchCase": 1 } ],
 		"no-console": "off",
-		"no-useless-escape": "off"
+		"no-useless-escape": "off",
+		"arrow-body-style": ["error", "as-needed"]
 	}
 }
