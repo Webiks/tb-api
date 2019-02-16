@@ -1,7 +1,7 @@
 {
   "x-swagger-router-controller": "geoserver",
   "get": {
-    "produces": ["text/html"],
+    "produces": ["text/xml"],
     "tags": ["Geo Server"],
     "description": "Get layer by id",
     "operationId": "getCapabilities",
