@@ -1,18 +1,16 @@
 const { createNewLayer } = require('../databaseCrud/DbUtils');
 
 // set the File Data from the ReqFiles
-const setFileData = (file) => {
-	return {
-		name: file.name,
-		size: file.size,
-		fileUploadDate: file.fileUploadDate,
-		fileExtension: file.fileExtension,
-		format: file.format,
-		filePath: file.filePath,
-		encodeFileName: file.encodeFileName,
-		splitPath: null
-	};
-};
+const setFileData = (file) => ({
+	name: file.name,
+	size: file.size,
+	fileUploadDate: file.fileUploadDate,
+	fileExtension: file.fileExtension,
+	format: file.format,
+	filePath: file.filePath,
+	encodeFileName: file.encodeFileName,
+	splitPath: null
+});
 
 // set the world-layer main fields
 const setWorldLayer = (file, fileData) => {
@@ -33,17 +31,15 @@ const setWorldLayer = (file, fileData) => {
 };
 
 // save all the image date in mongo Database and return the new layer is succeed
-const saveDataToDB = (savedFile, worldId) => {
-	return createNewLayer(savedFile, worldId)
-		.then(newLayer => {
-			console.log('createNewLayer OK!');
-			return newLayer;
-		})
-		.catch(error => {
-			console.error('ERROR createNewLayer: ', error);
-			return null;
-		});
-};
+const saveDataToDB = (savedFile, worldId) => createNewLayer(savedFile, worldId)
+	.then(newLayer => {
+		console.log('createNewLayer OK!');
+		return newLayer;
+	})
+	.catch(error => {
+		console.error('ERROR createNewLayer: ', error);
+		return null;
+	});
 
 module.exports = {
 	saveDataToDB,

@@ -9,29 +9,27 @@ const deg2dec = (str) => {
 	return nums.reduce((res, value, index) => res + (value / 60 ** index), 0);
 };
 
-const exiftoolParsing = (buffer) => {
-	return new Promise((resolve, reject) => {
-		exiftool.metadata(buffer, (err, metadata) => {
-			if (err) {
-				console.log(err);
-				reject(err);
-			} else {
-				resolve({
-					GPSLatitude: +deg2dec(metadata.gpsLatitude),
-					GPSLongitude: +deg2dec(metadata.gpsLongitude),
-					ExifImageWidth: +metadata.imageWidth,
-					ExifImageHeight: +metadata.imageHeight,
-					relativeAltitude: +metadata.relativeAltitude,
-					gimbalRollDegree: +metadata.gimbalRollDegree,
-					gimbalYawDegree: +metadata.gimbalYawDegree,
-					gimbalPitchDegree: +metadata.gimbalPitchDegree,
-					fieldOfView: parseFloat(metadata.fieldOfView)
-				});
-			}
-		});
-
+const exiftoolParsing = (buffer) => new Promise((resolve, reject) => {
+	exiftool.metadata(buffer, (err, metadata) => {
+		if (err) {
+			console.log(err);
+			reject(err);
+		} else {
+			resolve({
+				GPSLatitude: +deg2dec(metadata.gpsLatitude),
+				GPSLongitude: +deg2dec(metadata.gpsLongitude),
+				ExifImageWidth: +metadata.imageWidth,
+				ExifImageHeight: +metadata.imageHeight,
+				relativeAltitude: +metadata.relativeAltitude,
+				gimbalRollDegree: +metadata.gimbalRollDegree,
+				gimbalYawDegree: +metadata.gimbalYawDegree,
+				gimbalPitchDegree: +metadata.gimbalPitchDegree,
+				fieldOfView: parseFloat(metadata.fieldOfView)
+			});
+		}
 	});
-};
+
+});
 
 const imageFileData = (req, res) => {
 	const { buffer } = req.files.file[0];
