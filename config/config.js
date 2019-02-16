@@ -30,6 +30,7 @@ module.exports = {
 		passwordKey: 'TB_PASSWORD'
 	},
 	geoserver: {
+		url: 'http://geoserver.tb-server.webiks.com/geoserver',
 		port: 8080,
 		path: 'geoserver',
 		workspaces: 'geoserver/rest/workspaces',
@@ -39,7 +40,6 @@ module.exports = {
 			start: '?service=WMS&version=1.1.0&request=GetMap&transparent=true&layer=',
 			end: '&styles=&width=256&height=256&format=image/jpeg'
 		},
-		wmtsServiceUrl: 'gwc/service/wmts?SERVICE=wmts&REQUEST=getcapabilities&VERSION=1%2E0%2E0',
 		baseCurl: 'curl -u admin:geoserver'
 	},
 	upload: {

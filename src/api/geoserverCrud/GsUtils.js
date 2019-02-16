@@ -5,14 +5,12 @@ class GsUtils {
 	// 1. get the layer's info (resource)
 	static getLayerInfoFromGeoserver(worldLayer, worldId) {
 		return gsLayers.getLayerInfoFromGeoserver(worldId, worldLayer.name)
-			.then(layerInfo => {
-				return {
-					...worldLayer,
-					geoserver: {
-						layer: layerInfo.layer
-					}
-				};
-			});
+			.then(layerInfo => ({
+				...worldLayer,
+				geoserver: {
+					layer: layerInfo.layer
+				}
+			}));
 	}
 
 	// 2. get the layer's details
@@ -103,10 +101,10 @@ class GsUtils {
 	static getAllLayerData(worldLayer, worldId) {
 		const { geoserver } = require('../../../config/config');
 		return this.getLayerInfoFromGeoserver(worldLayer, worldId)
-			.then(layerInfo => {
+			.then(layerInfo =>
 				// 2. get the layer's details
-				return this.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href);
-			})
+				this.getLayerDetailsFromGeoserver(layerInfo, layerInfo.geoserver.layer.resource.href)
+			)
 			.then(layerDetails => {
 				const baseThumbnailUrl = `${worldLayer.displayUrl}${geoserver.wmsThumbnailParams.start}${layerDetails.geoserver.layer.resource.name}`;
 				const bbox = [

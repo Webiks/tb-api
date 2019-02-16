@@ -1,0 +1,40 @@
+{
+  "x-swagger-router-controller": "geoserver",
+  "get": {
+    "produces": ["text/xml"],
+    "tags": ["Geo Server"],
+    "description": "Get layer by id",
+    "operationId": "getCapabilities",
+    "parameters": [
+      {
+        "name": "workspace",
+        "description": "workspace",
+        "in": "path",
+        "type": "string",
+        "enum": ["public"],
+        "required": true
+      },
+      {
+        "name": "layer",
+        "description": "layer",
+        "in": "path",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Get layer By id",
+        "schema": {
+          "type": "object"
+        }
+      },
+      "default": {
+        "description": "Error",
+        "schema": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
