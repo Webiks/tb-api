@@ -173,9 +173,9 @@ const addLayer = async (req, res) => {
 			case sensorTypes.Satellite:
 				break;
 		}
-		res.json(result)
+		res.json(result);
 	} catch (err) {
-		res.status(500).json({ error: err.message, _error: err })
+		res.status(500).json({ error: err.message, _error: err });
 	}
 };
 

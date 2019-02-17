@@ -6,7 +6,7 @@ const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 const s3UploadFile = require('../utils/s3/S3UploadFile');
 
 const createThumbnail = (buffer) => new Promise((resolve, reject) => {
-	console.log('buffer' , buffer)
+	console.log('buffer' , buffer);
 	return gm(buffer)
 		.resize('x256')
 		.toBuffer((err, thumbnailBuffer) => {

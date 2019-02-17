@@ -1,7 +1,7 @@
 const swaggerTools = require('swagger-tools');
 const swaggerDoc = require('./config');
 
-const initSwagger = (app) => new Promise((resolve, reject) => {
+const initSwagger = (app) => new Promise((resolve) => {
 	swaggerTools.initializeMiddleware(swaggerDoc, (middleware) => {
 		app.use(middleware.swaggerMetadata());
 
