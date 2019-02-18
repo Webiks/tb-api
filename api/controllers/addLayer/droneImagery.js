@@ -44,7 +44,7 @@ const droneImagery = (file, workspace) => {
 			try {
 				const [cesiumRes, gdalRes] = await Promise.all([cesium, gdal]);
 				droneOverlay['footprint'] = geometry('MultiPolygon', [cesiumRes.bboxPolygon.geometry.coordinates]);
-				droneOverlay['bbox'] = cesiumRes.bboxPolygon.coordinates;
+				droneOverlay['bbox'] = cesiumRes.bboxPolygon.geometry.coordinates;
 				Object.assign(droneOverlay, await uploadToGeoserver(workspace, gdalRes.data, tiffName))
 			} catch (err) {
 				console.log('Error', err);

@@ -30,7 +30,7 @@ const uploadToGeoserver = (workspace, buffer, name) => {
 				}
 			}
 		});
-		rp(uploadImageTask).then(finalResp => {
+		return rp(uploadImageTask).then(finalResp => {
 			resp['fileType'] = finalResp.data.format;
 			return rp({
 				uri: finalResp.layer.href,
@@ -39,7 +39,7 @@ const uploadToGeoserver = (workspace, buffer, name) => {
 			}).then(({ layer }) => {
 				resp['bbox'] = layer.bbox;
 				resp['projection'] = layer.srs;
-				return resp;
+				return rp(Object.assign(baseOpt, {uri: baseTasks})).then( () => resp);
 			});
 		})
 	})
