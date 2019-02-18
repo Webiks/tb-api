@@ -16,7 +16,7 @@ module.exports = {
 				required: false
 			},
 			{
-				name: 'creditName ',
+				name: 'creditName',
 				description: 'name of credit',
 				in: 'formData',
 				type: 'string',
