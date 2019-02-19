@@ -26,7 +26,7 @@ initSwagger(app).then(() => {
 	DBManager.connect(url).catch(() => {
 		console.log('No connection for mongo!');
 	});
-	app.use(cors({ credentials: true, origin: true }));
+	app.use(cors());
 	app.use(bodyParser.json());
 
 	app.use(session({
