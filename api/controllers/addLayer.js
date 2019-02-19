@@ -5,20 +5,20 @@ const addLayer = async (req, res) => {
 	Object.entries(req.swagger.params).forEach(([key, value]) => {
 		fields[key] = value.value;
 	});
-	console.log('fields: ' , fields);
+	console.log('fields: ', fields);
 	const { file } = fields;
 	let overlay = {
 		name: file.originalname,
 		sensorType: fields.sensorType,
 		sensorName: fields.sensorName,
 		creditName: fields.creditName,
-		date: fields.date? new Date(fields.date) : new Date(),
+		date: fields.date ? new Date(fields.date) : new Date()
 	};
 	overlay['photoTime'] = overlay.date.toISOString();
 	try {
 		switch (fields.sensorType) {
 			case sensorTypes.DroneImagery:
-			 		Object.assign(overlay , await droneImagery(fields.file, fields.sharing));
+				Object.assign(overlay, await droneImagery(fields.file, fields.sharing));
 				break;
 			case sensorTypes.Mobile:
 

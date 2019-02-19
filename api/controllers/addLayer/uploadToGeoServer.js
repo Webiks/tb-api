@@ -4,7 +4,7 @@ const baseOpt = {
 	method: 'POST',
 	json: true,
 	headers: {
-		"Authorization": geoserver.Auth
+		'Authorization': geoserver.Auth
 	}
 };
 
@@ -34,15 +34,15 @@ const uploadToGeoserver = (workspace, buffer, name) => {
 			resp['fileType'] = finalResp.data.format;
 			return rp({
 				uri: finalResp.layer.href,
-				headers: { "Authorization": geoserver.Auth },
+				headers: { 'Authorization': geoserver.Auth },
 				json: true
 			}).then(({ layer }) => {
 				resp['bbox'] = layer.bbox;
 				resp['projection'] = layer.srs;
 				return rp(Object.assign(baseOpt, {uri: baseTasks})).then( () => resp);
 			});
-		})
-	})
+		});
+	});
 };
 
 module.exports = uploadToGeoserver;
