@@ -58,7 +58,7 @@ module.exports = {
 				name: 'date',
 				description: 'Layer date',
 				in: 'formData',
-				type: 'number',
+				type: 'string',
 				required: false
 			}
 		],

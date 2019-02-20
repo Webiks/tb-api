@@ -14,6 +14,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 	let resp = {
 		geoserver: {},
 		tag: {
+			name: '',
 			fileType: '',
 			bbox: {},
 			projection: '',
@@ -53,6 +54,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 		uri: finalResp.layer.href,
 	}, 'GET'));
 	console.log('layer', layer);
+	resp.tag.name = layer.name;
 	resp.tag.bbox = layer.bbox;
 	resp.tag.projection = layer.srs;
 	resp.tag.geoserver.layer.resource.name = `${workspace}:${layer.name}`;

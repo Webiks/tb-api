@@ -6,7 +6,7 @@ module.exports = {
 	remote: {
 		localDomain: 'http://127.0.0.1',
 		domain: 'http://tb-server.webiks.com',
-		baseUrl: process.env.NODE_ENV === 'production' ? 'http://tb-server.webiks.com' : 'http://127.0.0.1',
+		baseUrl: process.env.NODE_ENV === 'production' ? 'http://api.ansyn.webiks.com' : 'http://127.0.0.1',
 		droneDomain: 'http://drone-geo-referencer.ansyn.webiks.com/v1/api/',
 		gdal: 'http://jpg2tiff.ansyn.webiks.com/upload/'
 	},

@@ -26,8 +26,8 @@ initSwagger(app).then(() => {
 	DBManager.connect(url).catch(() => {
 		console.log('No connection for mongo!');
 	});
-	app.use(cors());
 	app.use(bodyParser.json());
+	app.use(cors());
 
 	app.use(session({
 		secret: 'keyboard cat',
@@ -37,7 +37,6 @@ initSwagger(app).then(() => {
 			secure: false
 		}
 	}));
-
 	app.use('/login', login);
 	app.use('/v1/api', api);
 });
