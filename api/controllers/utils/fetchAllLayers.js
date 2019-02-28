@@ -29,8 +29,8 @@ const _findLayers = (layersId, $geometry, $gt, $lt, parsedQueries) => {
 	}
 	return layerModel.find({
 		$or: layersId.map((_id) => ({ _id })),
-		'createdDate': { $gt, $lt },
-		'geoData.footprint.geometry': { $geoIntersects: { $geometry } },
+		'overlay.date': { $gt, $lt },
+		'overlay.footprint': { $geoIntersects: { $geometry } },
 		...parsedQueries
 	});
 };

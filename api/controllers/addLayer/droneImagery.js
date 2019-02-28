@@ -14,7 +14,7 @@ const droneImagery = async (_id, file, workspace) => {
 	const tiffName = droneOverlay._id;
 	const ext = name.substring(name.lastIndexOf('.'));
 	let { request: exifResult, date } = await exiftoolParsing(file.buffer);
-	droneOverlay['date'] = new Date(date);
+	droneOverlay.date = new Date(date).getTime();
 	droneOverlay['photoTime'] = droneOverlay.date.toISOString();
 	const invalidResult = Object.values(exifResult).some((value) => isNaN(value));
 	if (invalidResult) {

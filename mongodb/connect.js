@@ -3,6 +3,7 @@ const globals = require('../config/globals');
 const MongoClient = require('mongodb').MongoClient;
 const url = config.mongodb.url;
 const dbName = config.mongodb.name;
+const DBManager = require('../src/database/DBManager');
 
 const connectMongodb = () => {
 	MongoClient.connect(url, function(err, client) {
@@ -13,6 +14,11 @@ const connectMongodb = () => {
 			console.log(`Connected to mongodb on ${url}/${dbName}`);
 		}
 	});
+
+	DBManager.connect(`${url}/${dbName}`).catch(() => {
+		console.log('No connection for mongo!');
+	});
+
 };
 
 

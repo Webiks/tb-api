@@ -35,7 +35,7 @@ module.exports = {
 				description: 'the sensor\'s name',
 				in: 'formData',
 				type: 'string',
-				enum: ['Phantom 3', 'Phantom 4', 'Phantom 4 Advanced', 'Phantom 4 Pro', 'Mavic', 'Mavic Pro', 'Mavic 2', 'Spark', 'Inspire'],
+				// enum: ['Phantom 3', 'Phantom 4', 'Phantom 4 Advanced', 'Phantom 4 Pro', 'Mavic', 'Mavic Pro', 'Mavic 2', 'Spark', 'Inspire'],
 				required: true
 			},
 			{

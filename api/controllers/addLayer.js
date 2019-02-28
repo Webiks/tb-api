@@ -4,13 +4,8 @@ const config = require('../../config/config');
 const saveLayerOnDB = require('./utils/db/saveToDB');
 const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
 const uuid = require('uuid');
-const turf = require('@turf/turf');
 
-const _buildThumbnailUrl = (overlay) => {
-	const { bbox } = overlay.tag;
-	const BBOX = `${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}`;
-	return `${overlay.imageUrl}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fjpeg&TRANSPARENT=true&tiled=true&LAYERS=${overlay.tag.geoserver.layer.resource.name}&exceptions=application%2Fvnd.ogc.se_inimage&tilesOrigin=-57.710227986794244%2C-31.98336391045549&WIDTH=256&HEIGHT=256&SRS=${overlay.tag.projection}&STYLES=&BBOX=${BBOX}`;
-};
+const { buildThumbnailUrl, fetchBBOX } = require('./utils/geoserver');
 
 const addLayer = (req, res) => {
 	const _id = uuid();
@@ -19,23 +14,20 @@ const addLayer = (req, res) => {
 	Object.entries(req.swagger.params).forEach(([key, value]) => {
 		fields[key] = value.value;
 	});
-	console.log('fields: ', fields);
 	const { file } = fields;
+	const overlayDate = fields.date && !isNaN(fields.date) ? new Date(+fields.date) : new Date();
+
 	let overlay = {
+		id: _id,
 		name: file.originalname,
 		sensorType: fields.sensorType,
 		sensorName: fields.sensorName,
 		creditName: fields.creditName,
+		date: overlayDate.getTime(),
+		photoTime: overlayDate.toISOString(),
+		isGeoRegistered: true,
+
 	};
-	console.log('overlay' , overlay);
-	if(fields.date && !isNaN(fields.date)){
-		overlay['date'] = new Date(+fields.date);
-	}else{
-		overlay['date'] = new Date();
-	}
-	console.log('overlay date' , overlay.date);
-	overlay['photoTime'] = overlay.date.toISOString();
-	overlay.id = _id;
 
 	let promiseResp;
 
@@ -45,12 +37,13 @@ const addLayer = (req, res) => {
 		case sensorTypes.DroneImagery:
 			promiseResp = droneImagery(_id, fields.file, fields.sharing);
 			break;
-		case sensorTypes.Mobile:
-			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
-			break;
 
 		case sensorTypes.DroneMap:
-			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`);
+			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
+			break;
+
+		case sensorTypes.Mobile:
+			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
 			break;
 
 		case sensorTypes.Satellite:
@@ -58,20 +51,16 @@ const addLayer = (req, res) => {
 			break;
 	}
 
-	promiseResp.then(overlayResp => {
-		Object.assign(overlay, overlayResp);
+	promiseResp.then(uploads => {
+		overlay = { ...overlay, ...uploads };
 		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
-		overlay.thumbnailUrl = _buildThumbnailUrl(overlay);
-		if (!overlay.footprint) {
-			const { minx, miny, maxx, maxy } = overlay.tag.bbox;
-			const bboxPolygon = turf.bboxPolygon([minx, miny, maxx, maxy]);
-			overlay.footprint = turf.geometry('MultiPolygon', [bboxPolygon.geometry.coordinates]);
-		}
+		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
 		console.log('final overlay: ' , overlay);
 		saveLayerOnDB({ _id, overlay }, fields.sharing).then(() => {
 			console.log('finish upload layer');
 			res.json(overlay);
 		});
+
 	})
 		.catch(err => res.status(500).send(err.message));
 };

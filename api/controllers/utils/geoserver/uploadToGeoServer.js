@@ -17,7 +17,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 			fileType: '',
 			bbox: {},
 			projection: '',
-			geoserver: { layer: { resource: { name: '' } } },
+			geoserver: { layer: { resource: { name: '' } }, workspace },
 			imageData: {ExifImageHeight: 0, ExifImageWidth: 0}
 		}
 	};
@@ -50,10 +50,12 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 	let { layer } = await rp(createOption({
 		uri: finalResp.layer.href,
 	}, 'GET'));
+
 	resp.tag.name = layer.name;
 	resp.tag.bbox = layer.bbox;
 	resp.tag.projection = layer.srs;
 	resp.tag.geoserver.layer.resource.name = `${workspace}:${layer.name}`;
+
 	return resp;
 };
 
