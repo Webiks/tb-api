@@ -22,7 +22,7 @@ module.exports = {
 	},
 	mongodb: {
 		port: 85,
-		name: 'tb',
+		name: 'tb' || process.env.MONGO_DB,
 		url: 'mongodb://ansyn.webiks.com:85' || process.env.MONGO_URL 
 	},
 	login: {
