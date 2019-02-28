@@ -7,7 +7,7 @@ const dbName = config.mongodb.name;
 const connectMongodb = () => {
 	MongoClient.connect(url, function(err, client) {
 		if (err) {
-			console.log(`Failed to Connected to mongodb`)
+			console.log('Failed to Connected to mongodb');
 		} else {
 			globals.db = client.db(dbName);
 			console.log(`Connected to mongodb on ${url}/${dbName}`);
