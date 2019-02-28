@@ -8,7 +8,8 @@ const turf = require('@turf/turf');
 
 const _buildThumbnailUrl = (overlay) => {
 	const { bbox } = overlay.tag;
-	return `${overlay.imageUrl}?service=WMS&version=1.1.1&request=GetMap&transparent=true&layer=${overlay.tag.geoserver.layer.resource.name}&bbox=${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}&srs=${overlay.tag.projection}&width=256&height=256&format=image/jpeg`;
+	const BBOX = `${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}`;
+	return `${overlay.imageUrl}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fjpeg&TRANSPARENT=true&tiled=true&LAYERS=${overlay.tag.geoserver.layer.resource.name}&exceptions=application%2Fvnd.ogc.se_inimage&tilesOrigin=-57.710227986794244%2C-31.98336391045549&WIDTH=256&HEIGHT=256&SRS=${overlay.tag.projection}&STYLES=&BBOX=${BBOX}`
 };
 
 const addLayer = (req, res) => {
