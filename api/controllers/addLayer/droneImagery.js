@@ -1,13 +1,12 @@
 const rp = require('request-promise');
-const uuid = require('uuid');
 const { geometry } = require('@turf/turf');
 const { remote } = require('../../../config/config');
 const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
-const droneImagery = async (file, workspace) => {
+const droneImagery = async (_id, file, workspace) => {
 	const droneOverlay = {
-		_id: uuid(),
+		_id,
 		sensorType: 'Awesome Drone Imagery (GeoTIFF)',
 		isGeoRegistered: true,
 	};

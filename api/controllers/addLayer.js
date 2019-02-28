@@ -2,8 +2,12 @@ const sensorTypes = require('../swagger/config/paths/layer/sensorTypes');
 const droneImagery = require('./addLayer/droneImagery');
 const config = require('../../config/config');
 const createNewLayer = require('../../src/api/databaseCrud/createNewLayer');
+const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
+const uuid = require('uuid');
 
 const addLayer = (req, res) => {
+	const _id = uuid();
+
 	const fields = {};
 	Object.entries(req.swagger.params).forEach(([key, value]) => {
 		fields[key] = value.value;
@@ -27,14 +31,14 @@ const addLayer = (req, res) => {
 	let promiseResp;
 	switch (fields.sensorType) {
 		case sensorTypes.DroneImagery:
-			promiseResp = droneImagery(fields.file, fields.sharing);
+			promiseResp = droneImagery(_id, fields.file, fields.sharing);
 			break;
 		case sensorTypes.Mobile:
 			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
 			break;
 
 		case sensorTypes.DroneMap:
-			promiseResp = Promise.resolve({ type: 'DronMap' }); //TODO: implement Drone map upload
+			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`);
 			break;
 
 		case sensorTypes.Satellite:
