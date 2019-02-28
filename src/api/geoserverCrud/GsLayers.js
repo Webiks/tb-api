@@ -8,7 +8,7 @@ class GsLayers {
 	// ==============
 	//  GET Requests
 	// ==============
-	// get a list of all the layers of the world from geoserver by REST api
+	// get a list of all the layer of the world from geoserver by REST api
 	static getWorldLayerListFromGeoserver(worldName) {
 		const urlGetLayers = `${baseWorkspacesUrlGeoserver}/${worldName}/layers.json`;
 		console.log(`GsLayers: start GET-ALL world's layers from Geoserver...${urlGetLayers}`);

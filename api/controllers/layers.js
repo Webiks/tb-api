@@ -1,15 +1,9 @@
-'use strict';
-const fetch = require('../../src/api/ansyn/fetchLayers');
+const fetchAllLayers = require('./utils/fetchAllLayers');
 const layerModel = require('../../src/database/schemas/LayerSchema');
 
-module.exports = {
-	fetchLayers,
-	layerById
-};
-
-function fetchLayers(req, res) {
+const fetchLayers = (req, res) => {
 	console.log('fetchLayers...');
-	fetch(req.body)
+	fetchAllLayers(req.body)
 		.then(layers => {
 			console.log('fetchLayers success:', layers.length);
 			res.json(layers);
@@ -18,9 +12,9 @@ function fetchLayers(req, res) {
 			console.log('fetchLayers failed:', error.message);
 			res.status(500).json({ message: error.message });
 		});
-}
+};
 
-function layerById(req, res) {
+const fetchLayer = (req, res) => {
 	console.log(req.swagger.params.id.value);
 	layerModel.findOne({ _id: req.swagger.params.id.value })
 		.then(layer => {
@@ -36,4 +30,9 @@ function layerById(req, res) {
 			console.log('layerById failed:', error.message);
 			res.status(500).json({ message: 'failed to find layer' });
 		});
-}
+};
+
+module.exports = {
+	fetchLayers,
+	fetchLayer
+};
