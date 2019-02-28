@@ -17,6 +17,7 @@ const fetchBBOX = (overlay) => rp({
 	json: true,
 	headers
 }).then(({ coverage: { latLonBoundingBox: bbox, nativeBoundingBox } }) => {
+	nativeBoundingBox.crs = nativeBoundingBox.crs.$ || nativeBoundingBox.crs;
 	const { minx, miny, maxx, maxy } = bbox;
 	const footprint = turf.bboxPolygon([minx, miny, maxx, maxy]).geometry;
 	const tag = {...overlay.tag, bbox, nativeBoundingBox };
