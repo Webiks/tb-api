@@ -11,19 +11,17 @@ const buildThumbnailUrl = (overlay) => {
 
 const _fetchBBOXuri = ({ id, tag }) => `http://localhost:8080/geoserver/rest/workspaces/${tag.geoserver.workspace}/coveragestores/${id}.tiff/coverages/${tag.name}.json`;
 
-const fetchBBOX = (overlay) => {
-	return rp({
-		uri: _fetchBBOXuri(overlay),
-		method: 'GET',
-		json: true,
-		headers
-	}).then(({ coverage: { latLonBoundingBox: bbox } }) => {
-		const { minx, miny, maxx, maxy } = bbox;
-		const footprint = turf.bboxPolygon([minx, miny, maxx, maxy]).geometry;
-		const tag = {...overlay.tag, bbox };
-		return { ...overlay, footprint, tag };
-	});
-}
+const fetchBBOX = (overlay) => rp({
+	uri: _fetchBBOXuri(overlay),
+	method: 'GET',
+	json: true,
+	headers
+}).then(({ coverage: { latLonBoundingBox: bbox } }) => {
+	const { minx, miny, maxx, maxy } = bbox;
+	const footprint = turf.bboxPolygon([minx, miny, maxx, maxy]).geometry;
+	const tag = {...overlay.tag, bbox };
+	return { ...overlay, footprint, tag };
+});
 
 
 module.exports = { buildThumbnailUrl, fetchBBOX };
