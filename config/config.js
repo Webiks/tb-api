@@ -37,8 +37,8 @@ module.exports = {
 		getLayerUrl: 'api/gsLayers/layer',
 		Auth: `Basic ${Buffer.from('admin:geoserver').toString('base64')}`,
 		wmsThumbnailParams: {
-			start: '?service=WMS&version=1.1.0&request=GetMap&transparent=true&layer=',
-			end: '&styles=&width=256&height=256&format=image/jpeg'
+			start: '?service=WMS&version=1.1.1&request=GetMap&transparent=true&layer=',
+			end: 'width=256&height=256&format=image/jpeg'
 		},
 		baseCurl: 'curl -u admin:geoserver'
 	},

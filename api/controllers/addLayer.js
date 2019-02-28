@@ -1,9 +1,15 @@
 const sensorTypes = require('../swagger/config/paths/layer/sensorTypes');
 const droneImagery = require('./addLayer/droneImagery');
 const config = require('../../config/config');
-const createNewLayer = require('../../src/api/databaseCrud/createNewLayer');
+const saveLayerOnDB = require('./utils/db/saveToDB');
 const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
 const uuid = require('uuid');
+const turf = require('@turf/turf');
+
+const _buildThumbnailUrl = (overlay) => {
+	const { bbox } = overlay.tag;
+	return `${overlay.imageUrl}?service=WMS&version=1.1.1&request=GetMap&transparent=true&layer=${overlay.tag.geoserver.layer.resource.name}&bbox=${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}&srs=${overlay.tag.projection}&width=256&height=256&format=image/jpeg`;
+};
 
 const addLayer = (req, res) => {
 	const _id = uuid();
@@ -28,7 +34,12 @@ const addLayer = (req, res) => {
 	}
 	console.log('overlay date' , overlay.date);
 	overlay['photoTime'] = overlay.date.toISOString();
+	overlay.id = _id;
+
 	let promiseResp;
+
+	console.log(`Upload ${fields.sensorType}`);
+
 	switch (fields.sensorType) {
 		case sensorTypes.DroneImagery:
 			promiseResp = droneImagery(_id, fields.file, fields.sharing);
@@ -48,12 +59,18 @@ const addLayer = (req, res) => {
 
 	promiseResp.then(overlayResp => {
 		Object.assign(overlay, overlayResp);
-		overlay['imageUrl'] = `${config.geoserver.url}/${fields.sharing}/wms`;
-		const { bbox } = overlayResp.tag.bbox;
-		overlay['thumbnailUrl'] `${overlay.imageUrl}?${config.geoserver.wmsThumbnailParams.start}&bbox=${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}&srs=${overlay.tag.projection}${config.geoserver.wmsThumbnailParams.end}`;
+		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
+		overlay.thumbnailUrl = _buildThumbnailUrl(overlay);
+		if (!overlay.footprint) {
+			const { minx, miny, maxx, maxy } = overlay.tag.bbox;
+			const bboxPolygon = turf.bboxPolygon([minx, miny, maxx, maxy]);
+			overlay.footprint = turf.geometry('MultiPolygon', [bboxPolygon.geometry.coordinates]);
+		}
 		console.log('final overlay: ' , overlay);
-		createNewLayer(overlay, fields.sharing);
-		return res.json(overlay);
+		saveLayerOnDB({ _id, overlay }, fields.sharing).then(() => {
+			console.log('finish upload layer');
+			res.json(overlay);
+		});
 	})
 		.catch(err => res.status(500).send(err.message));
 };

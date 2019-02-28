@@ -7,8 +7,8 @@ const { mongodb, appPort, paths, remote: { baseUrl } } = require('./config/confi
 const domain = `${baseUrl}:${appPort}`;
 const api = require('./src/api/index');
 const login = require('./src/login/index');
-const DBManager = require('./src/database/DBManager');
 const initSwagger = require('./api/swagger/init');
+const connectMongodb = require('./mongodb/connect');
 
 const app = express();
 
@@ -20,12 +20,15 @@ initSwagger(app).then(() => {
 	/* v1 api - no swagger */
 
 	// DB Connection URL
-	const url = `${mongodb.url}/${mongodb.name}`;
+	// const url = `${mongodb.url}/${mongodb.name}`;
+	connectMongodb();
 
 	// start the connection to the mongo Database
-	DBManager.connect(url).catch(() => {
-		console.log('No connection for mongo!');
-	});
+
+	// DBManager.connect(url).catch(() => {
+	// 	console.log('No connection for mongo!');
+	// });
+
 	app.use(bodyParser.json());
 	app.use(cors());
 
