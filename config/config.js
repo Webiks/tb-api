@@ -6,7 +6,7 @@ module.exports = {
 	remote: {
 		localDomain: 'http://127.0.0.1',
 		domain: 'http://tb-server.webiks.com',
-		baseUrl: process.env.NODE_ENV === 'production' ? 'http://tb-server.webiks.com' : 'http://127.0.0.1',
+		baseUrl: process.env.GEO_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'http://tb-server.webiks.com' : 'http://127.0.0.1'),
 		droneDomain: 'http://drone-geo-referencer.webiks.com/v1/api/',
 		gsDatadir: 'D:/GeoServer/data_dir'
 	},
@@ -22,8 +22,8 @@ module.exports = {
 	},
 	mongodb: {
 		port: 85,
-		name: 'tb' || process.env.MONGO_DB,
-		url: 'mongodb://ansyn.webiks.com:85' || process.env.MONGO_URL 
+		name: process.env.MONGO_DB || 'tb',
+		url: process.env.MONGO_URL || 'mongodb://ansyn.webiks.com:85' 
 	},
 	login: {
 		usernameKey: 'TB_USERNAME',
