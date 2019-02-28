@@ -6,9 +6,10 @@ module.exports = {
 	remote: {
 		localDomain: 'http://127.0.0.1',
 		domain: 'http://tb-server.webiks.com',
-		baseUrl: process.env.NODE_ENV === 'production' ? 'http://api.ansyn.webiks.com' : 'http://127.0.0.1',
-		droneDomain: 'http://drone-geo-referencer.ansyn.webiks.com/v1/api/',
-		gdal: 'http://jpg2tiff.ansyn.webiks.com/upload/'
+		gdal: 'http://jpg2tiff.ansyn.webiks.com/upload/',
+		baseUrl: process.env.GEO_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'http://tb-server.webiks.com' : 'http://127.0.0.1'),
+		droneDomain: 'http://drone-geo-referencer.webiks.com/v1/api/',
+		gsDatadir: 'D:/GeoServer/data_dir'
 	},
 	s3config: {
 		accessKeyId: 'AWS_ACCESS_KEY_ID',
@@ -22,15 +23,15 @@ module.exports = {
 	},
 	mongodb: {
 		port: 85,
-		name: 'tb_database',
-		url: 'mongodb://localhost:27017'
+		name: process.env.MONGO_DB || 'tb',
+		url: process.env.MONGO_URL || 'mongodb://ansyn.webiks.com:85'
 	},
 	login: {
 		usernameKey: 'TB_USERNAME',
 		passwordKey: 'TB_PASSWORD'
 	},
 	geoserver: {
-		url: 'http://geoserver.ansyn.webiks.com/geoserver',
+		url: process.env.GEO_SERVER_URL || 'http://geoserver.ansyn.webiks.com/geoserver',
 		workspaces: '/rest/workspaces',
 		imports: '/rest/imports',
 		getLayerUrl: 'api/gsLayers/layer',
