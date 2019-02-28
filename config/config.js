@@ -31,7 +31,7 @@ module.exports = {
 	},
 	geoserver: {
 		url: 'http://geoserver.tb-server.webiks.com/geoserver',
-		port: 8080,
+		port: process.env.GEO_SERVER_PORT || 8080,
 		path: 'geoserver',
 		workspaces: 'geoserver/rest/workspaces',
 		imports: 'geoserver/rest/imports',
