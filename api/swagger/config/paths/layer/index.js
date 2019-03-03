@@ -1,4 +1,4 @@
-const sensorTypes = Object.values(require('./sensorTypes'));
+// const sensorTypes = Object.values(require('./sensorTypes'));
 
 module.exports = {
 	'x-swagger-router-controller': 'addLayer',
