@@ -6,11 +6,12 @@ const dbName = config.mongodb.name;
 const DBManager = require('../src/database/DBManager');
 
 const connectMongodb = () => {
-	MongoClient.connect(url, function(err, client) {
+	MongoClient.connect(url, (err, client) => {
 		if (err) {
 			console.log('Failed to Connected to mongodb');
 		} else {
-			globals.db = client.db(dbName);
+			globals.mongo.client = client;
+			globals.mongo.db = client.db(dbName);
 			console.log(`Connected to mongodb on ${url}/${dbName}`);
 		}
 	});
