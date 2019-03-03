@@ -27,7 +27,7 @@ module.exports = {
 				description: 'the sensor\'s type',
 				in: 'formData',
 				type: 'string',
-				enum: sensorTypes,
+				// enum: sensorTypes,
 				required: true
 			},
 			{
