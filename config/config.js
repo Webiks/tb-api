@@ -24,7 +24,7 @@ module.exports = {
 	mongodb: {
 		port: 85,
 		name: process.env.MONGO_DB || 'tb',
-		url: process.env.MONGO_URL || 'mongodb://localhost:27017' || 'mongodb://ansyn.webiks.com:85'
+		url: process.env.MONGO_URL || 'mongodb://ansyn.webiks.com:85'
 	},
 	login: {
 		usernameKey: 'TB_USERNAME',
