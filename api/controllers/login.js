@@ -17,7 +17,7 @@ const login = (req, res) => {
 			const [username, role, id] = [user.username, user.role, uuid()];
 			const payload = { username, role, id };
 			const authToken = ansynJwt.createJWT(header, payload);
-			res.json({ authToken });
+			res.json({ authToken, data: user });
 		}
 	});
 };
