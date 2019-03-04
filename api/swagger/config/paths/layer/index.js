@@ -1,4 +1,4 @@
-const sensorTypes = Object.values(require('./sensorTypes'));
+// const sensorTypes = Object.values(require('./sensorTypes'));
 
 module.exports = {
 	'x-swagger-router-controller': 'addLayer',
@@ -27,7 +27,7 @@ module.exports = {
 				description: 'the sensor\'s type',
 				in: 'formData',
 				type: 'string',
-				enum: sensorTypes,
+				// enum: sensorTypes,
 				required: true
 			},
 			{
