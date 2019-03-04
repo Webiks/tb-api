@@ -5,7 +5,7 @@ const globals = require('../../config/globals');
 const ansynJwt = new AnsynJwt();
 
 const login = (req, res) => {
-	const { value: { username, password } } = req.swagger.params.payload.value;
+	const { value: { username, password } } = req.swagger.params.payload;
 	globals.mongo.db.collection('users').findOne({ _id: username.toLowerCase(), password }, (err, user) => {
 		if (err) {
 			res.status(500).send({ message: err });
