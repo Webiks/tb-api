@@ -1,7 +1,11 @@
 const globals = {
 	mongo: {
 		db: null,
-		client: null
+		client: null,
+		collections: {
+			WORLDS: 'worlds',
+			LAYERS: 'layers'
+		}
 	}
 };
 

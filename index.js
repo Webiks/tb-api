@@ -14,7 +14,7 @@ const app = express();
 
 initSwagger(app).then(() => {
 	app.listen(appPort, () => {
-		console.log(`Swagger-ui available on ${appPort}, on: ${domain}${paths.swaggerUi}`);
+		console.log(`Swagger-ui available on: ${domain}${paths.swaggerUi}`);
 	});
 
 	connectMongodb();
