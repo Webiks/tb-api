@@ -1,6 +1,6 @@
 const config = require('../config/config');
 const { mongo } = require('../config/globals');
-const { MongoClient } = require('mongodb')
+const { MongoClient } = require('mongodb');
 const url = config.mongodb.url;
 const dbName = config.mongodb.name;
 

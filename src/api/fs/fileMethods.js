@@ -1,15 +1,13 @@
 const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
 
-const getOptions = (uploadPath) => {
-	return {
-		encoding: 'utf-8',
-		maxFileSize: upload.maxFileSize,
-		uploadDir: uploadPath,
-		multiples: true, // req.files to be arrays of files
-		keepExtensions: true
-	};
-};
+const getOptions = (uploadPath) => ({
+	encoding: 'utf-8',
+	maxFileSize: upload.maxFileSize,
+	uploadDir: uploadPath,
+	multiples: true, // req.files to be arrays of files
+	keepExtensions: true
+});
 
 const getFileTypeData = (reqType, sensorType) => {
 	let sourceType = null;
