@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const { upload } = require('../../../config/config');
 
 const getOptions = (uploadPath) => {
-	console.log('start getOptions... ', uploadPath);
 	return {
 		encoding: 'utf-8',
 		maxFileSize: upload.maxFileSize,
