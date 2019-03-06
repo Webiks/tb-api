@@ -5,8 +5,6 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const { appPort, paths, remote: { baseUrl } } = require('./config/config');
 const domain = `${baseUrl}:${appPort}`;
-const api = require('./src/api/index');
-const login = require('./src/login/index');
 const initSwagger = require('./api/swagger/init');
 const connectMongodb = require('./mongodb/connect');
 
@@ -30,7 +28,5 @@ initSwagger(app).then(() => {
 			secure: false
 		}
 	}));
-	app.use('/login', login);
-	app.use('/v1/api', api);
 });
 
