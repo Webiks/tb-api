@@ -20,7 +20,7 @@ const fetchLayers = (req, res) => {
 		if (err) {
 			return res.status(500).send({ message: err });
 		}
-		console.log(`fetchLayers find ${layers.length} items.`)
+		console.log(`fetchLayers find ${layers.length} items.`);
 		res.json(layers);
 	});
 };
