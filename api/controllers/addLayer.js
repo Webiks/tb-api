@@ -1,9 +1,9 @@
 const sensorTypes = require('../swagger/config/paths/layer/sensorTypes');
 const droneImagery = require('./addLayer/droneImagery');
 const config = require('../../config/config');
-const saveLayerOnDB = require('./utils/db/saveToDB');
 const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
 const uuid = require('uuid');
+const { mongo } = require('../../config/globals');
 
 const { buildThumbnailUrl, fetchBBOX } = require('./utils/geoserver');
 
@@ -55,12 +55,15 @@ const addLayer = (req, res) => {
 		overlay = { ...overlay, ...uploads };
 		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
 		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
-		console.log('final overlay: ' , overlay);
-		saveLayerOnDB({ _id, overlay }, fields.sharing).then(() => {
-			console.log('finish upload layer');
-			res.json(overlay);
+		const layer = { _id, overlay };
+		mongo.db.collection(mongo.collections.OVERLAYS).insertOne(layer, (err) => {
+			if (err) {
+				res.status(500).json({ message: err });
+			} else {
+				console.log('Finish upload layer', layer);
+				res.json(overlay);
+			}
 		});
-
 	})
 		.catch(err => res.status(500).send(err.message));
 };
