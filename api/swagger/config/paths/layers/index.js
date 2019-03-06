@@ -1,5 +1,5 @@
 module.exports = {
-	'x-swagger-router-controller': 'layers',
+	'x-swagger-router-controller': 'overlays',
 	post: {
 		tags: ['Overlays'],
 		description: 'Fetch layers for ansyn.',
