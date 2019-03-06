@@ -1,12 +1,12 @@
 const AnsynJwt = require('./utils/ansynJwt');
 const uuid = require('uuid');
-const globals = require('../../config/globals');
+const { mongo } = require('../../config/globals');
 
 const ansynJwt = new AnsynJwt();
 
 const login = (req, res) => {
 	const { value: { username, password } } = req.swagger.params.payload;
-	globals.mongo.db.collection('users').findOne({ _id: username.toLowerCase(), password }, (err, user) => {
+	mongo.db.collection(mongo.collections.USERS).findOne({ _id: username.toLowerCase(), password }, (err, user) => {
 		if (err) {
 			res.status(500).send({ message: err });
 		} else if (!user) {

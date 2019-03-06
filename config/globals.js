@@ -3,7 +3,8 @@ const globals = {
 		db: null,
 		client: null,
 		collections: {
-			OVERLAYS: 'overlays'
+			OVERLAYS: 'overlays',
+			USERS: 'users'
 		}
 	}
 };
