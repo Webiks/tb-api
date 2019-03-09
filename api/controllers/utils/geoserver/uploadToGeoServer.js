@@ -1,6 +1,6 @@
 const rp = require('request-promise');
 const { geoserver } = require('../../../../config/config');
-const createOption = (additional,method) => ({
+const createOption = (additional, method) => ({
 	...additional,
 	method: method ? method : 'POST',
 	json: true,
@@ -18,7 +18,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 			bbox: {},
 			projection: '',
 			geoserver: { layer: { resource: { name: '' } }, workspace },
-			imageData: {ExifImageHeight: 0, ExifImageWidth: 0}
+			imageData: { ExifImageHeight: 0, ExifImageWidth: 0 }
 		}
 	};
 	let openImports = createOption({
@@ -50,7 +50,11 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 	let { layer } = await rp(createOption({
 		uri: finalResp.layer.href,
 	}, 'GET'));
-
+	let { coverageStore: target } = await rp(createOption({
+		uri: finalResp.target.href
+	},
+	'GET'));
+	resp.geoserver.location = target.url;
 	resp.tag.name = layer.name;
 	resp.tag.bbox = layer.bbox;
 	resp.tag.projection = layer.srs;
