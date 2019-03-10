@@ -23,7 +23,7 @@ const login = (req, res) => {
 			const [username, role, id] = [user.username, user.role, uuid()];
 			const payload = { username, role, id };
 			const authToken = ansynJwt.createJWT(header, payload);
-			updateLog(payload, req);
+			//updateLog(payload, req);
 			res.json({ authToken, data: user });
 		}
 	});
