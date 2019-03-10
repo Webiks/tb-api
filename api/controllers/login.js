@@ -4,7 +4,7 @@ const { mongo } = require('../../config/globals');
 
 const ansynJwt = new AnsynJwt();
 const updateLog = (user, req) => {
-	mongo.db.collections(mongo.collections.LOG).inserOne({
+	mongo.db.collections(mongo.collections.LOG).insertOne({
 		user: user.username,
 		ip: req.ip,
 		timestamp: new Date().getTime()
