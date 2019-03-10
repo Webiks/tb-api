@@ -4,7 +4,11 @@ const { mongo } = require('../../config/globals');
 
 const ansynJwt = new AnsynJwt();
 const updateLog = (user, req) => {
-	console.log(`user: ${user}, ip: ${req.ip}`);
+	mongo.db.collections(mongo.collections.LOG).inserOne({
+		user: user.username,
+		ip: req.ip,
+		timestamp: new Date().getTime()
+	});
 };
 const login = (req, res) => {
 	const { value: { username, password } } = req.swagger.params.payload;

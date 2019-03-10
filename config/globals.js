@@ -4,7 +4,8 @@ const globals = {
 		client: null,
 		collections: {
 			OVERLAYS: 'overlays',
-			USERS: 'users'
+			USERS: 'users',
+			LOG: 'logs'
 		}
 	}
 };
