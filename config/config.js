@@ -31,7 +31,7 @@ module.exports = {
 		passwordKey: 'TB_PASSWORD'
 	},
 	geoserver: {
-		url: process.env.GEO_SERVER_URL || 'http://geoserver.ansyn.webiks.com/geoserver',
+		url: process.env.GEO_SERVER_URL || 'http://localhost:8080/geoserver',
 		workspaces: '/rest/workspaces',
 		imports: '/rest/imports',
 		getLayerUrl: 'api/gsLayers/layer',
