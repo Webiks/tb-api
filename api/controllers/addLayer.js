@@ -55,7 +55,7 @@ const addLayer = (req, res) => {
 		overlay = { ...overlay, ...uploads };
 		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
 		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
-		const layer = { _id, overlay };
+		const layer = { _id, overlay, uploadDate: new Date().getTime() };
 		mongo.db.collection(mongo.collections.OVERLAYS).insertOne(layer, (err) => {
 			if (err) {
 				res.status(500).json({ message: err });
