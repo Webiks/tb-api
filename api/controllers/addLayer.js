@@ -37,18 +37,11 @@ const addLayer = (req, res) => {
 		case sensorTypes.DroneImagery:
 			promiseResp = droneImagery(_id, fields.file, fields.sharing);
 			break;
-
-		case sensorTypes.DroneMap:
-			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
-			break;
-
 		case sensorTypes.Mobile:
 			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
 			break;
-
-		case sensorTypes.Satellite:
-			promiseResp = Promise.resolve({ type: 'satellite' }); //TODO: implement Satellite upload
-			break;
+		default:
+			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
 	}
 
 	promiseResp.then(uploads => {
