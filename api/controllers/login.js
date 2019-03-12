@@ -4,11 +4,16 @@ const { mongo } = require('../../config/globals');
 
 const ansynJwt = new AnsynJwt();
 const updateLog = (user, req) => {
-	mongo.db.collection(mongo.collections.LOG).insertOne({
-		user: user.username,
-		ip: req.headers['ansyn-user-id'],
-		timestamp: new Date().getTime()
-	});
+	mongo.db.collection(mongo.collections.LOG).updateOne({ _id: user.id },
+		{
+			$set: {
+				user: user.username,
+				ip: req.headers['ansyn-user-id'],
+			},
+			$push: { timestamp: new Date().getTime() }
+		},
+		{ upsert: true }
+	);
 };
 const login = (req, res) => {
 	const { value: { username, password } } = req.swagger.params.payload;
@@ -34,8 +39,8 @@ const loginAuth = (req, res) => {
 	const isValidToken = ansynJwt.check(authToken);
 	if (isValidToken) {
 		const data = ansynJwt.getPayload(authToken);
-		updateLog(data, req);
 		if (Date.now() < data.exp) {
+			updateLog(data, req);
 			res.json({ authToken, data });
 			return;
 		}
