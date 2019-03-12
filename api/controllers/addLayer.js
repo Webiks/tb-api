@@ -8,6 +8,7 @@ const { mongo } = require('../../config/globals');
 const { buildThumbnailUrl, fetchBBOX } = require('./utils/geoserver');
 
 const addLayer = (req, res) => {
+	req.connection.setTimeout(10 * 60 * 1000);
 	const _id = uuid();
 
 	const fields = {};
