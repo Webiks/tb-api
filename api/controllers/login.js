@@ -6,7 +6,7 @@ const ansynJwt = new AnsynJwt();
 const updateLog = (user, req) => {
 	mongo.db.collection(mongo.collections.LOG).insertOne({
 		user: user.username,
-		ip: req.ip,
+		ip: req.headers['ansyn-user-id'],
 		timestamp: new Date().getTime()
 	});
 };

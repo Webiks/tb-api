@@ -34,8 +34,7 @@ module.exports = {
 		url: process.env.GEO_SERVER_URL || 'http://localhost:8080/geoserver',
 		workspaces: '/rest/workspaces',
 		imports: '/rest/imports',
-		getLayerUrl: 'api/gsLayers/layer',
-		Auth: `Basic ${Buffer.from('admin:geoserver').toString('base64')}`,
+		Auth: `Basic ${Buffer.from(`${process.env.GEO_SERVER_USER || 'admin'}:${process.env.GEO_SERVER_PASS || 'geoserver'}`).toString('base64')}`,
 		wmsThumbnailParams: {
 			start: '?service=WMS&version=1.1.1&request=GetMap&transparent=true&layer=',
 			end: 'width=256&height=256&format=image/jpeg'

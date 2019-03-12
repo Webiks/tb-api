@@ -15,7 +15,7 @@ const droneImagery = async (_id, file, workspace) => {
 	const ext = name.substring(name.lastIndexOf('.'));
 	let { request: exifResult, date } = await exiftoolParsing(file.buffer);
 	droneOverlay.date = new Date(date).getTime();
-	droneOverlay['photoTime'] = droneOverlay.date.toISOString();
+	droneOverlay['photoTime'] = new Date(date).toISOString();
 	const invalidResult = Object.values(exifResult).some((value) => isNaN(value));
 	if (invalidResult) {
 		throw new Error('Exiftool failed to get location information');
