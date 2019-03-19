@@ -83,7 +83,7 @@ class Server {
 					controllers: './src/controllers'
 				}));
 
-				if (process.ENV.NODE_ENV !== 'production') {
+				if (process.env.NODE_ENV !== 'production') {
 					this.app.use(middleware.swaggerUi({ swaggerUi: '/' }));
 				}
 
