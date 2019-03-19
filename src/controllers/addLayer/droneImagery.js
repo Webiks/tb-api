@@ -5,19 +5,17 @@ const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 const droneImagery = async (_id, file, workspace) => {
-	const { originalname: name } = file;
-	const tiffName = _id;
-	const ext = name.substring(name.lastIndexOf('.'));
-	let { request: exifResult, date } = await exiftoolParsing(file.buffer);
-
 	const droneOverlay = {
 		_id,
 		sensorType: 'Awesome Drone Imagery (GeoTIFF)',
 		isGeoRegistered: true,
-		date: new Date(date).getTime(),
-		photoTime: new Date(date).toISOString()
 	};
-
+	const { originalname: name } = file;
+	const tiffName = droneOverlay._id;
+	const ext = name.substring(name.lastIndexOf('.'));
+	let { request: exifResult, date } = await exiftoolParsing(file.buffer);
+	droneOverlay.date = new Date(date).getTime();
+	droneOverlay['photoTime'] = new Date(date).toISOString();
 	const invalidResult = Object.values(exifResult).some((value) => isNaN(value));
 	if (invalidResult) {
 		throw new Error('Exiftool failed to get location information');
