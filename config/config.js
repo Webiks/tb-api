@@ -23,7 +23,7 @@ module.exports = {
 	},
 	mongodb: {
 		port: 85,
-		name: process.env.MONGO_DB || 'tb',
+		name: process.env.MONGO_DB || 'test',
 		url: process.env.MONGO_URL || 'mongodb://localhost:27017'
 	},
 	login: {
