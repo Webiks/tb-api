@@ -68,7 +68,6 @@ class Server {
 	initSwagger() {
 		return new Promise((resolve) => {
 			swaggerTools.initializeMiddleware(swaggerDoc, (middleware) => {
-				this.app.use(cors());
 
 				this.app.use(middleware.swaggerMetadata());
 
@@ -84,7 +83,9 @@ class Server {
 					controllers: './src/controllers'
 				}));
 
-				this.app.use(middleware.swaggerUi({ swaggerUi: '/' }));
+				if (process.ENV.NODE_ENV !== 'production') {
+					this.app.use(middleware.swaggerUi({ swaggerUi: '/' }));
+				}
 
 				resolve();
 			});

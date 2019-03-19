@@ -51,7 +51,6 @@ describe('login', () => {
 			}
 		})
 			.catch((result) => {
-				console.log(result.response.body);
 				expect(result.response.body).toEqual({ message: 'UnAuthorized' });
 				done();
 			});
