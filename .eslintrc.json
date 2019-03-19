@@ -6,7 +6,8 @@
 	"env": {
 		"node": true,
 		"commonjs": true,
-	 	"es6": true
+	 	"es6": true,
+		"jasmine": true
 	},
 	"rules": {
 		"quotes": ["error", "single"],
@@ -14,6 +15,7 @@
 		"indent": ["error", "tab",  { "SwitchCase": 1 } ],
 		"no-console": "off",
 		"no-useless-escape": "off",
-		"arrow-body-style": ["error", "as-needed"]
+		"arrow-body-style": ["error", "as-needed"],
+		"no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
 	}
 }

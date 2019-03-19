@@ -12,6 +12,7 @@ cache:
 
 script:
 - npm run lint
+- npm run test
 - sh -x scripts/build.sh $REPO $TRAVIS_COMMIT
 
 before_deploy:

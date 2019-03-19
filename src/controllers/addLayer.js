@@ -1,4 +1,4 @@
-const sensorTypes = require('../swagger/config/paths/layer/sensorTypes');
+const sensorTypes = require('../../config/swagger/paths/layer/sensorTypes');
 const droneImagery = require('./addLayer/droneImagery');
 const config = require('../../config/config');
 const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');

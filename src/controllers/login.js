@@ -14,6 +14,7 @@ const login = (req, res) => {
 	const { value: { username, password } } = req.swagger.params.payload;
 	mongo.db.collection(mongo.collections.USERS).findOne({ _id: username.toLowerCase(), password }, (err, user) => {
 		if (err) {
+			console.log('adslkdasjklsdalkjsadkljdsakjldsajkldsakljdsajkl')
 			res.status(500).send({ message: err });
 		} else if (!user) {
 			res.status(401).send({ message: 'UnAuthorized' });
