@@ -18,4 +18,4 @@ RUN npm cache clean -f
 
 RUN npm install
 
-CMD node index
+CMD npm run start:prod
