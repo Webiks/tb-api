@@ -12,6 +12,8 @@ cache:
 
 script:
 - npm run lint
+- docker run -d -p 27017:27017 mongo
+- npm run test:travis
 - sh -x scripts/build.sh $REPO $TRAVIS_COMMIT
 
 before_deploy:
