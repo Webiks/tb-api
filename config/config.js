@@ -5,10 +5,10 @@ module.exports = {
 	},
 	remote: {
 		localDomain: 'http://127.0.0.1',
-		domain: 'http://tb-server.webiks.com',
-		gdal: 'http://jpg2tiff.ansyn.webiks.com/upload/',
-		baseUrl: process.env.GEO_SERVER_URL || (process.env.NODE_ENV === 'production' ? 'http://tb-server.webiks.com' : 'http://127.0.0.1'),
-		droneDomain: 'http://drone-geo-referencer.webiks.com/v1/api/',
+		domain: 'http://api.ansyn.webiks.com',
+		gdal: process.env.GDAL_URL || 'http://localhost:8888/upload/',
+		baseUrl: process.env.NODE_ENV === 'production' ? 'http://api.ansyn.webiks.com' : 'http://127.0.0.1',
+		droneDomain: process.env.DRONE_URL || 'http://localhost:8081/v1/api/',
 		gsDatadir: 'D:/GeoServer/data_dir'
 	},
 	s3config: {

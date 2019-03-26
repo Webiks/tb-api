@@ -36,7 +36,12 @@ const addLayer = (req, res) => {
 
 	switch (fields.sensorType) {
 		case sensorTypes.DroneImagery:
-			promiseResp = droneImagery(_id, fields.file, fields.sharing);
+			promiseResp = droneImagery(_id, fields.file, fields.sharing)
+				.then((uploads) => ({ ...overlay, ...uploads }))
+				.then((_overlay) => ({
+					..._overlay,
+					tag: { ..._overlay.tag, nativeBoundingBox: _overlay.tag.bbox }
+				}));
 			break;
 		case sensorTypes.Mobile:
 			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
@@ -45,8 +50,7 @@ const addLayer = (req, res) => {
 			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
 	}
 
-	promiseResp.then(uploads => {
-		overlay = { ...overlay, ...uploads };
+	promiseResp.then(overlay => {
 		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
 		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
 		const layer = { _id, overlay, uploadDate: new Date().getTime() };
@@ -55,7 +59,7 @@ const addLayer = (req, res) => {
 				res.status(500).json({ message: err });
 			} else {
 				console.log('Finish upload layer', layer);
-				res.json(overlay);
+				res.json(layer);
 			}
 		});
 	})
