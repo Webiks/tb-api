@@ -59,7 +59,7 @@ const addLayer = (req, res) => {
 				res.status(500).json({ message: err });
 			} else {
 				console.log('Finish upload layer', layer);
-				res.json(overlay);
+				res.json(layer);
 			}
 		});
 	})
