@@ -3,13 +3,12 @@ const request = require('request');
 const { geometry } = require('@turf/turf');
 const { remote } = require('../../../config/config');
 const fs = require('fs');
-const path = require('path');
 const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 
 const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
-	const streamName = path.join(__dirname, 'tmp.tiff');
+	const streamName = '/app/tmp/tmp.tiff';
 	const gdalReq = request.post({
 		url: remote.gdal,
 		formData: {
