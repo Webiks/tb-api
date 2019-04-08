@@ -2,13 +2,13 @@ const rp = require('request-promise');
 const request = require('request');
 const { geometry } = require('@turf/turf');
 const { remote } = require('../../../config/config');
-const  fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 
-const gdalPromise = (file, tiffName, ext) => new Promise( resolve => {
+const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
 	const streamName = path.join(__dirname, 'tmp.tiff');
 	const gdalReq = request.post({
 		url: remote.gdal,
@@ -22,7 +22,7 @@ const gdalPromise = (file, tiffName, ext) => new Promise( resolve => {
 			}
 		}
 	});
-	gdalReq.on('close' , () => {
+	gdalReq.on('close', () => {
 		console.log('done');
 		const stream = fs.createReadStream(streamName);
 		resolve(stream);
@@ -52,19 +52,19 @@ const droneImagery = async (_id, file, workspace) => {
 		body: exifResult,
 		json: true
 	});
-	if(!cesium.bboxPolygon){
-		throw new Error ('Unable to get footprint');
+	if (!cesium.bboxPolygon) {
+		throw new Error('Unable to get footprint');
 	}
 	droneOverlay['footprint'] = geometry('MultiPolygon', [cesium.bboxPolygon.geometry.coordinates]);
 	const gdal = await gdalPromise(file, tiffName, ext);
-	if(typeof gdal === 'object' && gdal.error){
-		throw new Error(gdal.error)
+	if (typeof gdal === 'object' && gdal.error) {
+		throw new Error(gdal.error);
 	}
 	const geoserverResp = await uploadToGeoserver(workspace, gdal, tiffName);
-	if(geoserverResp.error){
+	if (geoserverResp.error) {
 		throw new Error('Geoserver Error');
 	}
-	droneOverlay.tag =  geoserverResp.tag;
+	droneOverlay.tag = geoserverResp.tag;
 	droneOverlay.tag.geo = cesium;
 	droneOverlay.geoserver = geoserverResp.geoserver;
 	droneOverlay.tag.imageData.ExifImageHeight = exifResult.ExifImageHeight;

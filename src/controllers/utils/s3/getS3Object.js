@@ -6,7 +6,7 @@ aws.config.logger = console;
 
 let myCredentials;
 // get the credentials
-if (process.env.NODE_ENV === 'production'){
+if (process.env.NODE_ENV === 'production') {
 	// remote - get temporary credentials from the ec2
 	myCredentials = new aws.EC2MetadataCredentials({
 		httpOptions: { timeout: 5000 }, // 5 second timeout

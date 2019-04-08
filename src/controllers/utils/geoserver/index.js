@@ -20,7 +20,7 @@ const fetchBBOX = (overlay) => rp({
 	nativeBoundingBox.crs = nativeBoundingBox.crs.$ || nativeBoundingBox.crs;
 	const { minx, miny, maxx, maxy } = bbox;
 	const footprint = turf.bboxPolygon([minx, miny, maxx, maxy]).geometry;
-	const tag = {...overlay.tag, bbox, nativeBoundingBox };
+	const tag = { ...overlay.tag, bbox, nativeBoundingBox };
 	return { ...overlay, footprint, tag };
 });
 const getConveragePath = ({ id, tag }) => `${config.geoserver.url}/rest/workspaces/${tag.geoserver.workspace}/coveragestores/${id}/coverages/${tag.name}.json`;

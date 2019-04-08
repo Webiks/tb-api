@@ -5,7 +5,7 @@ const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
 const uuid = require('uuid');
 const { mongo } = require('../../config/globals');
 
-const { buildThumbnailUrl, fetchBBOX,getConveragePath } = require('./utils/geoserver');
+const { buildThumbnailUrl, fetchBBOX, getConveragePath } = require('./utils/geoserver');
 
 const addLayer = (req, res) => {
 	req.connection.setTimeout(10 * 60 * 1000);
@@ -54,7 +54,6 @@ const addLayer = (req, res) => {
 		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
 		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
 		overlay.geoserver.coverage = getConveragePath(overlay);
-		overlay.tag.realName = file.originalname;
 		const layer = { _id, overlay, uploadDate: new Date().getTime() };
 		mongo.db.collection(mongo.collections.OVERLAYS).insertOne(layer, (err) => {
 			if (err) {

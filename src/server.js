@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const { appPort, remote: { baseUrl } } = require('../config/config');
-const domain = `${ baseUrl }:${ appPort }`;
+const domain = `${baseUrl}:${appPort}`;
 const swaggerTools = require('swagger-tools');
 const swaggerDoc = require('../config/swagger');
 const config = require('../config/config');
@@ -45,7 +45,7 @@ class Server {
 				} else {
 					mongo.client = client;
 					mongo.db = client.db(dbName);
-					console.log(`MongoDB available on ${ mongoUrl }`);
+					console.log(`MongoDB available on ${mongoUrl}`);
 					console.log(`Geoserver url is: ${config.geoserver.url}`);
 					console.log(`Drone url is: ${config.remote.droneDomain}`);
 					console.log(`Gdal url is: ${config.remote.gdal}`);
@@ -61,7 +61,7 @@ class Server {
 				if (err) {
 					reject();
 				} else {
-					console.log(`Closing MongoDB on ${ mongoUrl }`);
+					console.log(`Closing MongoDB on ${mongoUrl}`);
 					resolve();
 				}
 			});
@@ -98,7 +98,7 @@ class Server {
 	listen() {
 		return new Promise(resolve => {
 			this.server = this.app.listen(appPort, () => {
-				console.log(`Swagger-ui available on: ${ this.baseUrl }`);
+				console.log(`Swagger-ui available on: ${this.baseUrl}`);
 				resolve();
 			});
 		});
@@ -107,7 +107,7 @@ class Server {
 	close() {
 		return new Promise(resolve => {
 			this.server.close(() => {
-				console.log(`Closing the server on: ${ this.baseUrl }`);
+				console.log(`Closing the server on: ${this.baseUrl}`);
 				resolve();
 			});
 		});
