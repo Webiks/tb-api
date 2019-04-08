@@ -1,8 +1,34 @@
 const rp = require('request-promise');
+const request = require('request');
 const { geometry } = require('@turf/turf');
 const { remote } = require('../../../config/config');
+const  fs = require('fs');
+const path = require('path');
 const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
+
+
+const gdalPromise = (file, tiffName, ext) => new Promise( resolve => {
+	const streamName = path.join(__dirname, 'tmp.tiff');
+	const gdalReq = request.post({
+		url: remote.gdal,
+		formData: {
+			image: {
+				value: file.buffer,
+				options: {
+					filename: tiffName + ext,
+					contentType: file.mimeType
+				}
+			}
+		}
+	});
+	gdalReq.on('close' , () => {
+		console.log('done');
+		const stream = fs.createReadStream(streamName);
+		resolve(stream);
+	});
+	gdalReq.pipe(fs.createWriteStream(streamName));
+});
 
 const droneImagery = async (_id, file, workspace) => {
 	const droneOverlay = {
@@ -20,36 +46,27 @@ const droneImagery = async (_id, file, workspace) => {
 	if (invalidResult) {
 		throw new Error('Exiftool failed to get location information');
 	}
-	const cesium = rp({
+	const cesium = await rp({
 		method: 'POST',
 		uri: remote.droneDomain,
 		body: exifResult,
 		json: true
 	});
-	const gdal = rp({
-		method: 'POST',
-		uri: remote.gdal,
-		json: true,
-		formData: {
-			image: {
-				value: file.buffer,
-				options: {
-					filename: tiffName + ext,
-					contentType: file.mimeType
-				}
-			}
-		}
-	});
-	try {
-		const [cesiumRes, gdalRes] = await Promise.all([cesium, gdal]);
-		droneOverlay['footprint'] = geometry('MultiPolygon', [cesiumRes.bboxPolygon.geometry.coordinates]);
-		const geoserverResp = await uploadToGeoserver(workspace, gdalRes.data, tiffName);
-		droneOverlay.tag =  geoserverResp.tag;
-		droneOverlay.geoserver = geoserverResp.geoserver;
-	} catch (err) {
-		console.log('Error', err);
-		throw err.message;
+	if(!cesium.bboxPolygon){
+		throw new Error ('Unable to get footprint');
 	}
+	droneOverlay['footprint'] = geometry('MultiPolygon', [cesium.bboxPolygon.geometry.coordinates]);
+	const gdal = await gdalPromise(file, tiffName, ext);
+	if(typeof gdal === 'object' && gdal.error){
+		throw new Error(gdal.error)
+	}
+	const geoserverResp = await uploadToGeoserver(workspace, gdal, tiffName);
+	if(geoserverResp.error){
+		throw new Error('Geoserver Error');
+	}
+	droneOverlay.tag =  geoserverResp.tag;
+	droneOverlay.tag.geo = cesium;
+	droneOverlay.geoserver = geoserverResp.geoserver;
 	droneOverlay.tag.imageData.ExifImageHeight = exifResult.ExifImageHeight;
 	droneOverlay.tag.imageData.ExifImageWidth = exifResult.ExifImageWidth;
 	return droneOverlay;

@@ -6,7 +6,7 @@ module.exports = {
 	remote: {
 		localDomain: 'http://127.0.0.1',
 		domain: 'http://api.ansyn.webiks.com',
-		gdal: process.env.GDAL_URL || 'http://localhost:8888/upload/',
+		gdal: process.env.GDAL_URL || 'http://localhost:8888/upload',
 		baseUrl: process.env.NODE_ENV === 'production' ? 'http://api.ansyn.webiks.com' : 'http://127.0.0.1',
 		droneDomain: process.env.DRONE_URL || 'http://localhost:8081/v1/api/',
 		gsDatadir: 'D:/GeoServer/data_dir'

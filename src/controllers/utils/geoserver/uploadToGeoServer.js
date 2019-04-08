@@ -11,6 +11,7 @@ const createOption = (additional, method) => ({
 
 const uploadToGeoserver = async (workspace, buffer, name) => {
 	let resp = {
+		error: true,
 		geoserver: {},
 		tag: {
 			name: '',
@@ -35,7 +36,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 		uri: `${baseTasks}/tasks`,
 		formData: {
 			upload: {
-				value: Buffer.from(buffer),
+				value: buffer,
 				options: {
 					filename: `${name}.tif`,
 					ContentType: 'image/tif'
@@ -59,7 +60,7 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 	resp.tag.bbox = layer.bbox;
 	resp.tag.projection = layer.srs;
 	resp.tag.geoserver.layer.resource.name = `${workspace}:${layer.name}`;
-
+	resp.error = false;
 	return resp;
 };
 
