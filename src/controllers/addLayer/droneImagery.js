@@ -21,8 +21,7 @@ const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
 			}
 		}
 	});
-	gdalReq.on('close', () => {
-		console.log('done');
+	gdalReq.on('end', () => {
 		const stream = fs.createReadStream(streamName);
 		resolve(stream);
 	});
