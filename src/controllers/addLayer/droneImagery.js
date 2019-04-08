@@ -21,12 +21,12 @@ const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
 			}
 		}
 	});
-	gdalReq.on('close', () => {
-		console.log('done');
+	gdalReq.pipe(fs.createWriteStream(streamName));
+	gdalReq.on('end', () => {
 		const stream = fs.createReadStream(streamName);
 		resolve(stream);
 	});
-	gdalReq.pipe(fs.createWriteStream(streamName));
+
 });
 
 const droneImagery = async (_id, file, workspace) => {
