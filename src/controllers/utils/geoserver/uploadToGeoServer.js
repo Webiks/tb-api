@@ -52,9 +52,9 @@ const uploadToGeoserver = async (workspace, buffer, name) => {
 		uri: finalResp.layer.href,
 	}, 'GET'));
 	let { coverageStore: target } = await rp(createOption({
-			uri: finalResp.target.href
-		},
-		'GET'));
+		uri: finalResp.target.href
+	},
+	'GET'));
 	resp.geoserver.location = target.url;
 	resp.tag.name = layer.name;
 	resp.tag.bbox = layer.bbox;
