@@ -29,7 +29,7 @@ const exiftoolParsing = (buffer) => new Promise((resolve, reject) => {
 					gimbalPitchDegree: +metadata.gimbalPitchDegree,
 					fieldOfView: parseFloat(metadata.fieldOfView)
 				},
-				date:  moment(metadata.createDate, exifDateFormat)
+				date: moment(metadata.createDate, exifDateFormat)
 			});
 		}
 	});
