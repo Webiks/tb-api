@@ -7,8 +7,8 @@ const uploadToGeoserver = require('../utils/geoserver/uploadToGeoServer');
 const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 
-const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
-	const streamName = '/app/tmp/tmp.tiff';
+const gdalPromise = (fgile, tiffName, ext) => new Promise(resolve => {
+	const streamName = 'tmp.tiff';
 	const gdalReq = request.post({
 		url: remote.gdal,
 		formData: {
