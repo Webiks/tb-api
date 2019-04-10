@@ -8,8 +8,14 @@ const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 
 const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
-	const streamName = 'tmp.tiff';
-	const gdalReq = request.post({
+	const streamName = 'app/tmp/tmp.tiff';
+	const stream = fs.createWriteStream(streamName);
+	stream.on('close', () => {
+		console.log(`stream close write bytes ${stream.bytesWritten}`);
+		const reader = fs.createReadStream(streamName);
+		resolve(reader);
+	});
+	request.post({
 		url: remote.gdal,
 		formData: {
 			image: {
@@ -20,13 +26,7 @@ const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
 				}
 			}
 		}
-	});
-	gdalReq.pipe(fs.createWriteStream(streamName));
-	gdalReq.on('end', () => {
-		const stream = fs.createReadStream(streamName);
-		resolve(stream);
-	});
-
+	}).pipe(stream);
 });
 
 const droneImagery = async (_id, file, workspace) => {
