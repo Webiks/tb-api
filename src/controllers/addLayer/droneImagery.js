@@ -8,7 +8,7 @@ const exiftoolParsing = require('../utils/exif/exiftoolParsing');
 
 
 const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
-	const streamName = config.remote.gdalTemp;
+	const streamName = remote.gdalTemp;
 	const stream = fs.createWriteStream(streamName);
 	stream.on('close', () => {
 		console.log(`stream close write bytes ${stream.bytesWritten}`);
