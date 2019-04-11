@@ -9,7 +9,7 @@ module.exports = {
 		gdal: process.env.GDAL_URL || 'http://localhost:8888/upload',
 		baseUrl: process.env.NODE_ENV === 'production' ? 'http://api.ansyn.webiks.com' : 'http://127.0.0.1',
 		droneDomain: process.env.DRONE_URL || 'http://localhost:8081/v1/api/',
-		gsDatadir: 'D:/GeoServer/data_dir'
+		gdalTemp: process.env.GDAL_TEMP || '/app/tmp/tmp.tiff'
 	},
 	s3config: {
 		accessKeyId: 'AWS_ACCESS_KEY_ID',
