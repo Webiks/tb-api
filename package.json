@@ -45,7 +45,6 @@
   },
   "scripts": {
     "start": "node index",
-    "start:prod": "export NODE_ENV=production && node index",
     "dev": "nodemon index",
     "ramon": "set MONGO_DB=tb&& set MONGO_URL=mongodb://localhost:27017&& set GEO_SERVER_URL=http://localhost:8080/geoserver&& nodemon index",
     "lint": "npx eslint \"**/*.js\" --ignore-pattern .eslintrc.json",

@@ -12,4 +12,4 @@ RUN mkdir tmp && npm cache clean -f
 
 RUN npm install
 
-CMD npm run start:prod
+CMD npm start
