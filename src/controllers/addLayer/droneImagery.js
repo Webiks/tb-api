@@ -26,7 +26,9 @@ const gdalPromise = (file, tiffName, ext) => new Promise(resolve => {
 				}
 			}
 		}
-}).pipe(stream);;
+	}).pipe(stream);
+
+});
 
 const droneImagery = async (_id, file, workspace) => {
 	const droneOverlay = {
