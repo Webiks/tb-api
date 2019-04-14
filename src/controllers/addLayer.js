@@ -1,5 +1,6 @@
 const sensorTypes = require('../../config/swagger/paths/layer/sensorTypes');
 const droneImagery = require('./addLayer/droneImagery');
+const mobileImagery = require('./addLayer/mobile');
 const config = require('../../config/config');
 const uploadToGeoServer = require('./utils/geoserver/uploadToGeoServer');
 const uuid = require('uuid');
@@ -27,7 +28,6 @@ const addLayer = (req, res) => {
 		date: overlayDate.getTime(),
 		photoTime: overlayDate.toISOString(),
 		isGeoRegistered: true,
-
 	};
 
 	let promiseResp;
@@ -44,16 +44,18 @@ const addLayer = (req, res) => {
 				}));
 			break;
 		case sensorTypes.Mobile:
-			promiseResp = Promise.resolve({ type: 'mobile' }); //TODO: implement Mobile upload
+			promiseResp = mobileImagery(_id, file).then( upload => ({...overlay , ...upload}));
 			break;
 		default:
-			promiseResp = uploadToGeoServer('public', fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
+			promiseResp = uploadToGeoServer(fields.sharing, fields.file.buffer, `${_id}.tiff`).then((uploads) => fetchBBOX({ ...overlay, ...uploads }));
 	}
 
 	promiseResp.then(overlay => {
-		overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
-		overlay.thumbnailUrl = buildThumbnailUrl(overlay);
-		overlay.geoserver.coverage = getConveragePath(overlay);
+		if (overlay.sensorType !== sensorTypes.Mobile) {
+			overlay.imageUrl = `${config.geoserver.url}/${fields.sharing}/wms`;
+			overlay.thumbnailUrl = buildThumbnailUrl(overlay);
+			overlay.geoserver.coverage = getConveragePath(overlay);
+		}
 		const layer = { _id, overlay, uploadDate: new Date().getTime() };
 		mongo.db.collection(mongo.collections.OVERLAYS).insertOne(layer, (err) => {
 			if (err) {

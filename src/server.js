@@ -45,7 +45,7 @@ class Server {
 				} else {
 					mongo.client = client;
 					mongo.db = client.db(dbName);
-					console.log(`MongoDB available on ${mongoUrl}`);
+					console.log(`MongoDB available on ${mongoUrl}/${dbName}`);
 					console.log(`Geoserver url is: ${config.geoserver.url}`);
 					console.log(`Drone url is: ${config.remote.droneDomain}`);
 					console.log(`Gdal url is: ${config.remote.gdal}`);
