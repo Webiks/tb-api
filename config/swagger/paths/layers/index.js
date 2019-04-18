@@ -75,7 +75,7 @@ module.exports = {
 									field: {
 										description: 'the field name',
 										type: 'string',
-										example: 'inputData.sensor.type'
+										example: 'overlay.sensorType'
 									},
 									values: {
 										description: 'the field\'s values',
